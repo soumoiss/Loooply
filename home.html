@@ -1,200 +1,1024 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Home - MoissWorld</title>
+
+    <!-- Fonte mantida no estilo do Luple -->
     <link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch&display=swap" rel="stylesheet">
+
     <style>
-        /* Configuração geral */
-        body {
+        /* =========================================================
+           CONFIGURAÇÃO GERAL
+           ========================================================= */
+
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
             background-color: #000;
             font-family: 'Cabin Sketch', cursive;
             color: #00FF00;
+
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            justify-content: center;
+            align-items: flex-start;
+
+            padding: 40px 15px;
         }
+
+
+        /* =========================================================
+           CONTAINER PRINCIPAL
+           ========================================================= */
 
         .container {
-            text-align: center;
-            margin-top: 20px;
-            width: 90%;
+            width: 100%;
             max-width: 600px;
+
+            background: rgba(0, 0, 0, 0.92);
+
+            border: 2px solid #00FF00;
+            border-radius: 20px;
+
+            padding: 25px;
+
+            box-shadow:
+                0 0 10px #00FF00,
+                0 0 25px rgba(0, 255, 0, 0.25);
+
+            text-align: center;
         }
 
-        /* Estilo da foto de perfil */
+
+        /* =========================================================
+           FOTO DO PERFIL
+           ========================================================= */
+
         .profile-pic {
             width: 100px;
             height: 100px;
+
             border-radius: 50%;
+
+            object-fit: cover;
+
             border: 4px solid #00FF00;
+
             margin-bottom: 10px;
+
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
         }
 
-        /* Mensagem de boas-vindas */
+
+        /* =========================================================
+           TÍTULO
+           ========================================================= */
+
         h2 {
             font-size: 28px;
-            text-shadow: 0 0 5px #00FF00;
+
+            color: #00FF00;
+
+            margin-bottom: 20px;
+
+            text-shadow:
+                0 0 5px #00FF00,
+                0 0 10px rgba(0, 255, 0, 0.5);
         }
 
-        /* Lista de cartas */
+
+        /* =========================================================
+           LISTA DE CARTAS
+           ========================================================= */
+
         .cartas-container {
-            margin-top: 20px;
             width: 100%;
-            max-height: 300px;
+
+            max-height: 320px;
+
             overflow-y: auto;
-            border: 2px solid #00FF00;
-            padding: 10px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px #00FF00;
+
+            padding-right: 5px;
         }
+
+
+        /* Barra de rolagem */
+
+        .cartas-container::-webkit-scrollbar,
+        .modal-texto::-webkit-scrollbar {
+            width: 7px;
+        }
+
+        .cartas-container::-webkit-scrollbar-track,
+        .modal-texto::-webkit-scrollbar-track {
+            background: rgba(0, 255, 0, 0.05);
+            border-radius: 10px;
+        }
+
+        .cartas-container::-webkit-scrollbar-thumb,
+        .modal-texto::-webkit-scrollbar-thumb {
+            background: #00FF00;
+            border-radius: 10px;
+        }
+
+
+        /* =========================================================
+           CARTA DA LISTA
+           ========================================================= */
 
         .carta {
             display: flex;
-            align-items: center;
+
             justify-content: space-between;
-            background-color: rgba(0, 255, 0, 0.1);
+            align-items: center;
+
+            background: rgba(0, 255, 0, 0.08);
+
             border: 2px solid #00FF00;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            transition: 0.3s;
+
+            border-radius: 12px;
+
+            padding: 12px 15px;
+
+            margin-bottom: 10px;
+
             cursor: pointer;
-        }
 
-        .carta:hover {
-            background-color: #00FF00;
-            color: #000;
-            transform: scale(1.05);
-        }
-
-        .check-icon {
-            font-size: 20px;
-            color: red;
             transition: 0.3s;
-        }
 
-        .check-icon.lida {
             color: #00FF00;
         }
 
-        /* Botão de logout */
+        .carta:hover {
+            background: rgba(0, 255, 0, 0.2);
+
+            transform: scale(1.03);
+
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.4);
+        }
+
+        .carta:active {
+            transform: scale(0.98);
+        }
+
+
+        /* =========================================================
+           CHECK DE CARTA LIDA
+           ========================================================= */
+
+        .check {
+            font-size: 18px;
+
+            color: red;
+
+            transition: 0.3s;
+
+            flex-shrink: 0;
+
+            margin-left: 10px;
+        }
+
+        .check.lida {
+            color: #00FF00;
+
+            text-shadow: 0 0 5px #00FF00;
+        }
+
+
+        /* =========================================================
+           MODAL
+           ========================================================= */
+
+        .modal {
+            position: fixed;
+
+            inset: 0;
+
+            background: rgba(0, 0, 0, 0.85);
+
+            display: none;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 20px;
+
+            z-index: 1000;
+        }
+
+        .modal.aberto {
+            display: flex;
+        }
+
+
+        /* =========================================================
+           JANELA DA CARTA
+           ========================================================= */
+
+        .modal-content {
+            background: #000;
+
+            width: 100%;
+
+            max-width: 600px;
+
+            max-height: 85vh;
+
+            border: 2px solid #00FF00;
+
+            border-radius: 18px;
+
+            padding: 25px;
+
+            box-shadow:
+                0 0 15px #00FF00,
+                0 20px 50px rgba(0, 0, 0, 0.8);
+
+            text-align: left;
+
+            display: flex;
+
+            flex-direction: column;
+
+            animation: abrirCarta 0.2s ease-out;
+        }
+
+
+        @keyframes abrirCarta {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+
+        /* =========================================================
+           TÍTULO DA CARTA NO MODAL
+           ========================================================= */
+
+        .modal-content h3 {
+            color: #00FF00;
+
+            font-family: 'Cabin Sketch', cursive;
+
+            font-size: 25px;
+
+            line-height: 1.3;
+
+            margin-bottom: 15px;
+
+            text-shadow: 0 0 5px #00FF00;
+        }
+
+
+        /* =========================================================
+           TEXTO DA CARTA
+           ========================================================= */
+
+        .modal-texto {
+            color: #00FF00;
+
+            font-family: Georgia, serif;
+
+            font-size: 17px;
+
+            line-height: 1.6;
+
+            white-space: pre-wrap;
+
+            overflow-y: auto;
+
+            flex: 1;
+
+            min-height: 0;
+
+            max-height: 60vh;
+
+            padding-right: 10px;
+
+            word-wrap: break-word;
+        }
+
+
+        /* =========================================================
+           ÁREA DO BOTÃO FECHAR
+           ========================================================= */
+
+        .fechar {
+            margin-top: 20px;
+
+            display: flex;
+
+            justify-content: flex-end;
+        }
+
+
+        .fechar button {
+            background: #00FF00;
+
+            color: #000;
+
+            border: 2px solid #00FF00;
+
+            padding: 9px 18px;
+
+            border-radius: 20px;
+
+            cursor: pointer;
+
+            font-family: 'Cabin Sketch', cursive;
+
+            font-size: 17px;
+
+            font-weight: bold;
+
+            transition: 0.3s;
+        }
+
+        .fechar button:hover {
+            background: transparent;
+
+            color: #00FF00;
+
+            box-shadow: 0 0 8px #00FF00;
+        }
+
+
+        /* =========================================================
+           BOTÃO SAIR
+           ========================================================= */
+
         .btn-logout {
             margin-top: 20px;
+
             padding: 10px 20px;
+
             font-size: 18px;
+
             border: 2px solid #00FF00;
+
             background: #00FF00;
+
             color: #000;
+
             cursor: pointer;
+
             font-weight: bold;
+
             border-radius: 5px;
+
+            font-family: 'Cabin Sketch', cursive;
+
             transition: all 0.3s;
         }
 
         .btn-logout:hover {
             background: transparent;
+
             color: #00FF00;
+
+            box-shadow: 0 0 8px #00FF00;
         }
 
-        /* Botão "Para Você" */
+
+        /* =========================================================
+           BOTÃO FOR YOU
+           ========================================================= */
+
         .btn-para-voce {
             position: fixed;
+
             bottom: 20px;
             right: 20px;
+
             padding: 10px 20px;
+
             font-size: 18px;
+
             border: 2px solid #00FF00;
+
             background: #00FF00;
+
             color: #000;
+
             cursor: pointer;
+
             font-weight: bold;
+
             border-radius: 5px;
+
+            font-family: 'Cabin Sketch', cursive;
+
             transition: all 0.3s;
+
             z-index: 10;
         }
 
         .btn-para-voce:hover {
             background: transparent;
+
             color: #00FF00;
+
+            box-shadow: 0 0 8px #00FF00;
+        }
+
+
+        /* =========================================================
+           MENSAGEM DE CARREGAMENTO
+           ========================================================= */
+
+        .carregando {
+            text-align: center;
+
+            color: #00FF00;
+
+            font-family: 'Cabin Sketch', cursive;
+
+            font-size: 18px;
+
+            padding: 20px;
+        }
+
+
+        /* =========================================================
+           ERRO AO CARREGAR CARTA
+           ========================================================= */
+
+        .erro-carta {
+            color: #ff4444;
+
+            font-family: Georgia, serif;
+
+            line-height: 1.6;
+
+            white-space: pre-wrap;
+        }
+
+
+        /* =========================================================
+           CELULAR
+           ========================================================= */
+
+        @media (max-width: 600px) {
+
+            body {
+                padding: 25px 10px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .modal {
+                padding: 12px;
+            }
+
+            .modal-content {
+                max-height: 90vh;
+
+                padding: 20px;
+
+                border-radius: 15px;
+            }
+
+            .modal-content h3 {
+                font-size: 22px;
+            }
+
+            .modal-texto {
+                font-size: 16px;
+
+                line-height: 1.55;
+
+                max-height: 68vh;
+            }
+
+            .btn-para-voce {
+                bottom: 15px;
+                right: 15px;
+
+                padding: 8px 15px;
+
+                font-size: 16px;
+            }
         }
     </style>
 </head>
+
 <body>
+
+    <!-- =========================================================
+         CONTAINER PRINCIPAL
+         ========================================================= -->
+
     <div class="container">
-        <img src="" alt="Foto de Perfil" class="profile-pic" id="profilePic">
+
+        <img
+            src=""
+            alt="Foto de Perfil"
+            class="profile-pic"
+            id="profilePic"
+        >
+
         <h2 id="welcomeMessage"></h2>
 
-        <div class="cartas-container" id="cartasContainer">
-            <!-- As cartas serão carregadas dinamicamente -->
+
+        <!-- =====================================================
+             LISTA DE CARTAS
+             ===================================================== -->
+
+        <div
+            class="cartas-container"
+            id="cartasContainer"
+        >
+            <!-- As 50 cartas serão criadas pelo JavaScript -->
         </div>
 
-        <button class="btn-logout" onclick="logout()">Sair</button>
 
-        <!-- Botão "Para Você" -->
-        <button class="btn-for-you" onclick="redirectToYou()">for you</button>
+        <!-- =====================================================
+             BOTÃO SAIR
+             ===================================================== -->
+
+        <button
+            class="btn-logout"
+            onclick="logout()"
+        >
+            Sair
+        </button>
+
     </div>
 
+
+    <!-- =========================================================
+         BOTÃO FOR YOU
+         ========================================================= -->
+
+    <button
+        class="btn-para-voce"
+        onclick="redirectToYou()"
+    >
+        for you
+    </button>
+
+
+    <!-- =========================================================
+         MODAL DA CARTA
+         ========================================================= -->
+
+    <div
+        class="modal"
+        id="modal"
+        onclick="fecharAoClicarFora(event)"
+    >
+
+        <div
+            class="modal-content"
+            onclick="event.stopPropagation()"
+        >
+
+            <h3 id="modalTitulo">
+                Carregando...
+            </h3>
+
+            <div
+                class="modal-texto"
+                id="modalTexto"
+            >
+                Carregando carta...
+            </div>
+
+            <div class="fechar">
+
+                <button
+                    onclick="fecharCarta()"
+                >
+                    Fechar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
     <script>
+
+        /* =========================================================
+           INICIALIZAÇÃO
+           ========================================================= */
+
         document.addEventListener("DOMContentLoaded", function () {
-            // Verifica se o usuário está logado
+
+            /*
+             * Verifica se existe uma sessão.
+             */
+
             if (!localStorage.getItem("isLoggedIn")) {
+
                 window.location.href = "login.html";
+
                 return;
             }
 
-            // Obtém os dados do usuário
-            const username = localStorage.getItem("username");
-            const profilePic = localStorage.getItem("profilePic");
 
-            // Atualiza a interface com os dados do usuário
-            document.getElementById("welcomeMessage").innerText = `Bem-vindo(a), ${username}`;
-            document.getElementById("profilePic").src = profilePic;
+            /*
+             * Recupera os dados do usuário.
+             */
 
-            // Elemento onde as cartas serão listadas
-            const cartasContainer = document.getElementById("cartasContainer");
+            const username =
+                localStorage.getItem("username");
 
-            // Gera a lista de 50 cartas para o usuário logado
-            for (let i = 1; i <= 50; i++) {
-                const cartaDiv = document.createElement("div");
-                cartaDiv.classList.add("carta");
-                const nomeArquivo = `${username}carta${i}.txt`;
+            const profilePic =
+                localStorage.getItem("profilePic");
 
-                cartaDiv.innerHTML = `
-                    <span>Carta ${i}</span>
-                    <span class="check-icon" onclick="toggleLida(event, this)">✔</span>
-                `;
 
-                // Ao clicar, abre o arquivo de texto
-                cartaDiv.addEventListener("click", function () {
-                    const caminhoArquivo = `${nomeArquivo}`;
-                    window.open(caminhoArquivo, "_blank");
-                });
+            /*
+             * Atualiza a interface.
+             */
 
-                cartasContainer.appendChild(cartaDiv);
+            document.getElementById("welcomeMessage").innerText =
+                `Bem-vindo(a), ${username}`;
+
+
+            /*
+             * Coloca a foto salva no localStorage.
+             */
+
+            if (profilePic) {
+
+                document.getElementById("profilePic").src =
+                    profilePic;
+
             }
+
+
+            /*
+             * Carrega as 50 cartas.
+             */
+
+            carregarCartas(username);
+
         });
 
-        // Marca cartas como lidas
-        function toggleLida(event, element) {
-            event.stopPropagation(); // Evita que o clique abra a carta
-            element.classList.toggle("lida");
+
+        /* =========================================================
+           CARREGAR LISTA DE CARTAS
+           ========================================================= */
+
+        function carregarCartas(username) {
+
+            const cartasContainer =
+                document.getElementById("cartasContainer");
+
+
+            /*
+             * Limpa o container antes de criar as cartas.
+             */
+
+            cartasContainer.innerHTML = "";
+
+
+            /*
+             * O Luple continua trabalhando com 50 arquivos:
+             *
+             * usuarioCarta1.txt
+             * usuarioCarta2.txt
+             * usuarioCarta3.txt
+             * ...
+             * usuarioCarta50.txt
+             */
+
+            for (let i = 1; i <= 50; i++) {
+
+                const cartaDiv =
+                    document.createElement("div");
+
+
+                cartaDiv.className = "carta";
+
+
+                /*
+                 * Identificação da carta.
+                 */
+
+                cartaDiv.innerHTML = `
+
+                    <span>
+                        Carta ${i}
+                    </span>
+
+                    <span
+                        class="check"
+                        id="check${i}"
+                    >
+                        ✔
+                    </span>
+
+                `;
+
+
+                /*
+                 * Nome exato do arquivo utilizado
+                 * pelo sistema original do Luple.
+                 */
+
+                const nomeArquivo =
+                    `${username}carta${i}.txt`;
+
+
+                /*
+                 * Ao clicar na carta:
+                 *
+                 * NÃO abre outra página.
+                 *
+                 * Abre o modal.
+                 */
+
+                cartaDiv.addEventListener(
+                    "click",
+                    function () {
+
+                        abrirCarta(
+                            i,
+                            nomeArquivo
+                        );
+
+                    }
+                );
+
+
+                /*
+                 * Coloca a carta na lista.
+                 */
+
+                cartasContainer.appendChild(
+                    cartaDiv
+                );
+
+            }
+
         }
 
-        // Função de logout
+
+        /* =========================================================
+           ABRIR CARTA
+           ========================================================= */
+
+        async function abrirCarta(
+            numero,
+            nomeArquivo
+        ) {
+
+            const modal =
+                document.getElementById("modal");
+
+            const titulo =
+                document.getElementById("modalTitulo");
+
+            const texto =
+                document.getElementById("modalTexto");
+
+
+            /*
+             * Abre imediatamente a janela.
+             */
+
+            modal.classList.add("aberto");
+
+
+            /*
+             * Mostra o título.
+             */
+
+            titulo.innerText =
+                `Carta ${numero}`;
+
+
+            /*
+             * Enquanto o arquivo é buscado,
+             * mostramos essa mensagem.
+             */
+
+            texto.className =
+                "modal-texto";
+
+            texto.innerText =
+                "Carregando carta...";
+
+
+            /*
+             * Marca a carta como lida.
+             */
+
+            const check =
+                document.getElementById(
+                    `check${numero}`
+                );
+
+            if (check) {
+
+                check.classList.add("lida");
+
+            }
+
+
+            /*
+             * Busca o arquivo TXT dentro do próprio site.
+             *
+             * Exemplo:
+             *
+             * https://seusite.com/Moiséscarta1.txt
+             *
+             * O navegador busca o arquivo e transforma
+             * seu conteúdo em texto.
+             */
+
+            try {
+
+                const resposta =
+                    await fetch(
+                        encodeURI(nomeArquivo),
+                        {
+                            method: "GET",
+                            cache: "no-cache"
+                        }
+                    );
+
+
+                /*
+                 * Verifica se o servidor encontrou o arquivo.
+                 */
+
+                if (!resposta.ok) {
+
+                    throw new Error(
+                        `Arquivo não encontrado (${resposta.status})`
+                    );
+
+                }
+
+
+                /*
+                 * Extrai o conteúdo do TXT.
+                 */
+
+                const conteudo =
+                    await resposta.text();
+
+
+                /*
+                 * Coloca o conteúdo dentro da janela.
+                 *
+                 * innerText/textContent é usado para que
+                 * o texto do TXT não seja interpretado
+                 * como código HTML.
+                 */
+
+                texto.innerText =
+                    conteudo;
+
+
+                /*
+                 * O título continua sendo "Carta X".
+                 *
+                 * Caso queira futuramente que o próprio
+                 * TXT tenha um título, podemos extrair
+                 * isso também.
+                 */
+
+                titulo.innerText =
+                    `Carta ${numero}`;
+
+
+            } catch (erro) {
+
+                console.error(
+                    "Erro ao carregar carta:",
+                    erro
+                );
+
+
+                /*
+                 * Mostra o erro dentro do modal.
+                 */
+
+                texto.className =
+                    "modal-texto erro-carta";
+
+
+                texto.innerText =
+                    `Não foi possível carregar a Carta ${numero}.
+
+Arquivo procurado:
+${nomeArquivo}
+
+Verifique se o arquivo .txt está no mesmo local desta página.
+
+Erro:
+${erro.message}`;
+
+
+            }
+
+        }
+
+
+        /* =========================================================
+           FECHAR CARTA
+           ========================================================= */
+
+        function fecharCarta() {
+
+            const modal =
+                document.getElementById("modal");
+
+
+            modal.classList.remove("aberto");
+
+        }
+
+
+        /* =========================================================
+           FECHAR CLICANDO FORA DA CARTA
+           ========================================================= */
+
+        function fecharAoClicarFora(event) {
+
+            /*
+             * Só fecha se o clique tiver sido diretamente
+             * no fundo escuro do modal.
+             */
+
+            if (
+                event.target.id === "modal"
+            ) {
+
+                fecharCarta();
+
+            }
+
+        }
+
+
+        /* =========================================================
+           TECLA ESC
+           ========================================================= */
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Escape"
+                ) {
+
+                    fecharCarta();
+
+                }
+
+            }
+        );
+
+
+        /* =========================================================
+           LOGOUT
+           ========================================================= */
+
         function logout() {
+
             localStorage.clear();
-            window.location.href = "login.html";
+
+            window.location.href =
+                "login.html";
+
         }
 
-        // Redireciona para o link do botão "Para Você"
+
+        /* =========================================================
+           BOTÃO FOR YOU
+           ========================================================= */
+
         function redirectToYou() {
-            window.location.href = "https://youtu.be/xkKzaTt3D3g?si=ldu3R8m5bnH9u9Lu";
+
+            window.location.href =
+                "https://youtu.be/xkKzaTt3D3g?si=ldu3R8m5bnH9u9Lu";
+
         }
+
     </script>
+
 </body>
 </html>
