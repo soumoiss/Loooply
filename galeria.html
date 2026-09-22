@@ -5,12 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#f4f0ff">
 <meta name="color-scheme" content="light">
-<meta name="description" content="Nossos Momentos — fotos, áudios e vídeos reunidos em uma pequena galeria pessoal.">
-<title>Nossos Momentos - MoissWorld</title>
-
+<meta name="description" content="Nossos Momentos — Pequenos pedacinhos de nós, quero deixar guardados aqui ♡">
+<title>Nossos Momentos</title>
 <style>
 /* ============================================================
-   IDENTIDADE VISUAL — derivada da interface do Luple final
+   IDENTIDADE VISUAL
    ============================================================ */
 
 @font-face {
@@ -230,15 +229,6 @@ button {
     margin-bottom: 25px;
 }
 
-.eyebrow {
-    color: var(--primary-strong);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: .18em;
-    text-transform: uppercase;
-    margin-bottom: 7px;
-}
-
 .hero h1 {
     font-family: "Quillen", Georgia, "Times New Roman", serif;
     font-size: clamp(38px,8vw,62px);
@@ -262,47 +252,14 @@ button {
 }
 
 /* ============================================================
-   RESUMO
+   RESUMO E CONTADOR
    ============================================================ */
 
 .overview {
-    display: grid;
-    grid-template-columns: minmax(0,1fr) auto;
-    gap: 12px;
-    align-items: stretch;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
     margin-bottom: 15px;
-}
-
-.overview-card {
-    min-width: 0;
-    padding: 15px 17px;
-    border-radius: var(--radius-sm);
-    background: linear-gradient(135deg,#fff,#faf7ff);
-    border: 1px solid var(--line);
-    box-shadow: var(--shadow-sm);
-}
-
-.overview-label {
-    color: var(--muted);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-}
-
-.lista-titulo {
-    font-size: clamp(22px,5vw,28px);
-    line-height: 1.05;
-    font-weight: 800;
-    letter-spacing: -.035em;
-}
-
-.collection-note {
-    margin-top: 5px;
-    color: var(--muted);
-    font-size: 11px;
-    line-height: 1.45;
 }
 
 .contador {
@@ -414,7 +371,7 @@ button {
 }
 
 /* ============================================================
-   MASONRY — LÓGICA VISUAL DO CÓDIGO 1
+   MASONRY - GALERIA DE FOTOS
    ============================================================ */
 
 .galeria {
@@ -590,7 +547,7 @@ video {
 }
 
 /* ============================================================
-   ESTADOS
+   ESTADOS DE CARREGAMENTO E VAZIO
    ============================================================ */
 
 .loading-state {
@@ -701,7 +658,7 @@ video {
 }
 
 /* ============================================================
-   LIGHTBOX — COMPORTAMENTO DO CÓDIGO 1
+   LIGHTBOX
    ============================================================ */
 
 .lightbox {
@@ -866,7 +823,7 @@ video {
     .galeria {
         column-count: 3;
     }
-
+    
     .media-grid {
         grid-template-columns: 1fr;
     }
@@ -876,20 +833,20 @@ video {
     body {
         padding-top: max(12px,env(safe-area-inset-top));
     }
-
+    
     .container {
         padding: 19px 13px 16px;
         border-radius: 24px;
     }
-
+    
     .hero {
         margin-bottom: 21px;
     }
-
+    
     .topbar {
         margin-bottom: 9px;
     }
-
+    
     .navigation-button,
     .topbar-spacer {
         min-width: 43px;
@@ -899,46 +856,42 @@ video {
         flex-basis: 43px;
         border-radius: 14px;
     }
-
+    
     .navigation-label {
         display: none;
     }
-
+    
     .galeria {
         column-count: 2;
         column-gap: 9px;
         padding: 0;
     }
-
+    
     .media-card {
         margin-bottom: 9px;
     }
-
+    
     .photo-shell {
         border-radius: 14px;
     }
-
+    
     .overview {
-        grid-template-columns: 1fr;
+        justify-content: flex-start;
     }
-
-    .contador {
-        justify-self: start;
-    }
-
+    
     .section-head {
         align-items: flex-start;
         flex-direction: column;
     }
-
+    
     .section-head p {
         text-align: left;
     }
-
+    
     .media-tab {
         flex: 1 1 calc(50% - 8px);
     }
-
+    
     .lightbox-caption {
         bottom: max(12px,env(safe-area-inset-bottom));
     }
@@ -948,34 +901,30 @@ video {
     .galeria {
         column-count: 1;
     }
-
+    
     .media-tab {
         flex-basis: 100%;
     }
-
+    
     .hero h1 {
         font-size: 39px;
     }
-
+    
     .subtitulo {
         font-size: 15px;
     }
-
+    
     .lightbox-close {
         width: 44px;
         height: 44px;
     }
 }
 
-/* ============================================================
-   REDUÇÃO DE MOVIMENTO
-   ============================================================ */
-
 @media (prefers-reduced-motion: reduce) {
     html {
         scroll-behavior: auto;
     }
-
+    
     *,
     *::before,
     *::after {
@@ -985,16 +934,12 @@ video {
     }
 }
 
-/* ============================================================
-   IMPRESSÃO
-   ============================================================ */
-
 @media print {
     body {
         background: #fff;
         padding: 0;
     }
-
+    
     body::before,
     .topbar,
     .media-tabs,
@@ -1002,7 +947,7 @@ video {
     .lightbox {
         display: none !important;
     }
-
+    
     .container {
         border: 0;
         box-shadow: none;
@@ -1011,8 +956,8 @@ video {
 }
 </style>
 </head>
-
 <body>
+
 <main class="app-shell">
 
     <div class="topbar">
@@ -1031,29 +976,20 @@ video {
                 <span class="navigation-label">Voltar</span>
             </button>
         </nav>
-
+        
         <div class="topbar-spacer" aria-hidden="true"></div>
     </div>
 
     <section class="container" aria-label="Nossos Momentos">
 
         <header class="hero">
-            <div class="eyebrow">MoissWorld</div>
             <h1>Nossos Momentos</h1>
             <p class="subtitulo">
-                fotos e pequenos pedacinhos de nós,quero guardar aqui ♡
+                Pequenos pedacinhos de nós, quero deixar guardados aqui ♡
             </p>
         </header>
 
         <div class="overview">
-            <div class="overview-card">
-                <div class="overview-label">.</div>
-                <div class="lista-titulo">Nossos Momentos</div>
-                <div class="collection-note" id="collectionNote">
-                    Procurando as mídias do repositório...
-                </div>
-            </div>
-
             <div
                 class="contador"
                 id="contador"
@@ -1146,7 +1082,7 @@ video {
 
             <div class="empty-state" id="fotoEmpty">
                 <strong>Nenhuma foto encontrada</strong>
-                Coloque imagens dentro de <b>midia/Fotos/</b> e faça um novo commit.
+                Coloque imagens dentro do diretório <b>midia/</b> e faça um novo commit.
             </div>
         </section>
 
@@ -1171,7 +1107,7 @@ video {
 
             <div class="empty-state" id="audioEmpty">
                 <strong>Nenhum áudio encontrado</strong>
-                Coloque arquivos dentro de <b>midia/Áudios/</b> e faça um novo commit.
+                Coloque arquivos de áudio dentro do diretório <b>midia/</b> e faça um novo commit.
             </div>
         </section>
 
@@ -1196,7 +1132,7 @@ video {
 
             <div class="empty-state" id="videoEmpty">
                 <strong>Nenhum vídeo encontrado</strong>
-                Coloque arquivos dentro <b>midia/Vídeos/</b> e faça um novo commit.
+                Coloque arquivos de vídeo dentro do diretório <b>midia/</b> e faça um novo commit.
             </div>
         </section>
 
@@ -1212,6 +1148,7 @@ video {
             </button>
         </div>
     </section>
+
 </main>
 
 <div
@@ -1231,12 +1168,10 @@ video {
     >
         ×
     </button>
-
     <div
         class="lightbox-content"
         id="lightboxContent"
     ></div>
-
     <div
         class="lightbox-caption"
         id="lightboxCaption"
@@ -1248,33 +1183,7 @@ video {
 "use strict";
 
 /* ============================================================
-   CONFIGURAÇÃO DO GITHUB
-   ============================================================
-
-   Não existe lista manual de arquivos.
-
-   owner, repo e branch podem permanecer vazios.
-
-   Quando a página estiver em:
-       https://USUARIO.github.io/REPOSITORIO/galeria.html
-
-   o sistema tenta descobrir:
-       owner = USUARIO
-       repo  = REPOSITORIO
-
-   Quando estiver em:
-       https://USUARIO.github.io/galeria.html
-
-   ele tenta usar:
-       repo = USUARIO.github.io
-
-   O branch também pode ficar vazio. Nesse caso o GitHub informa
-   qual é o branch padrão do repositório.
-
-   Em domínio personalizado, se a URL não permitir descobrir o
-   repositório, basta preencher owner e repo abaixo.
-
-   Nunca coloque nomes individuais de fotos, áudios ou vídeos aqui.
+   CONFIGURAÇÃO DO GITHUB & REPOSITÓRIO
    ============================================================ */
 
 const REPOSITORIO = {
@@ -1284,49 +1193,16 @@ const REPOSITORIO = {
     pastaMidia: "midia"
 };
 
-const PASTAS = {
-    fotos: "Fotos",
-    audios: "Áudios",
-    videos: "Vídeos"
-};
-
 const EXTENSOES = {
     fotos: new Set([
-        "jpg",
-        "jpeg",
-        "png",
-        "webp",
-        "gif",
-        "avif",
-        "bmp",
-        "svg",
-        "heic",
-        "heif",
-        "jfif",
-        "tif",
-        "tiff"
+        "jpg", "jpeg", "png", "webp", "gif", "avif", 
+        "bmp", "svg", "heic", "heif", "jfif", "tif", "tiff"
     ]),
-
     audios: new Set([
-        "mp3",
-        "m4a",
-        "wav",
-        "ogg",
-        "oga",
-        "aac",
-        "flac",
-        "opus",
-        "webm"
+        "mp3", "m4a", "wav", "ogg", "oga", "aac", "flac", "opus"
     ]),
-
     videos: new Set([
-        "mp4",
-        "webm",
-        "mov",
-        "m4v",
-        "ogv",
-        "avi",
-        "mkv"
+        "mp4", "webm", "mov", "m4v", "ogv", "avi", "mkv"
     ])
 };
 
@@ -1371,20 +1247,16 @@ const estado = {
         audios: [],
         videos: []
     },
-
     configuracao: null,
-
     lightboxAberto: false,
     lightboxUsouHistorico: false,
     ultimaFocada: null,
-
     indiceFotoAtual: -1,
-
     carregando: true
 };
 
 /* ============================================================
-   FUNÇÕES BÁSICAS
+   UTILITÁRIOS E CLASSIFICAÇÃO
    ============================================================ */
 
 function escaparHTML(valor) {
@@ -1403,539 +1275,158 @@ function escaparHTML(valor) {
 function obterExtensao(nome) {
     const base = String(nome || "").split("/").pop();
     const posicao = base.lastIndexOf(".");
-
-    if (posicao === -1) {
-        return "";
-    }
-
-    return base
-        .slice(posicao + 1)
-        .toLowerCase();
+    if (posicao === -1) return "";
+    return base.slice(posicao + 1).toLowerCase();
 }
 
 function obterNomeSemExtensao(nome) {
     const base = String(nome || "").split("/").pop();
     const posicao = base.lastIndexOf(".");
-
-    if (posicao <= 0) {
-        return base;
-    }
-
-    return base.slice(0,posicao);
+    if (posicao <= 0) return base;
+    return base.slice(0, posicao);
 }
 
-function classificarArquivo(nome,mime = "") {
+function classificarArquivo(nome, mime = "") {
     const extensao = obterExtensao(nome);
     const tipoMime = String(mime || "").toLowerCase();
 
-    if (tipoMime.startsWith("image/")) {
-        return "fotos";
-    }
+    if (tipoMime.startsWith("image/")) return "fotos";
+    if (tipoMime.startsWith("audio/")) return "audios";
+    if (tipoMime.startsWith("video/")) return "videos";
 
-    if (tipoMime.startsWith("audio/")) {
-        return "audios";
-    }
-
-    if (tipoMime.startsWith("video/")) {
-        return "videos";
-    }
-
-    if (EXTENSOES.fotos.has(extensao)) {
-        return "fotos";
-    }
-
-    if (EXTENSOES.audios.has(extensao)) {
-        return "audios";
-    }
-
-    if (EXTENSOES.videos.has(extensao)) {
-        return "videos";
-    }
+    if (EXTENSOES.fotos.has(extensao)) return "fotos";
+    if (EXTENSOES.audios.has(extensao)) return "audios";
+    if (EXTENSOES.videos.has(extensao)) return "videos";
 
     return null;
 }
 
 function tipoMimePorArquivo(arquivo) {
-    if (arquivo.mime) {
-        return arquivo.mime;
-    }
-
-    return MIME_POR_EXTENSAO[
-        obterExtensao(arquivo.nome)
-    ] || "";
+    if (arquivo.mime) return arquivo.mime;
+    return MIME_POR_EXTENSAO[obterExtensao(arquivo.nome)] || "";
 }
 
-/* ============================================================
-   EMBARALHAMENTO — FISHER-YATES DO CÓDIGO 1
-   ============================================================ */
-
 function shuffleArray(array) {
-    for (
-        let i = array.length - 1;
-        i > 0;
-        i--
-    ) {
-        const j = Math.floor(
-            Math.random() * (i + 1)
-        );
-
-        [
-            array[i],
-            array[j]
-        ] = [
-            array[j],
-            array[i]
-        ];
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
     }
-
     return array;
 }
 
-/* Mantém também o nome em português caso alguma parte futura
-   do projeto utilize essa função. */
-function embaralhar(array) {
-    return shuffleArray(array);
+function compararNomes(a, b) {
+    return String(a.nome).localeCompare(String(b.nome), "pt-BR", {
+        numeric: true,
+        sensitivity: "base"
+    });
 }
 
 /* ============================================================
-   DETECÇÃO DO REPOSITÓRIO
+   DETECÇÃO DE REPOSITÓRIO E URL
    ============================================================ */
 
 function detectarRepositorioAutomaticamente() {
     const host = window.location.hostname;
-    const caminho = window.location.pathname
-        .split("/")
-        .filter(Boolean);
+    const caminho = window.location.pathname.split("/").filter(Boolean);
+    const configuracao = { ...REPOSITORIO };
+    const ehGithubPages = host.endsWith(".github.io");
 
-    const configuracao = {
-        ...REPOSITORIO
-    };
-
-    const ehGithubPages =
-        host.endsWith(".github.io");
-
-    if (
-        !configuracao.owner &&
-        ehGithubPages
-    ) {
-        configuracao.owner =
-            host.split(".")[0];
+    if (!configuracao.owner && ehGithubPages) {
+        configuracao.owner = host.split(".")[0];
     }
 
-    if (
-        !configuracao.repo &&
-        ehGithubPages &&
-        caminho.length > 0 &&
-        !caminho[0].includes(".")
-    ) {
+    if (!configuracao.repo && ehGithubPages && caminho.length > 0 && !caminho[0].includes(".")) {
         configuracao.repo = caminho[0];
     }
 
-    if (
-        !configuracao.repo &&
-        ehGithubPages &&
-        configuracao.owner
-    ) {
-        configuracao.repo =
-            `${configuracao.owner}.github.io`;
+    if (!configuracao.repo && ehGithubPages && configuracao.owner) {
+        configuracao.repo = `${configuracao.owner}.github.io`;
     }
 
     return configuracao;
 }
 
 function validarConfiguracaoMinima(configuracao) {
-    if (
-        !configuracao.owner ||
-        !configuracao.repo
-    ) {
-        throw new Error(
-            "Não foi possível descobrir automaticamente o proprietário e o repositório do GitHub. Preencha REPOSITORIO.owner e REPOSITORIO.repo no início do JavaScript."
-        );
+    if (!configuracao.owner || !configuracao.repo) {
+        throw new Error("Não foi possível descobrir automaticamente o proprietário e repositório. Preencha REPOSITORIO.owner e REPOSITORIO.repo no script.");
     }
 }
 
-/* ============================================================
-   URL RAW
-   ============================================================ */
-
-function construirRawUrl(caminho,configuracao) {
-    const partes = String(caminho)
-        .split("/")
-        .map(encodeURIComponent);
-
-    const branch =
-        configuracao.branch || "main";
-
-    return (
-        "https://raw.githubusercontent.com/" +
-        encodeURIComponent(configuracao.owner) +
-        "/" +
-        encodeURIComponent(configuracao.repo) +
-        "/" +
-        encodeURIComponent(branch) +
-        "/" +
-        partes.join("/")
-    );
+function construirRawUrl(caminho, configuracao) {
+    const partes = String(caminho).split("/").map(encodeURIComponent);
+    const branch = configuracao.branch || "main";
+    return `https://raw.githubusercontent.com/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/${encodeURIComponent(branch)}/${partes.join("/")}`;
 }
 
-/* ============================================================
-   CONSULTA À API DO GITHUB
-   ============================================================ */
-
 async function githubFetch(url) {
-    const resposta = await fetch(url,{
+    const resposta = await fetch(url, {
         method: "GET",
         headers: {
-            "Accept":
-                "application/vnd.github+json",
-            "X-GitHub-Api-Version":
-                API_VERSION
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": API_VERSION
         },
         cache: "no-store"
     });
 
     if (!resposta.ok) {
         let detalhe = "";
-
         try {
-            const json =
-                await resposta.json();
-
-            if (json && json.message) {
-                detalhe =
-                    ` — ${json.message}`;
-            }
-        } catch (_) {
-            /* A resposta pode não ser JSON. */
-        }
-
-        throw new Error(
-            `GitHub respondeu HTTP ${resposta.status}${detalhe}`
-        );
+            const json = await resposta.json();
+            if (json && json.message) detalhe = ` — ${json.message}`;
+        } catch (_) {}
+        throw new Error(`GitHub respondeu HTTP ${resposta.status}${detalhe}`);
     }
 
     return resposta.json();
 }
 
 async function obterConfiguracaoEfetiva() {
-    const configuracao =
-        detectarRepositorioAutomaticamente();
-
-    validarConfiguracaoMinima(
-        configuracao
-    );
+    const configuracao = detectarRepositorioAutomaticamente();
+    validarConfiguracaoMinima(configuracao);
 
     if (!configuracao.branch) {
-        const url =
-            "https://api.github.com/repos/" +
-            encodeURIComponent(
-                configuracao.owner
-            ) +
-            "/" +
-            encodeURIComponent(
-                configuracao.repo
-            );
-
-        const metadados =
-            await githubFetch(url);
-
-        configuracao.branch =
-            metadados.default_branch ||
-            "main";
+        const url = `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}`;
+        const metadados = await githubFetch(url);
+        configuracao.branch = metadados.default_branch || "main";
     }
 
     return configuracao;
 }
 
 /* ============================================================
-   NORMALIZAÇÃO DE ITENS
+   CONSULTA RECURSIVA AO DIRETÓRIO MIDIA/
    ============================================================ */
 
-function transformarItemGithub(
-    item,
-    tipoEsperado,
-    configuracao
-) {
-    if (!item || item.type !== "file") {
-        return null;
+async function listarCatalogoViaTree(configuracao) {
+    const url = `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/git/trees/${encodeURIComponent(configuracao.branch)}?recursive=1`;
+    const dados = await githubFetch(url);
+
+    if (!dados || !Array.isArray(dados.tree)) {
+        throw new Error("A API do GitHub não retornou a árvore do repositório.");
     }
 
-    const extensao = obterExtensao(item.name);
-    const tipoMime = String(item.mime_type || "").toLowerCase();
-    const tipo = classificarArquivo(item.name, item.mime_type || "");
-    const extensaoAceitaNaPasta = EXTENSOES[tipoEsperado]?.has(extensao);
-    const mimeAceitoNaPasta =
-        (tipoEsperado === "fotos" && tipoMime.startsWith("image/")) ||
-        (tipoEsperado === "audios" && tipoMime.startsWith("audio/")) ||
-        (tipoEsperado === "videos" && tipoMime.startsWith("video/"));
+    if (dados.truncated) return null;
 
-    if (tipo !== tipoEsperado && !extensaoAceitaNaPasta && !mimeAceitoNaPasta) {
-        return null;
-    }
-
-    return {
-        nome: item.name,
-        caminho: item.path,
-        url:
-            item.download_url ||
-            construirRawUrl(
-                item.path,
-                configuracao
-            ),
-        apiUrl: item.url || "",
-        sha: item.sha || "",
-        tamanho: Number(item.size || 0),
-        mime:
-            item.mime_type ||
-            MIME_POR_EXTENSAO[
-                obterExtensao(item.name)
-            ] ||
-            "",
-        tipo
-    };
-}
-
-/* ============================================================
-   CONTENTS API — UMA PASTA
-   ============================================================ */
-
-async function listarPastaViaContents(
-    nomePasta,
-    configuracao
-) {
-    const caminho =
-        `${configuracao.pastaMidia}/${nomePasta}`;
-
-    const resultados = [];
-    const vistos = new Set();
-
-    const limitePagina = 100;
-
-    for (
-        let pagina = 1;
-        pagina <= 100;
-        pagina++
-    ) {
-        const url =
-            "https://api.github.com/repos/" +
-            encodeURIComponent(
-                configuracao.owner
-            ) +
-            "/" +
-            encodeURIComponent(
-                configuracao.repo
-            ) +
-            "/contents/" +
-            caminho
-                .split("/")
-                .map(encodeURIComponent)
-                .join("/") +
-            "?ref=" +
-            encodeURIComponent(
-                configuracao.branch
-            ) +
-            "&per_page=" +
-            limitePagina +
-            "&page=" +
-            pagina;
-
-        const dados =
-            await githubFetch(url);
-
-        if (!Array.isArray(dados)) {
-            break;
-        }
-
-        let novos = 0;
-
-        for (const item of dados) {
-            if (!item || !item.path) {
-                continue;
-            }
-
-            if (vistos.has(item.path)) {
-                continue;
-            }
-
-            vistos.add(item.path);
-
-            const transformado =
-                transformarItemGithub(
-                    item,
-                    classificarPasta(
-                        nomePasta
-                    ),
-                    configuracao
-                );
-
-            if (transformado) {
-                resultados.push(
-                    transformado
-                );
-                novos++;
-            }
-        }
-
-        if (
-            dados.length < limitePagina ||
-            novos === 0
-        ) {
-            break;
-        }
-    }
-
-    return resultados;
-}
-
-/* ============================================================
-   CLASSIFICAÇÃO DE PASTAS
-   ============================================================ */
-
-function classificarPasta(nomePasta) {
-    if (
-        nomePasta === PASTAS.fotos
-    ) {
-        return "fotos";
-    }
-
-    if (
-        nomePasta === PASTAS.audios
-    ) {
-        return "audios";
-    }
-
-    if (
-        nomePasta === PASTAS.videos
-    ) {
-        return "videos";
-    }
-
-    return null;
-}
-
-/* ============================================================
-   GIT TREE API — CAMINHO PRINCIPAL
-   ============================================================ */
-
-async function listarCatalogoViaTree(
-    configuracao
-) {
-    const url =
-        "https://api.github.com/repos/" +
-        encodeURIComponent(
-            configuracao.owner
-        ) +
-        "/" +
-        encodeURIComponent(
-            configuracao.repo
-        ) +
-        "/git/trees/" +
-        encodeURIComponent(
-            configuracao.branch
-        ) +
-        "?recursive=1";
-
-    const dados =
-        await githubFetch(url);
-
-    if (
-        !dados ||
-        !Array.isArray(dados.tree)
-    ) {
-        throw new Error(
-            "A API do GitHub não retornou a árvore do repositório."
-        );
-    }
-
-    if (dados.truncated) {
-        return null;
-    }
-
-    const prefixos = {
-        fotos:
-            `${configuracao.pastaMidia}/${PASTAS.fotos}/`,
-
-        audios:
-            `${configuracao.pastaMidia}/${PASTAS.audios}/`,
-
-        videos:
-            `${configuracao.pastaMidia}/${PASTAS.videos}/`
-    };
-
-    const resultado = {
-        fotos: [],
-        audios: [],
-        videos: []
-    };
+    const prefixo = `${configuracao.pastaMidia}/`;
+    const resultado = { fotos: [], audios: [], videos: [] };
 
     for (const item of dados.tree) {
-        if (
-            !item ||
-            item.type !== "blob" ||
-            !item.path
-        ) {
-            continue;
-        }
+        if (!item || item.type !== "blob" || !item.path) continue;
+        if (!item.path.startsWith(prefixo)) continue;
 
-        let tipo = null;
+        const nome = item.path.slice(item.path.lastIndexOf("/") + 1);
+        const tipo = classificarArquivo(nome, "");
 
-        if (
-            item.path.startsWith(
-                prefixos.fotos
-            )
-        ) {
-            tipo = "fotos";
-        } else if (
-            item.path.startsWith(
-                prefixos.audios
-            )
-        ) {
-            tipo = "audios";
-        } else if (
-            item.path.startsWith(
-                prefixos.videos
-            )
-        ) {
-            tipo = "videos";
-        }
-
-        if (!tipo) {
-            continue;
-        }
-
-        const nome =
-            item.path.slice(
-                item.path.lastIndexOf("/") + 1
-            );
-
-        const extensao = obterExtensao(nome);
-        const classificado = classificarArquivo(nome, "");
-
-        /* A pasta é a fonte contextual quando uma extensão é ambígua.
-           Isso permite WEBM em Áudios/ e também WEBM em Vídeos/. */
-        if (
-            classificado !== tipo &&
-            !EXTENSOES[tipo]?.has(extensao)
-        ) {
-            continue;
-        }
+        if (!tipo) continue;
 
         resultado[tipo].push({
             nome,
             caminho: item.path,
-            url:
-                construirRawUrl(
-                    item.path,
-                    configuracao
-                ),
+            url: construirRawUrl(item.path, configuracao),
             apiUrl: item.url || "",
             sha: item.sha || "",
-            tamanho:
-                Number(item.size || 0),
-            mime:
-                MIME_POR_EXTENSAO[
-                    obterExtensao(nome)
-                ] || "",
+            tamanho: Number(item.size || 0),
+            mime: MIME_POR_EXTENSAO[obterExtensao(nome)] || "",
             tipo
         });
     }
@@ -1943,68 +1434,61 @@ async function listarCatalogoViaTree(
     return resultado;
 }
 
-/* ============================================================
-   CATÁLOGO COMPLETO
-   ============================================================ */
+async function listarPastaViaContentsRecursivo(caminho, configuracao) {
+    const url = `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/contents/${caminho.split("/").map(encodeURIComponent).join("/")}?ref=${encodeURIComponent(configuracao.branch)}`;
+    const dados = await githubFetch(url);
+    let resultados = [];
+
+    if (!Array.isArray(dados)) return resultados;
+
+    for (const item of dados) {
+        if (!item) continue;
+        if (item.type === "dir") {
+            const subResultados = await listarPastaViaContentsRecursivo(item.path, configuracao);
+            resultados = resultados.concat(subResultados);
+        } else if (item.type === "file") {
+            const tipo = classificarArquivo(item.name, item.mime_type || "");
+            if (tipo) {
+                resultados.push({
+                    nome: item.name,
+                    caminho: item.path,
+                    url: item.download_url || construirRawUrl(item.path, configuracao),
+                    apiUrl: item.url || "",
+                    sha: item.sha || "",
+                    tamanho: Number(item.size || 0),
+                    mime: item.mime_type || MIME_POR_EXTENSAO[obterExtensao(item.name)] || "",
+                    tipo
+                });
+            }
+        }
+    }
+
+    return resultados;
+}
 
 async function carregarCatalogo() {
-    const configuracao =
-        await obterConfiguracaoEfetiva();
+    const configuracao = await obterConfiguracaoEfetiva();
+    estado.configuracao = configuracao;
 
-    estado.configuracao =
-        configuracao;
-
-    let catalogo =
-        await listarCatalogoViaTree(
-            configuracao
-        );
+    let catalogo = await listarCatalogoViaTree(configuracao);
 
     if (!catalogo) {
-        /* A Git Trees API pode retornar truncated=true
-           em repositórios muito grandes. Nesse caso cada
-           diretório é consultado separadamente. */
-        const [
-            fotos,
-            audios,
-            videos
-        ] = await Promise.all([
-            listarPastaViaContents(
-                PASTAS.fotos,
-                configuracao
-            ),
-            listarPastaViaContents(
-                PASTAS.audios,
-                configuracao
-            ),
-            listarPastaViaContents(
-                PASTAS.videos,
-                configuracao
-            )
-        ]);
-
-        catalogo = {
-            fotos,
-            audios,
-            videos
-        };
+        const todosArquivos = await listarPastaViaContentsRecursivo(configuracao.pastaMidia, configuracao);
+        catalogo = { fotos: [], audios: [], videos: [] };
+        for (const item of todosArquivos) {
+            if (catalogo[item.tipo]) {
+                catalogo[item.tipo].push(item);
+            }
+        }
     }
 
     estado.arquivos = catalogo;
 
-    embaralhar(
-        estado.arquivos.fotos
-    );
-
-    estado.arquivos.audios.sort(
-        compararNomes
-    );
-
-    estado.arquivos.videos.sort(
-        compararNomes
-    );
+    shuffleArray(estado.arquivos.fotos);
+    estado.arquivos.audios.sort(compararNomes);
+    estado.arquivos.videos.sort(compararNomes);
 
     atualizarResumo();
-
     renderizarFotos();
     renderizarAudios();
     renderizarVideos();
@@ -2013,1304 +1497,444 @@ async function carregarCatalogo() {
 }
 
 /* ============================================================
-   ORDENAÇÃO DOS MEDIA NÃO-FOTOGRÁFICOS
-   ============================================================ */
-
-function compararNomes(a,b) {
-    return String(a.nome).localeCompare(
-        String(b.nome),
-        "pt-BR",
-        {
-            numeric: true,
-            sensitivity: "base"
-        }
-    );
-}
-
-/* ============================================================
-   RESUMO
+   INTERFACE E RENDERIZAÇÃO
    ============================================================ */
 
 function atualizarResumo() {
-    const fotos =
-        estado.arquivos.fotos.length;
+    const fotos = estado.arquivos.fotos.length;
+    const audios = estado.arquivos.audios.length;
+    const videos = estado.arquivos.videos.length;
+    const total = fotos + audios + videos;
 
-    const audios =
-        estado.arquivos.audios.length;
-
-    const videos =
-        estado.arquivos.videos.length;
-
-    const total =
-        fotos +
-        audios +
-        videos;
-
-    document.getElementById(
-        "contador"
-    ).textContent =
-        `${total} ${total === 1 ? "mídia" : "mídias"}`;
-
-    document.getElementById(
-        "collectionNote"
-    ).textContent =
-        `${fotos} ${fotos === 1 ? "foto" : "fotos"} · ` +
-        `${audios} ${audios === 1 ? "áudio" : "áudios"} · ` +
-        `${videos} ${videos === 1 ? "vídeo" : "vídeos"}`;
-
-    document.getElementById(
-        "fotoStatus"
-    ).textContent =
-        `${fotos} ${fotos === 1 ? "foto" : "fotos"}`;
-
-    document.getElementById(
-        "audioStatus"
-    ).textContent =
-        `${audios} ${audios === 1 ? "áudio" : "áudios"}`;
-
-    document.getElementById(
-        "videoStatus"
-    ).textContent =
-        `${videos} ${videos === 1 ? "vídeo" : "vídeos"}`;
+    document.getElementById("contador").textContent = `${total} ${total === 1 ? "mídia" : "mídias"}`;
+    document.getElementById("fotoStatus").textContent = `${fotos} ${fotos === 1 ? "foto" : "fotos"}`;
+    document.getElementById("audioStatus").textContent = `${audios} ${audios === 1 ? "áudio" : "áudios"}`;
+    document.getElementById("videoStatus").textContent = `${videos} ${videos === 1 ? "vídeo" : "vídeos"}`;
 }
-
-/* ============================================================
-   ESTADOS DE CARREGAMENTO
-   ============================================================ */
 
 function esconderCarregamento(id) {
-    const elemento =
-        document.getElementById(id);
-
-    if (elemento) {
-        elemento.remove();
-    }
+    const elemento = document.getElementById(id);
+    if (elemento) elemento.remove();
 }
-
-function marcarSecaoComoPronta(id) {
-    const secao =
-        document.getElementById(id);
-
-    if (secao) {
-        secao.setAttribute(
-            "aria-busy",
-            "false"
-        );
-    }
-}
-
-/* ============================================================
-   FOTOS
-   ============================================================ */
 
 function renderizarFotos() {
-    const container =
-        document.getElementById(
-            "galeria"
-        );
-
+    const container = document.getElementById("galeria");
     container.innerHTML = "";
+    container.setAttribute("aria-busy", "false");
+    esconderCarregamento("fotoLoading");
 
-    container.setAttribute(
-        "aria-busy",
-        "false"
-    );
+    const vazio = document.getElementById("fotoEmpty");
+    vazio.classList.toggle("visible", estado.arquivos.fotos.length === 0);
 
-    esconderCarregamento(
-        "fotoLoading"
-    );
-
-    const vazio =
-        document.getElementById(
-            "fotoEmpty"
-        );
-
-    vazio.classList.toggle(
-        "visible",
-        estado.arquivos.fotos.length === 0
-    );
-
-    estado.arquivos.fotos.forEach(
-        (arquivo,index) => {
-            const card =
-                criarCartaoFoto(
-                    arquivo,
-                    index
-                );
-
-            container.appendChild(card);
-        }
-    );
+    estado.arquivos.fotos.forEach((arquivo, index) => {
+        const card = criarCartaoFoto(arquivo, index);
+        container.appendChild(card);
+    });
 }
 
-function criarCartaoFoto(
-    arquivo,
-    index
-) {
-    const card =
-        document.createElement(
-            "article"
-        );
-
-    card.className =
-        "media-card";
-
+function criarCartaoFoto(arquivo, index) {
+    const card = document.createElement("article");
+    card.className = "media-card";
     card.tabIndex = 0;
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", `Abrir ${arquivo.nome}`);
+    card.dataset.indice = String(index);
+    card.style.animationDelay = `${Math.min(index * .012, .35)}s`;
 
-    card.setAttribute(
-        "role",
-        "button"
-    );
+    const shell = document.createElement("div");
+    shell.className = "photo-shell";
 
-    card.setAttribute(
-        "aria-label",
-        `Abrir ${arquivo.nome}`
-    );
-
-    card.dataset.indice =
-        String(index);
-
-    card.style.animationDelay =
-        `${Math.min(index * .012,.35)}s`;
-
-    const shell =
-        document.createElement(
-            "div"
-        );
-
-    shell.className =
-        "photo-shell";
-
-    const imagem =
-        document.createElement(
-            "img"
-        );
-
+    const imagem = document.createElement("img");
     imagem.loading = "lazy";
     imagem.decoding = "async";
-    imagem.alt =
-        `Foto: ${arquivo.nome}`;
+    imagem.alt = `Foto: ${arquivo.nome}`;
+    imagem.src = arquivo.url;
 
-    imagem.src =
-        arquivo.url;
+    imagem.addEventListener("error", () => mostrarFallbackImagem(shell, arquivo), { once: true });
 
-    imagem.addEventListener(
-        "error",
-        () => {
-            mostrarFallbackImagem(
-                shell,
-                arquivo
-            );
-        },
-        {
-            once: true
+    const overlay = document.createElement("div");
+    overlay.className = "photo-overlay";
+    overlay.textContent = obterNomeSemExtensao(arquivo.nome);
+
+    shell.append(imagem, overlay);
+    card.appendChild(shell);
+
+    const abrir = () => abrirLightbox(arquivo, card, index);
+    card.addEventListener("click", abrir);
+    card.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            abrir();
         }
-    );
-
-    const overlay =
-        document.createElement(
-            "div"
-        );
-
-    overlay.className =
-        "photo-overlay";
-
-    overlay.textContent =
-        obterNomeSemExtensao(
-            arquivo.nome
-        );
-
-    shell.appendChild(
-        imagem
-    );
-
-    shell.appendChild(
-        overlay
-    );
-
-    card.appendChild(
-        shell
-    );
-
-    const abrir =
-        () => abrirLightbox(
-            arquivo,
-            card,
-            index
-        );
-
-    card.addEventListener(
-        "click",
-        abrir
-    );
-
-    card.addEventListener(
-        "keydown",
-        event => {
-            if (
-                event.key === "Enter" ||
-                event.key === " "
-            ) {
-                event.preventDefault();
-                abrir();
-            }
-        }
-    );
+    });
 
     return card;
 }
 
-function mostrarFallbackImagem(
-    shell,
-    arquivo
-) {
-    if (
-        shell.dataset.fallback === "true"
-    ) {
-        return;
-    }
-
-    shell.dataset.fallback =
-        "true";
-
+function mostrarFallbackImagem(shell, arquivo) {
+    if (shell.dataset.fallback === "true") return;
+    shell.dataset.fallback = "true";
     shell.innerHTML = "";
 
-    const box =
-        document.createElement(
-            "div"
-        );
+    const box = document.createElement("div");
+    box.className = "photo-fallback";
 
-    box.className =
-        "photo-fallback";
+    const extensao = obterExtensao(arquivo.nome).toUpperCase();
+    const texto = document.createElement("div");
+    const titulo = document.createElement("strong");
+    titulo.textContent = `♡ ${extensao || "IMAGEM"}`;
 
-    const extensao =
-        obterExtensao(
-            arquivo.nome
-        ).toUpperCase();
+    const detalhe = document.createElement("small");
+    detalhe.innerHTML = "Este navegador não conseguiu exibir esta imagem diretamente.<br>Toque para abrir o arquivo original.";
 
-    const texto =
-        document.createElement(
-            "div"
-        );
+    texto.append(titulo, detalhe);
+    box.appendChild(texto);
+    shell.appendChild(box);
+    shell.style.cursor = "pointer";
 
-    const titulo =
-        document.createElement(
-            "strong"
-        );
-
-    titulo.textContent =
-        `♡ ${extensao || "IMAGEM"}`;
-
-    const detalhe =
-        document.createElement(
-            "small"
-        );
-
-    detalhe.innerHTML =
-        "Este navegador não conseguiu exibir esta imagem diretamente." +
-        "<br>" +
-        "Toque para abrir o arquivo original.";
-
-    texto.append(
-        titulo,
-        detalhe
-    );
-
-    box.appendChild(
-        texto
-    );
-
-    shell.appendChild(
-        box
-    );
-
-    shell.style.cursor =
-        "pointer";
-
-    shell.addEventListener(
-        "click",
-        event => {
-            event.stopPropagation();
-
-            abrirArquivoOriginal(
-                arquivo
-            );
-        },
-        {
-            once: true
-        }
-    );
+    shell.addEventListener("click", event => {
+        event.stopPropagation();
+        const janela = window.open(arquivo.url, "_blank", "noopener,noreferrer");
+        if (janela) janela.opener = null;
+    }, { once: true });
 }
-
-function abrirArquivoOriginal(
-    arquivo
-) {
-    const janela =
-        window.open(
-            arquivo.url,
-            "_blank",
-            "noopener,noreferrer"
-        );
-
-    if (janela) {
-        janela.opener = null;
-    }
-}
-
-/* ============================================================
-   ÁUDIOS
-   ============================================================ */
 
 function renderizarAudios() {
-    const container =
-        document.getElementById(
-            "audios"
-        );
-
+    const container = document.getElementById("audios");
     container.innerHTML = "";
+    esconderCarregamento("audioLoading");
 
-    esconderCarregamento(
-        "audioLoading"
-    );
+    const vazio = document.getElementById("audioEmpty");
+    vazio.classList.toggle("visible", estado.arquivos.audios.length === 0);
 
-    const vazio =
-        document.getElementById(
-            "audioEmpty"
-        );
+    if (estado.arquivos.audios.length === 0) return;
 
-    vazio.classList.toggle(
-        "visible",
-        estado.arquivos.audios.length === 0
-    );
+    const panel = document.createElement("article");
+    panel.className = "media-panel";
 
-    if (
-        estado.arquivos.audios.length === 0
-    ) {
-        return;
-    }
+    const titulo = document.createElement("h3");
+    titulo.textContent = "Nossas vozes";
 
-    const panel =
-        document.createElement(
-            "article"
-        );
+    const descricao = document.createElement("p");
+    descricao.textContent = "Os áudios encontrados dentro da pasta midia/. Eles não começam sozinhas.";
 
-    panel.className =
-        "media-panel";
+    panel.append(titulo, descricao);
 
-    const titulo =
-        document.createElement(
-            "h3"
-        );
+    estado.arquivos.audios.forEach(arquivo => {
+        const item = document.createElement("div");
+        item.className = "audio-item";
 
-    titulo.textContent =
-        "Nossas vozes";
+        const nome = document.createElement("span");
+        nome.className = "media-name";
+        nome.textContent = arquivo.nome;
 
-    const descricao =
-        document.createElement(
-            "p"
-        );
+        const player = document.createElement("audio");
+        player.controls = true;
+        player.preload = "none";
+        player.playsInline = true;
+        player.src = arquivo.url;
 
-    descricao.textContent =
-        "As gravações são encontradas automaticamente em midia/Áudios/. Elas não começam sozinhas.";
+        player.addEventListener("error", () => {
+            adicionarErroMedia(item, "Este navegador não conseguiu reproduzir este áudio.");
+        }, { once: true });
 
-    panel.append(
-        titulo,
-        descricao
-    );
+        item.append(nome, player);
+        panel.appendChild(item);
+    });
 
-    estado.arquivos.audios.forEach(
-        arquivo => {
-            const item =
-                document.createElement(
-                    "div"
-                );
-
-            item.className =
-                "audio-item";
-
-            const nome =
-                document.createElement(
-                    "span"
-                );
-
-            nome.className =
-                "media-name";
-
-            nome.textContent =
-                arquivo.nome;
-
-            const player =
-                document.createElement(
-                    "audio"
-                );
-
-            player.controls = true;
-            player.preload = "none";
-            player.playsInline = true;
-
-            player.src =
-                arquivo.url;
-
-            player.addEventListener(
-                "error",
-                () => {
-                    adicionarErroMedia(
-                        item,
-                        "Este navegador não conseguiu reproduzir este áudio."
-                    );
-                },
-                {
-                    once: true
-                }
-            );
-
-            item.append(
-                nome,
-                player
-            );
-
-            panel.appendChild(
-                item
-            );
-        }
-    );
-
-    container.appendChild(
-        panel
-    );
+    container.appendChild(panel);
 }
-
-/* ============================================================
-   VÍDEOS
-   ============================================================ */
 
 function renderizarVideos() {
-    const container =
-        document.getElementById(
-            "videos"
-        );
-
+    const container = document.getElementById("videos");
     container.innerHTML = "";
+    esconderCarregamento("videoLoading");
 
-    esconderCarregamento(
-        "videoLoading"
-    );
+    const vazio = document.getElementById("videoEmpty");
+    vazio.classList.toggle("visible", estado.arquivos.videos.length === 0);
 
-    const vazio =
-        document.getElementById(
-            "videoEmpty"
-        );
+    if (estado.arquivos.videos.length === 0) return;
 
-    vazio.classList.toggle(
-        "visible",
-        estado.arquivos.videos.length === 0
-    );
+    const panel = document.createElement("article");
+    panel.className = "media-panel";
 
-    if (
-        estado.arquivos.videos.length === 0
-    ) {
-        return;
-    }
+    const titulo = document.createElement("h3");
+    titulo.textContent = "Nossos vídeos";
 
-    const panel =
-        document.createElement(
-            "article"
-        );
+    const descricao = document.createElement("p");
+    descricao.textContent = "Os vídeos salvos na pasta midia/. Não iniciam automaticamente.";
 
-    panel.className =
-        "media-panel";
+    panel.append(titulo, descricao);
 
-    const titulo =
-        document.createElement(
-            "h3"
-        );
+    estado.arquivos.videos.forEach(arquivo => {
+        const item = document.createElement("div");
+        item.className = "video-item";
 
-    titulo.textContent =
-        "Nossos vídeos";
+        const nome = document.createElement("span");
+        nome.className = "media-name";
+        nome.textContent = arquivo.nome;
 
-    const descricao =
-        document.createElement(
-            "p"
-        );
+        const player = document.createElement("video");
+        player.controls = true;
+        player.preload = "metadata";
+        player.playsInline = true;
+        player.src = arquivo.url;
 
-    descricao.textContent =
-        "Os vídeos não iniciam automaticamente e só pedem dados ao navegador quando necessário.";
+        const tipo = tipoMimePorArquivo(arquivo);
+        if (tipo) player.setAttribute("type", tipo);
 
-    panel.append(
-        titulo,
-        descricao
-    );
+        player.addEventListener("error", () => {
+            adicionarErroMedia(item, "Este navegador encontrou o arquivo, mas não consegue reproduzir esse formato diretamente.");
+        }, { once: true });
 
-    estado.arquivos.videos.forEach(
-        arquivo => {
-            const item =
-                document.createElement(
-                    "div"
-                );
+        item.append(nome, player);
+        panel.appendChild(item);
+    });
 
-            item.className =
-                "video-item";
-
-            const nome =
-                document.createElement(
-                    "span"
-                );
-
-            nome.className =
-                "media-name";
-
-            nome.textContent =
-                arquivo.nome;
-
-            const player =
-                document.createElement(
-                    "video"
-                );
-
-            player.controls = true;
-            player.preload = "metadata";
-            player.playsInline = true;
-            player.src =
-                arquivo.url;
-
-            const tipo =
-                tipoMimePorArquivo(
-                    arquivo
-                );
-
-            if (tipo) {
-                player.setAttribute(
-                    "type",
-                    tipo
-                );
-            }
-
-            player.addEventListener(
-                "error",
-                () => {
-                    adicionarErroMedia(
-                        item,
-                        "Este navegador encontrou o arquivo, mas não consegue reproduzir esse formato diretamente."
-                    );
-                },
-                {
-                    once: true
-                }
-            );
-
-            item.append(
-                nome,
-                player
-            );
-
-            panel.appendChild(
-                item
-            );
-        }
-    );
-
-    container.appendChild(
-        panel
-    );
+    container.appendChild(panel);
 }
 
-/* ============================================================
-   ERRO DE PLAYER
-   ============================================================ */
-
-function adicionarErroMedia(
-    container,
-    mensagem
-) {
-    if (
-        container.querySelector(
-            ".media-error"
-        )
-    ) {
-        return;
-    }
-
-    const erro =
-        document.createElement(
-            "div"
-        );
-
-    erro.className =
-        "media-error";
-
-    erro.textContent =
-        mensagem;
-
-    container.appendChild(
-        erro
-    );
+function adicionarErroMedia(container, mensagem) {
+    if (container.querySelector(".media-error")) return;
+    const erro = document.createElement("div");
+    erro.className = "media-error";
+    erro.textContent = mensagem;
+    container.appendChild(erro);
 }
 
 /* ============================================================
    LIGHTBOX
    ============================================================ */
 
-function abrirLightbox(
-    arquivo,
-    elementoOrigem,
-    indice
-) {
-    const lightbox =
-        document.getElementById(
-            "lightbox"
-        );
+function abrirLightbox(arquivo, elementoOrigem, indice) {
+    const lightbox = document.getElementById("lightbox");
+    const content = document.getElementById("lightboxContent");
+    const caption = document.getElementById("lightboxCaption");
 
-    const content =
-        document.getElementById(
-            "lightboxContent"
-        );
+    estado.ultimaFocada = elementoOrigem || document.activeElement;
+    estado.indiceFotoAtual = Number.isInteger(indice) ? indice : -1;
+    estado.lightboxAberto = true;
+    content.innerHTML = "";
 
-    const caption =
-        document.getElementById(
-            "lightboxCaption"
-        );
+    const extensao = obterExtensao(arquivo.nome);
 
-    estado.ultimaFocada =
-        elementoOrigem ||
-        document.activeElement;
-
-    estado.indiceFotoAtual =
-        Number.isInteger(indice)
-            ? indice
-            : -1;
-
-    estado.lightboxAberto =
-        true;
-
-    content.innerHTML =
-        "";
-
-    const extensao =
-        obterExtensao(
-            arquivo.nome
-        );
-
-    if (
-        extensao === "heic" ||
-        extensao === "heif"
-    ) {
+    if (extensao === "heic" || extensao === "heif") {
         renderizarFallbackLightbox(
             arquivo,
             "Formato HEIC/HEIF",
-            "O arquivo foi encontrado corretamente, mas muitos navegadores não conseguem decodificar HEIC/HEIF diretamente. O arquivo original continua disponível abaixo."
+            "O arquivo foi encontrado corretamente, mas navegadores não decodificam HEIC/HEIF diretamente."
         );
     } else {
-        const imagem =
-            document.createElement(
-                "img"
+        const imagem = document.createElement("img");
+        imagem.className = "lightbox-img";
+        imagem.src = arquivo.url;
+        imagem.alt = `Visualização ampliada: ${arquivo.nome}`;
+
+        imagem.addEventListener("error", () => {
+            renderizarFallbackLightbox(
+                arquivo,
+                "Não foi possível visualizar esta imagem",
+                "O arquivo existe no repositório, mas este navegador não conseguiu decodificá-lo."
             );
+        }, { once: true });
 
-        imagem.className =
-            "lightbox-img";
-
-        imagem.src =
-            arquivo.url;
-
-        imagem.alt =
-            `Visualização ampliada: ${arquivo.nome}`;
-
-        imagem.addEventListener(
-            "error",
-            () => {
-                renderizarFallbackLightbox(
-                    arquivo,
-                    "Não foi possível visualizar esta imagem",
-                    "O arquivo existe no repositório, mas este navegador não conseguiu decodificá-lo."
-                );
-            },
-            {
-                once: true
-            }
-        );
-
-        content.appendChild(
-            imagem
-        );
+        content.appendChild(imagem);
     }
 
-    caption.textContent =
-        arquivo.nome;
+    caption.textContent = arquivo.nome;
+    lightbox.classList.add("aberto");
+    lightbox.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
 
-    lightbox.classList.add(
-        "aberto"
-    );
-
-    lightbox.setAttribute(
-        "aria-hidden",
-        "false"
-    );
-
-    document.body.style.overflow =
-        "hidden";
-
-    if (
-        !history.state ||
-        !history.state.nossosMomentosLightbox
-    ) {
-        history.pushState(
-            {
-                ...(history.state || {}),
-                nossosMomentosLightbox: true
-            },
-            ""
-        );
-
-        estado.lightboxUsouHistorico =
-            true;
+    if (!history.state || !history.state.nossosMomentosLightbox) {
+        history.pushState({ ...(history.state || {}), nossosMomentosLightbox: true }, "");
+        estado.lightboxUsouHistorico = true;
     } else {
-        estado.lightboxUsouHistorico =
-            false;
+        estado.lightboxUsouHistorico = false;
     }
 
-    requestAnimationFrame(
-        () => {
-            document
-                .getElementById(
-                    "lightboxClose"
-                )
-                ?.focus();
-        }
-    );
+    requestAnimationFrame(() => {
+        document.getElementById("lightboxClose")?.focus();
+    });
 }
 
-function renderizarFallbackLightbox(
-    arquivo,
-    tituloTexto,
-    descricaoTexto
-) {
-    const content =
-        document.getElementById(
-            "lightboxContent"
-        );
+function renderizarFallbackLightbox(arquivo, tituloTexto, descricaoTexto) {
+    const content = document.getElementById("lightboxContent");
+    content.innerHTML = "";
 
-    content.innerHTML =
-        "";
+    const fallback = document.createElement("div");
+    fallback.className = "lightbox-fallback";
 
-    const fallback =
-        document.createElement(
-            "div"
-        );
+    const titulo = document.createElement("strong");
+    titulo.textContent = tituloTexto;
 
-    fallback.className =
-        "lightbox-fallback";
+    const descricao = document.createElement("p");
+    descricao.textContent = descricaoTexto;
 
-    const titulo =
-        document.createElement(
-            "strong"
-        );
+    const link = document.createElement("a");
+    link.className = "raw-link";
+    link.href = arquivo.url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = "Abrir arquivo original";
 
-    titulo.textContent =
-        tituloTexto;
-
-    const descricao =
-        document.createElement(
-            "p"
-        );
-
-    descricao.textContent =
-        descricaoTexto;
-
-    const link =
-        document.createElement(
-            "a"
-        );
-
-    link.className =
-        "raw-link";
-
-    link.href =
-        arquivo.url;
-
-    link.target =
-        "_blank";
-
-    link.rel =
-        "noopener noreferrer";
-
-    link.textContent =
-        "Abrir arquivo original";
-
-    fallback.append(
-        titulo,
-        descricao,
-        link
-    );
-
-    content.appendChild(
-        fallback
-    );
+    fallback.append(titulo, descricao, link);
+    content.appendChild(fallback);
 }
 
-function fecharLightbox(
-    iniciadoPeloHistorico = false
-) {
-    const lightbox =
-        document.getElementById(
-            "lightbox"
-        );
+function fecharLightbox(iniciadoPeloHistorico = false) {
+    const lightbox = document.getElementById("lightbox");
+    if (!estado.lightboxAberto && !lightbox.classList.contains("aberto")) return;
 
-    if (
-        !estado.lightboxAberto &&
-        !lightbox.classList.contains(
-            "aberto"
-        )
-    ) {
-        return;
-    }
+    estado.lightboxAberto = false;
+    lightbox.classList.remove("aberto");
+    lightbox.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
 
-    estado.lightboxAberto =
-        false;
+    document.getElementById("lightboxContent").innerHTML = "";
+    document.getElementById("lightboxCaption").textContent = "";
+    estado.indiceFotoAtual = -1;
 
-    lightbox.classList.remove(
-        "aberto"
-    );
+    const foco = estado.ultimaFocada;
+    estado.ultimaFocada = null;
 
-    lightbox.setAttribute(
-        "aria-hidden",
-        "true"
-    );
-
-    document.body.style.overflow =
-        "";
-
-    document.getElementById(
-        "lightboxContent"
-    ).innerHTML = "";
-
-    document.getElementById(
-        "lightboxCaption"
-    ).textContent = "";
-
-    estado.indiceFotoAtual =
-        -1;
-
-    const foco =
-        estado.ultimaFocada;
-
-    estado.ultimaFocada =
-        null;
-
-    if (
-        !iniciadoPeloHistorico &&
-        estado.lightboxUsouHistorico &&
-        history.state?.nossosMomentosLightbox
-    ) {
-        estado.lightboxUsouHistorico =
-            false;
-
+    if (!iniciadoPeloHistorico && estado.lightboxUsouHistorico && history.state?.nossosMomentosLightbox) {
+        estado.lightboxUsouHistorico = false;
         history.back();
         return;
     }
 
-    estado.lightboxUsouHistorico =
-        false;
-
-    if (
-        foco &&
-        typeof foco.focus === "function"
-    ) {
-        requestAnimationFrame(
-            () => foco.focus()
-        );
+    estado.lightboxUsouHistorico = false;
+    if (foco && typeof foco.focus === "function") {
+        requestAnimationFrame(() => foco.focus());
     }
 }
 
-/* ============================================================
-   EVENTOS DO LIGHTBOX
-   ============================================================ */
+const lightboxEl = document.getElementById("lightbox");
+lightboxEl.addEventListener("click", event => {
+    if (event.target === lightboxEl) fecharLightbox();
+});
 
-const lightbox =
-    document.getElementById(
-        "lightbox"
-    );
+document.getElementById("lightboxClose").addEventListener("click", event => {
+    event.stopPropagation();
+    fecharLightbox();
+});
 
-lightbox.addEventListener(
-    "click",
-    event => {
-        if (
-            event.target === lightbox
-        ) {
-            fecharLightbox();
-        }
-    }
-);
-
-document.getElementById(
-    "lightboxClose"
-).addEventListener(
-    "click",
-    event => {
-        event.stopPropagation();
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && estado.lightboxAberto) {
+        event.preventDefault();
         fecharLightbox();
     }
-);
+});
 
-document.addEventListener(
-    "keydown",
-    event => {
-        if (
-            event.key === "Escape" &&
-            estado.lightboxAberto
-        ) {
-            event.preventDefault();
-            fecharLightbox();
-        }
-    }
-);
-
-window.addEventListener(
-    "popstate",
-    () => {
-        if (
-            estado.lightboxAberto
-        ) {
-            fecharLightbox(true);
-        }
-    }
-);
+window.addEventListener("popstate", () => {
+    if (estado.lightboxAberto) fecharLightbox(true);
+});
 
 /* ============================================================
-   ABAS DE MÍDIA
+   NAVEGAÇÃO POR ABAS
    ============================================================ */
 
 function trocarSecao(nome) {
-    document.querySelectorAll(
-        ".media-tab"
-    ).forEach(
-        botao => {
-            const ativo =
-                botao.dataset.section ===
-                nome;
+    document.querySelectorAll(".media-tab").forEach(botao => {
+        const ativo = botao.dataset.section === nome;
+        botao.classList.toggle("active", ativo);
+        botao.setAttribute("aria-selected", String(ativo));
+    });
 
-            botao.classList.toggle(
-                "active",
-                ativo
-            );
-
-            botao.setAttribute(
-                "aria-selected",
-                String(ativo)
-            );
-        }
-    );
-
-    document.querySelectorAll(
-        ".section"
-    ).forEach(
-        secao => {
-            const ativo =
-                secao.id ===
-                `section-${nome}`;
-
-            secao.classList.toggle(
-                "active",
-                ativo
-            );
-
-            secao.hidden =
-                !ativo;
-        }
-    );
+    document.querySelectorAll(".section").forEach(secao => {
+        const ativo = secao.id === `section-${nome}`;
+        secao.classList.toggle("active", ativo);
+        secao.hidden = !ativo;
+    });
 }
 
-document.querySelectorAll(
-    ".media-tab"
-).forEach(
-    botao => {
-        botao.addEventListener(
-            "click",
-            () => {
-                trocarSecao(
-                    botao.dataset.section
-                );
-            }
-        );
-    }
-);
+document.querySelectorAll(".media-tab").forEach(botao => {
+    botao.addEventListener("click", () => trocarSecao(botao.dataset.section));
+});
+
+document.getElementById("mediaTabs").addEventListener("keydown", event => {
+    const botoes = Array.from(document.querySelectorAll(".media-tab"));
+    const indice = botoes.indexOf(event.target);
+    if (indice === -1) return;
+
+    let novoIndice = indice;
+    if (event.key === "ArrowRight") novoIndice = (indice + 1) % botoes.length;
+    else if (event.key === "ArrowLeft") novoIndice = (indice - 1 + botoes.length) % botoes.length;
+    else if (event.key === "Home") novoIndice = 0;
+    else if (event.key === "End") novoIndice = botoes.length - 1;
+    else return;
+
+    event.preventDefault();
+    botoes[novoIndice].focus();
+    trocarSecao(botoes[novoIndice].dataset.section);
+});
 
 /* ============================================================
-   TECLADO DAS ABAS
-   ============================================================ */
-
-document.getElementById(
-    "mediaTabs"
-).addEventListener(
-    "keydown",
-    event => {
-        const botoes =
-            Array.from(
-                document.querySelectorAll(
-                    ".media-tab"
-                )
-            );
-
-        const indice =
-            botoes.indexOf(
-                event.target
-            );
-
-        if (indice === -1) {
-            return;
-        }
-
-        let novoIndice =
-            indice;
-
-        if (
-            event.key === "ArrowRight"
-        ) {
-            novoIndice =
-                (indice + 1) %
-                botoes.length;
-        } else if (
-            event.key === "ArrowLeft"
-        ) {
-            novoIndice =
-                (indice - 1 +
-                    botoes.length) %
-                botoes.length;
-        } else if (
-            event.key === "Home"
-        ) {
-            novoIndice = 0;
-        } else if (
-            event.key === "End"
-        ) {
-            novoIndice =
-                botoes.length - 1;
-        } else {
-            return;
-        }
-
-        event.preventDefault();
-
-        botoes[
-            novoIndice
-        ].focus();
-
-        trocarSecao(
-            botoes[
-                novoIndice
-            ].dataset.section
-        );
-    }
-);
-
-/* ============================================================
-   NAVEGAÇÃO PARA HOME.HTML
+   BOTÕES DE VOLTAR
    ============================================================ */
 
 function voltarHome() {
-    window.location.href =
-        "home.html";
+    window.location.href = "home.html";
 }
 
-document.getElementById(
-    "btnVoltar"
-).addEventListener(
-    "click",
-    voltarHome
-);
-
-document.getElementById(
-    "btnVoltarInferior"
-).addEventListener(
-    "click",
-    voltarHome
-);
+document.getElementById("btnVoltar").addEventListener("click", voltarHome);
+document.getElementById("btnVoltarInferior").addEventListener("click", voltarHome);
 
 /* ============================================================
-   ERRO GLOBAL
+   TRATAMENTO DE ERROS E INICIALIZAÇÃO
    ============================================================ */
 
-function mostrarErroGlobal(
-    erro
-) {
-    const box =
-        document.getElementById(
-            "globalError"
-        );
+function mostrarErroGlobal(erro) {
+    const box = document.getElementById("globalError");
+    const detectado = detectarRepositorioAutomaticamente();
+    const owner = detectado.owner || "(vazio)";
+    const repo = detectado.repo || "(vazio)";
+    const branch = detectado.branch || "(será descoberto)";
 
-    const detectado =
-        detectarRepositorioAutomaticamente();
+    box.innerHTML = "";
 
-    const owner =
-        detectado.owner ||
-        "(vazio)";
+    const estadoErro = document.createElement("div");
+    estadoErro.className = "error-state";
 
-    const repo =
-        detectado.repo ||
-        "(vazio)";
+    const titulo = document.createElement("strong");
+    titulo.textContent = "Não consegui consultar as mídias do GitHub.";
 
-    const branch =
-        detectado.branch ||
-        "(será descoberto)";
+    const detalhe = document.createElement("div");
+    detalhe.textContent = erro?.message || "Ocorreu um erro inesperado.";
 
-    box.innerHTML =
-        "";
+    const orientacao = document.createElement("div");
+    orientacao.style.marginTop = "9px";
+    orientacao.textContent = "Confira se o repositório é público, se a pasta midia/ existe e se os arquivos estão dentro dela.";
 
-    const estadoErro =
-        document.createElement(
-            "div"
-        );
+    const configuracao = document.createElement("div");
+    configuracao.style.marginTop = "9px";
+    configuracao.innerHTML = `<small>Configuração detectada: <code>${escaparHTML(`${owner}/${repo} ·${branch}`)}</code></small>`;
 
-    estadoErro.className =
-        "error-state";
-
-    const titulo =
-        document.createElement(
-            "strong"
-        );
-
-    titulo.textContent =
-        "Não consegui consultar as mídias do GitHub.";
-
-    const detalhe =
-        document.createElement(
-            "div"
-        );
-
-    detalhe.textContent =
-        erro?.message ||
-        "Ocorreu um erro inesperado.";
-
-    const orientacao =
-        document.createElement(
-            "div"
-        );
-
-    orientacao.style.marginTop =
-        "9px";
-
-    orientacao.textContent =
-        "Confira se o repositório é público, se as três pastas existem exatamente com os nomes midia/Fotos/, midia/Áudios/ e midia/Vídeos/, e se owner/repo estão corretos quando a página estiver em domínio personalizado.";
-
-    const configuracao =
-        document.createElement(
-            "div"
-        );
-
-    configuracao.style.marginTop =
-        "9px";
-
-    configuracao.innerHTML =
-        "<small>Configuração detectada: " +
-        "<code>" +
-        escaparHTML(
-            `${owner}/${repo} · ${branch}`
-        ) +
-        "</code></small>";
-
-    estadoErro.append(
-        titulo,
-        document.createElement(
-            "br"
-        ),
-        detalhe,
-        orientacao,
-        configuracao
-    );
-
-    box.appendChild(
-        estadoErro
-    );
-
-    document.getElementById(
-        "collectionNote"
-    ).textContent =
-        "Não foi possível carregar o catálogo de mídias.";
+    estadoErro.append(titulo, document.createElement("br"), detalhe, orientacao, configuracao);
+    box.appendChild(estadoErro);
 }
-
-/* ============================================================
-   FALLBACK DE FALHA INDIVIDUAL
-   ============================================================ */
-
-window.addEventListener(
-    "unhandledrejection",
-    event => {
-        console.error(
-            "Promise rejeitada:",
-            event.reason
-        );
-    }
-);
-
-/* ============================================================
-   INICIALIZAÇÃO
-   ============================================================ */
 
 async function iniciar() {
     try {
         await carregarCatalogo();
     } catch (erro) {
-        console.error(
-            "Falha ao iniciar Nossos Momentos:",
-            erro
-        );
+        console.error("Falha ao carregar galeria:", erro);
+        estado.carregando = false;
 
-        estado.carregando =
-            false;
+        esconderCarregamento("fotoLoading");
+        esconderCarregamento("audioLoading");
+        esconderCarregamento("videoLoading");
 
-        esconderCarregamento(
-            "fotoLoading"
-        );
+        document.getElementById("fotoEmpty").classList.add("visible");
+        document.getElementById("audioEmpty").classList.add("visible");
+        document.getElementById("videoEmpty").classList.add("visible");
 
-        esconderCarregamento(
-            "audioLoading"
-        );
-
-        esconderCarregamento(
-            "videoLoading"
-        );
-
-        document.getElementById(
-            "fotoEmpty"
-        ).classList.add(
-            "visible"
-        );
-
-        document.getElementById(
-            "fotoEmpty"
-        ).innerHTML =
-            "<strong>Não foi possível carregar a galeria</strong>" +
-            "Confira a configuração do repositório e tente novamente.";
-
-        document.getElementById(
-            "audioEmpty"
-        ).classList.add(
-            "visible"
-        );
-
-        document.getElementById(
-            "audioEmpty"
-        ).innerHTML =
-            "<strong>Não foi possível carregar os áudios</strong>" +
-            "A consulta ao repositório não foi concluída.";
-
-        document.getElementById(
-            "videoEmpty"
-        ).classList.add(
-            "visible"
-        );
-
-        document.getElementById(
-            "videoEmpty"
-        ).innerHTML =
-            "<strong>Não foi possível carregar os vídeos</strong>" +
-            "A consulta ao repositório não foi concluída.";
-
-        mostrarErroGlobal(
-            erro
-        );
+        mostrarErroGlobal(erro);
     }
 }
 
 iniciar();
 </script>
 </body>
-  </html>
+</html>
