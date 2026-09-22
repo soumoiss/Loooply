@@ -136,10 +136,46 @@
 
         .topbar {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: space-between;
             gap: 12px;
             margin-bottom: 14px;
+        }
+
+        .navigation-stack {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 7px;
+        }
+
+        .navigation-button {
+            width: auto;
+            min-width: 46px;
+            min-height: 42px;
+            height: auto;
+            padding: 7px 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 7px;
+            border-radius: 14px;
+        }
+
+        .navigation-button .navigation-label {
+            max-width: 0;
+            overflow: hidden;
+            opacity: 0;
+            white-space: nowrap;
+            font-size: 11px;
+            font-weight: 800;
+            transition: max-width .20s ease, opacity .20s ease;
+        }
+
+        .navigation-button:hover .navigation-label,
+        .navigation-button:focus-visible .navigation-label {
+            max-width: 70px;
+            opacity: 1;
         }
 
         .topbar-spacer {
@@ -279,6 +315,13 @@
             line-height: 1.05;
             font-weight: 800;
             letter-spacing: -.035em;
+        }
+
+        .collection-note {
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.4;
         }
 
         .contador {
@@ -558,6 +601,12 @@
             display: none;
         }
 
+        .carta.tocando {
+            transform: scale(.988);
+            box-shadow: 0 3px 12px rgba(75,54,104,.06);
+        }
+
+
         .carta-numero-box {
             width: 55px;
             height: 55px;
@@ -704,7 +753,7 @@
             box-shadow: var(--shadow-sm);
         }
 
-        .btn-para-voce {
+        .btn-musicas {
             position: fixed;
             right: max(16px, env(safe-area-inset-right));
             bottom: max(16px, env(safe-area-inset-bottom));
@@ -726,14 +775,262 @@
             transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
         }
 
-        .btn-para-voce:hover {
+        .btn-musicas svg {
+            width: 18px;
+            height: 18px;
+            flex: 0 0 18px;
+        }
+
+        .btn-musicas:hover {
             transform: translateY(-2px);
             background: var(--primary-strong);
             box-shadow: 0 17px 35px rgba(96,62,133,.27);
         }
 
-        .btn-para-voce:active {
+        .btn-musicas:active {
             transform: scale(.97);
+        }
+
+        /* =========================================================
+           CAMADA DE NAVEGAÇÃO HUMANA
+           ---------------------------------------------------------
+           Os dois atalhos no topo foram pensados como pequenos gestos
+           de navegação, não como uma barra de menu. A intenção é que
+           permaneçam presentes sem competir com a fotografia, o nome e
+           a coleção de cartas.
+           ========================================================= */
+
+        .navigation-stack .icon-button {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .navigation-stack .icon-button::after {
+            content: "";
+            position: absolute;
+            inset: 1px;
+            border-radius: inherit;
+            pointer-events: none;
+            opacity: 0;
+            background: linear-gradient(
+                120deg,
+                rgba(255,255,255,.32),
+                transparent 42%
+            );
+            transition: opacity .20s ease;
+        }
+
+        .navigation-stack .icon-button:hover::after,
+        .navigation-stack .icon-button:focus-visible::after {
+            opacity: 1;
+        }
+
+        .navigation-stack .icon-button:focus-visible {
+            outline-offset: 2px;
+        }
+
+        .navigation-stack .icon-button svg {
+            position: relative;
+            z-index: 1;
+            flex: 0 0 auto;
+        }
+
+        .navigation-stack .navigation-label {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* =========================================================
+           CABEÇALHO MAIS AFETIVO
+           ========================================================= */
+
+        .subtitulo {
+            font-family:
+                "Quillen",
+                Georgia,
+                "Times New Roman",
+                serif;
+            font-size: 16px;
+            line-height: 1.55;
+            letter-spacing: .005em;
+            color: #776f7e;
+        }
+
+        .subtitulo::first-letter {
+            color: var(--primary-strong);
+        }
+
+        /* =========================================================
+           CARTAS — DETALHES DE LEITURA
+           ========================================================= */
+
+        .carta-info {
+            padding-block: 2px;
+        }
+
+        .carta-titulo {
+            text-wrap: pretty;
+        }
+
+        .carta[data-indisponivel="true"] {
+            opacity: .72;
+        }
+
+        .carta[data-indisponivel="true"] .carta-numero-box {
+            background: #f3f0f5;
+            color: #98919f;
+        }
+
+        .carta[data-indisponivel="true"] .carta-titulo {
+            font-family:
+                Inter,
+                ui-sans-serif,
+                system-ui,
+                sans-serif;
+            font-size: 14px;
+            letter-spacing: 0;
+        }
+
+        .carta .check {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .carta .check::before {
+            content: "";
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* =========================================================
+           CALENDÁRIO — LEITURA E TOQUE
+           ========================================================= */
+
+        .calendar-card {
+            position: relative;
+        }
+
+        .calendar-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 18px;
+            right: 18px;
+            height: 1px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(155,93,229,.10),
+                transparent
+            );
+        }
+
+        .day-button:not(:disabled):focus-visible {
+            outline: 2px solid rgba(155,93,229,.35);
+            outline-offset: 1px;
+        }
+
+        .day-button.has-cards:not(.selected) {
+            font-weight: 850;
+        }
+
+        .day-button.selected {
+            border-color: rgba(155,93,229,.18);
+        }
+
+        .day-button.muted-day:hover {
+            transform: none;
+            background: transparent;
+        }
+
+        /* =========================================================
+           ESTADOS VAZIOS
+           ========================================================= */
+
+        .empty-state {
+            line-height: 1.6;
+        }
+
+        .empty-state strong {
+            font-family:
+                "Quillen",
+                Georgia,
+                serif;
+            font-size: 18px;
+            font-weight: 400;
+        }
+
+        /* =========================================================
+           CARTA ABERTA — PEQUENOS DETALHES DE PAPEL
+           ========================================================= */
+
+        .carta-folha {
+            position: relative;
+        }
+
+        .carta-folha::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            border-radius: inherit;
+            opacity: .16;
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(96,75,54,.018) 0,
+                    rgba(96,75,54,.018) 1px,
+                    transparent 1px,
+                    transparent 4px
+                );
+            mix-blend-mode: multiply;
+        }
+
+        .modal-header,
+        .modal-texto,
+        .modal-footer {
+            position: relative;
+            z-index: 1;
+        }
+
+        .modal-texto::selection {
+            background: rgba(155,93,229,.20);
+        }
+
+        .modal-texto:focus-visible {
+            outline: 2px solid rgba(125,91,164,.30);
+            outline-offset: -3px;
+        }
+
+        .modal-fechar-x {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* =========================================================
+           MÚSICAS — ATALHO FLUTUANTE
+           ========================================================= */
+
+        .btn-musicas {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .btn-musicas svg {
+            transition: transform .18s ease;
+        }
+
+        .btn-musicas:hover svg,
+        .btn-musicas:focus-visible svg {
+            transform: translateY(-1px);
+        }
+
+        .btn-musicas:focus-visible {
+            outline: 3px solid rgba(155,93,229,.28);
+            outline-offset: 3px;
         }
 
         /* =========================================================
@@ -1050,7 +1347,7 @@
                 width: 100%;
             }
 
-            .btn-para-voce {
+            .btn-musicas {
                 min-height: 48px;
                 right: max(12px, env(safe-area-inset-right));
                 bottom: max(12px, env(safe-area-inset-bottom));
@@ -1087,25 +1384,1167 @@
                 transition-duration: .01ms !important;
             }
         }
+
+
+        /* =========================================================
+           DETALHES DE ESTADO DOS CONTROLES
+           ========================================================= */
+
+        .filter-button[aria-pressed="true"] {
+            color: #fff;
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .filter-button[aria-pressed="false"] {
+            color: var(--muted);
+        }
+
+        .icon-button[aria-current="page"] {
+            background: var(--primary-pale);
+            border-color: rgba(155,93,229,.20);
+        }
+
+        .btn-musicas[aria-busy="true"] {
+            cursor: wait;
+            opacity: .75;
+        }
+
+        .btn-musicas[aria-busy="true"] svg {
+            animation: musicIconBreath 1s ease-in-out infinite;
+        }
+
+        @keyframes musicIconBreath {
+            0%, 100% { opacity: .55; transform: scale(.94); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        /* =========================================================
+           CARTÕES EM ESTADO DE FILTRO
+           ========================================================= */
+
+        .cartas-container.tem-filtro .carta:not(.oculta) {
+            border-color: rgba(155,93,229,.11);
+        }
+
+        .cartas-container.tem-filtro .carta:not(.oculta)::before {
+            content: "";
+            position: absolute;
+            top: 13px;
+            bottom: 13px;
+            left: 0;
+            width: 2px;
+            border-radius: 2px;
+            background: rgba(155,93,229,.30);
+            opacity: .75;
+        }
+
+        .cartas-container.tem-filtro .carta:not(.oculta) .carta-numero-box {
+            background: #f2eaff;
+        }
+
+        .cartas-container.sem-resultados {
+            min-height: 90px;
+        }
+
+        /* =========================================================
+           PROGRESSO DA COLEÇÃO
+           ========================================================= */
+
+        .overview-card[data-completa="true"] {
+            border-color: rgba(155,93,229,.18);
+            background:
+                linear-gradient(135deg, #fff, #f7f0ff);
+        }
+
+        .overview-card[data-completa="true"] .collection-note {
+            color: var(--primary-strong);
+        }
+
+        .overview-card[data-vazia="true"] .collection-note {
+            color: var(--muted);
+        }
+
+        /* =========================================================
+           CALENDÁRIO — CABEÇALHO
+           ========================================================= */
+
+        .calendar-head {
+            min-height: 38px;
+        }
+
+        .calendar-month {
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .calendar-nav button {
+            font-size: 18px;
+            line-height: 1;
+            font-weight: 700;
+        }
+
+        .calendar-nav button:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .calendar-nav button:not(:disabled):active {
+            transform: scale(.94);
+        }
+
+        /* =========================================================
+           CALENDÁRIO — DIA COM CARTA
+           ========================================================= */
+
+        .day-button.has-cards {
+            background: rgba(155,93,229,.035);
+        }
+
+        .day-button.has-cards:hover {
+            background: rgba(155,93,229,.10);
+        }
+
+        .day-button.has-cards::after {
+            transition: transform .18s ease, background .18s ease;
+        }
+
+        .day-button.has-cards:hover::after {
+            transform: translateX(-50%) scale(1.35);
+        }
+
+        .day-button.selected:hover {
+            background: var(--primary);
+        }
+
+        .day-button.selected.has-cards::after {
+            transform: translateX(-50%) scale(1.15);
+        }
+
+        /* =========================================================
+           CALENDÁRIO — SEM DATA
+           ========================================================= */
+
+        .calendar-foot #calendarInfo {
+            min-width: 0;
+            text-align: right;
+        }
+
+        /* =========================================================
+           CARTA — ESTADO LIDA
+           ========================================================= */
+
+        .carta:has(.check.lida) .carta-numero-box {
+            background: #eee3ff;
+        }
+
+        .carta:has(.check.lida) .carta-data {
+            color: #81718e;
+        }
+
+        .carta:has(.check.lida) .carta-titulo {
+            color: #332d39;
+        }
+
+        /* =========================================================
+           CARTA — ESTADO NÃO LIDA
+           ========================================================= */
+
+        .carta:not(:has(.check.lida)) .carta-numero-box {
+            background: #f6f3f8;
+        }
+
+        .carta:not(:has(.check.lida)) .check {
+            background: #faf9fb;
+        }
+
+        /* =========================================================
+           CHECK DE LEITURA
+           ========================================================= */
+
+        .check {
+            position: relative;
+        }
+
+        .check.lida::after {
+            content: "";
+            position: absolute;
+            inset: -4px;
+            border: 1px solid rgba(155,93,229,.12);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .check.lida {
+            transform: translateZ(0);
+        }
+
+        /* =========================================================
+           MODAL — ESTADO DE CARREGAMENTO
+           ========================================================= */
+
+        .modal-texto[data-carregando="true"] {
+            color: #766a5e;
+        }
+
+        .modal-texto[data-carregando="true"]::first-line {
+            opacity: .75;
+        }
+
+        .modal-texto[data-erro="true"] {
+            min-height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* =========================================================
+           MODAL — LEITURA CONTÍNUA
+           ========================================================= */
+
+        .carta-folha[data-tem-data="true"] .modal-header {
+            background: rgba(255,255,255,.09);
+        }
+
+        .carta-folha[data-tem-data="false"] .modal-date {
+            display: none;
+        }
+
+        .modal-texto:not(.erro-carta) {
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* =========================================================
+           MODAL — ÁREA DE LEITURA NO DESKTOP
+           ========================================================= */
+
+        @media (min-width: 821px) {
+            .modal-texto {
+                padding-left: 72px;
+                padding-right: 72px;
+            }
+
+            .modal-header {
+                padding-left: 28px;
+                padding-right: 28px;
+            }
+
+            .modal-footer {
+                padding-left: 28px;
+                padding-right: 28px;
+            }
+        }
+
+        /* =========================================================
+           MODAL — CELULAR ESTREITO
+           ========================================================= */
+
+        @media (max-width: 390px) {
+            .modal {
+                padding-inline: 5px;
+            }
+
+            .carta-folha {
+                border-radius: 18px;
+            }
+
+            .modal-header {
+                gap: 9px;
+                padding-inline: 12px;
+            }
+
+            .modal-content h3 {
+                font-size: 20px;
+            }
+
+            .modal-texto {
+                padding-inline: 17px;
+                font-size: 18px;
+                line-height: 1.67;
+            }
+
+            .modal-fechar-x {
+                width: 40px;
+                height: 40px;
+                flex-basis: 40px;
+            }
+        }
+
+        /* =========================================================
+           NAVEGAÇÃO — TELAS PEQUENAS
+           ========================================================= */
+
+        @media (max-width: 560px) {
+            .navigation-stack {
+                gap: 6px;
+            }
+
+            .navigation-button {
+                min-width: 43px;
+                min-height: 41px;
+                padding: 7px 9px;
+            }
+
+            .navigation-button .navigation-label {
+                display: none;
+            }
+
+            .navigation-button:focus-visible .navigation-label {
+                display: inline;
+                max-width: 70px;
+                opacity: 1;
+            }
+        }
+
+        /* =========================================================
+           NAVEGAÇÃO — TELAS MÉDIAS
+           ========================================================= */
+
+        @media (min-width: 561px) {
+            .navigation-button {
+                min-width: 48px;
+            }
+        }
+
+        /* =========================================================
+           LISTA — ALTURA DE LEITURA
+           ========================================================= */
+
+        @media (min-height: 800px) and (min-width: 561px) {
+            .cartas-container {
+                max-height: 66vh;
+                max-height: 66dvh;
+            }
+        }
+
+        @media (min-height: 1000px) and (min-width: 821px) {
+            .cartas-container {
+                max-height: 720px;
+            }
+        }
+
+        /* =========================================================
+           DESKTOP COM CURSOR PRECISO
+           ========================================================= */
+
+        @media (hover: hover) and (pointer: fine) {
+            .carta {
+                will-change: transform;
+            }
+
+            .icon-button,
+            .filter-button,
+            .day-button,
+            .calendar-nav button,
+            .btn-logout,
+            .btn-musicas,
+            .modal-fechar-x,
+            .fechar button {
+                will-change: transform;
+            }
+        }
+
+        /* =========================================================
+           TABLET EM LANDSCAPE
+           ========================================================= */
+
+        @media (min-width: 821px) and (max-width: 1100px) and (orientation: landscape) {
+            .app-shell {
+                width: min(100%, 760px);
+            }
+
+            .container {
+                padding: 28px 30px;
+            }
+
+            .profile-wrap {
+                margin-top: 0;
+                margin-bottom: 12px;
+            }
+
+            .profile-ring {
+                width: 118px;
+                height: 118px;
+            }
+
+            .cartas-container {
+                max-height: 54vh;
+                max-height: 54dvh;
+            }
+        }
+
+        /* =========================================================
+           TABLET EM RETRATO
+           ========================================================= */
+
+        @media (min-width: 561px) and (max-width: 820px) and (orientation: portrait) {
+            .navigation-button .navigation-label {
+                max-width: 0;
+            }
+
+            .navigation-button:hover .navigation-label,
+            .navigation-button:focus-visible .navigation-label {
+                max-width: 72px;
+            }
+        }
+
+        /* =========================================================
+           PREFERÊNCIA DE COR DO SISTEMA
+           ---------------------------------------------------------
+           O projeto permanece deliberadamente claro. Esta regra não
+           troca a identidade para dark mode; apenas garante que controles
+           nativos e áreas de seleção continuem coerentes em dispositivos
+           configurados com aparência escura.
+           ========================================================= */
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                color-scheme: light;
+            }
+        }
+
+        /* =========================================================
+           ESTABILIDADE DO LAYOUT
+           ========================================================= */
+
+        img {
+            max-width: 100%;
+        }
+
+        svg {
+            overflow: visible;
+        }
+
+        button {
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        button:disabled {
+            opacity: .55;
+        }
+
+        .container,
+        .overview-card,
+        .calendar-card,
+        .carta,
+        .carta-folha {
+            isolation: isolate;
+        }
+
+        /* =========================================================
+           TIPOGRAFIA — HIERARQUIA
+           ========================================================= */
+
+        .overview-label,
+        .carta-numero-label,
+        .modal-label {
+            text-rendering: geometricPrecision;
+        }
+
+        .lista-titulo,
+        .carta-titulo,
+        .modal-content h3,
+        .subtitulo {
+            font-kerning: normal;
+            font-variant-ligatures: common-ligatures;
+        }
+
+        /* =========================================================
+           TEXTO LONGO DOS TÍTULOS
+           ========================================================= */
+
+        @media (min-width: 561px) {
+            .carta-titulo {
+                max-width: 58ch;
+            }
+        }
+
+        /* =========================================================
+           ESTADO DE FOCO DOS CARTÕES
+           ========================================================= */
+
+        .carta:focus-visible {
+            outline: 3px solid rgba(155,93,229,.24);
+            outline-offset: 2px;
+            border-color: rgba(155,93,229,.22);
+        }
+
+        .carta[aria-disabled="true"] {
+            cursor: pointer;
+        }
+
+        /* =========================================================
+           REDUÇÃO DE MOVIMENTO ESPECÍFICA
+           ========================================================= */
+
+        @media (prefers-reduced-motion: reduce) {
+            .navigation-stack .icon-button::after,
+            .btn-musicas svg,
+            .check,
+            .day-button,
+            .carta,
+            .modal-content,
+            .modal,
+            .calendar-panel {
+                transition: none !important;
+                animation: none !important;
+            }
+        }
+
+        /* =========================================================
+           SAFE AREA EXTRA PARA RODAPÉ FLUTUANTE
+           ========================================================= */
+
+        @supports (bottom: env(safe-area-inset-bottom)) {
+            .btn-musicas {
+                bottom: calc(16px + env(safe-area-inset-bottom));
+            }
+        }
+
+        /* =========================================================
+           REFINO DE BORDA DO PAPEL
+           ========================================================= */
+
+        .carta-folha {
+            border-color: rgba(113, 89, 68, .13);
+        }
+
+        .carta-folha .modal-header,
+        .carta-folha .modal-footer {
+            border-color: rgba(113, 89, 68, .10);
+        }
+
+        /* =========================================================
+           REFINO DE FUNDO DA PÁGINA
+           ========================================================= */
+
+        body {
+            background-color: var(--bg);
+            background-attachment: fixed;
+        }
+
+        /* =========================================================
+           CONTROLE DE ESTOURO DE PALAVRAS
+           ========================================================= */
+
+        h1,
+        h2,
+        h3,
+        p,
+        span,
+        button {
+            overflow-wrap: anywhere;
+        }
+
+        /* =========================================================
+           BOTÕES DE FILTRO EM LINHA
+           ========================================================= */
+
+        .filters > .filter-button {
+            flex: 0 0 auto;
+        }
+
+        .filters > .filter-status {
+            align-self: center;
+        }
+
+        @media (max-width: 560px) {
+            .filters > .filter-status {
+                margin-top: 1px;
+            }
+        }
+
+        /* =========================================================
+           COLEÇÃO — PEQUENO RESPIRO ENTRE BLOCOS
+           ========================================================= */
+
+        .overview + .filters {
+            margin-top: 2px;
+        }
+
+        .filters + .calendar-panel {
+            margin-top: 0;
+        }
+
+        .calendar-panel + .cartas-container {
+            margin-top: 1px;
+        }
+
+        /* =========================================================
+           CARTA — RESPIRO INTERNO
+           ========================================================= */
+
+        .carta-numero-box,
+        .check {
+            flex-shrink: 0;
+        }
+
+        .carta-data {
+            overflow-wrap: anywhere;
+        }
+
+        /* =========================================================
+           MODAL — DATA
+           ========================================================= */
+
+        .modal-date {
+            overflow-wrap: anywhere;
+        }
+
+        /* =========================================================
+           ESTADO DE CARREGAMENTO
+           ========================================================= */
+
+        .carregando {
+            position: relative;
+        }
+
+        .carregando::after {
+            content: attr(data-percentual);
+            position: absolute;
+            margin-top: 46px;
+            font-size: 10px;
+            color: var(--muted-2);
+        }
+
+        .carregando[data-percentual="0"]::after,
+        .carregando:not([data-percentual])::after {
+            content: "";
+        }
+
+        /* =========================================================
+           CONSISTÊNCIA DO EMPTY STATE
+           ========================================================= */
+
+        .empty-state.visible + .acoes {
+            margin-top: 12px;
+        }
+
+        /* =========================================================
+           DESKTOP — LARGURA DO TEXTO DA CARTA
+           ========================================================= */
+
+        @media (min-width: 1100px) {
+            .modal-texto {
+                max-width: 760px;
+                width: 100%;
+                margin-inline: auto;
+            }
+        }
+
+        /* =========================================================
+           MOBILE — FOLHA QUASE DE BORDA A BORDA
+           ========================================================= */
+
+        @media (max-width: 560px) {
+            .modal-content {
+                width: calc(100vw - 10px);
+                max-width: none;
+            }
+
+            .carta-folha {
+                min-height: calc(100dvh - 16px);
+            }
+        }
+
+        /* =========================================================
+           ÚLTIMA CAMADA DE DELICADEZA
+           ========================================================= */
+
+        .carta,
+        .overview-card,
+        .calendar-card,
+        .icon-button,
+        .btn-logout,
+        .btn-musicas {
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+
+        .carta::selection,
+        .overview-card::selection {
+            background: rgba(155,93,229,.16);
+        }
+
+        /* =========================================================
+           ACESSIBILIDADE E MODOS DE LEITURA
+           ========================================================= */
+
+        @media (prefers-contrast: more) {
+            :root {
+                --line: rgba(72, 58, 88, .26);
+                --muted: #625c68;
+                --muted-2: #756e7b;
+            }
+
+            .icon-button,
+            .filter-button,
+            .calendar-card,
+            .carta,
+            .overview-card,
+            .btn-logout {
+                border-color: rgba(72, 58, 88, .26);
+            }
+
+            .carta-titulo,
+            .lista-titulo,
+            h2 {
+                color: #17151a;
+            }
+        }
+
+        @media (prefers-reduced-transparency: reduce) {
+            .container,
+            .icon-button,
+            .calendar-card,
+            .filter-button,
+            .overview-card {
+                background: #fff;
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+            }
+        }
+
+        /* =========================================================
+           TELAS MUITO PEQUENAS
+           ========================================================= */
+
+        @media (max-width: 340px) {
+            body {
+                padding-inline: 9px;
+            }
+
+            .container {
+                padding-inline: 10px;
+            }
+
+            .navigation-stack {
+                gap: 5px;
+            }
+
+            .navigation-button {
+                min-height: 40px;
+                padding: 6px 8px;
+                border-radius: 13px;
+            }
+
+            .navigation-button svg {
+                width: 18px;
+                height: 18px;
+            }
+
+            .navigation-button .navigation-label {
+                display: none;
+            }
+
+            .profile-ring {
+                width: 116px;
+                height: 116px;
+            }
+
+            .overview-card {
+                padding: 12px;
+            }
+
+            .lista-titulo {
+                font-size: 22px;
+            }
+
+            .carta {
+                grid-template-columns: 43px minmax(0, 1fr) 36px;
+                gap: 8px;
+                padding: 9px 8px;
+            }
+
+            .carta-numero-box {
+                width: 43px;
+                height: 43px;
+                border-radius: 13px;
+            }
+
+            .check {
+                width: 35px;
+                height: 35px;
+                min-width: 35px;
+            }
+
+            .carta-titulo {
+                font-size: 16px;
+            }
+
+            .carta-data {
+                font-size: 10px;
+            }
+
+            .filter-button {
+                min-height: 42px;
+                font-size: 12px;
+            }
+
+            .calendar-card {
+                padding: 10px;
+            }
+
+            .weekdays,
+            .calendar-grid {
+                gap: 2px;
+            }
+
+            .day-button {
+                min-height: 34px;
+                font-size: 11px;
+            }
+
+            .btn-musicas {
+                min-height: 46px;
+                padding-inline: 14px;
+                border-radius: 15px;
+            }
+        }
+
+        /* =========================================================
+           TABLETS EM RETRATO
+           ========================================================= */
+
+        @media (min-width: 561px) and (max-width: 820px) {
+            .app-shell {
+                width: min(100%, 720px);
+            }
+
+            .container {
+                padding: 30px 30px 28px;
+            }
+
+            .profile-ring {
+                width: 150px;
+                height: 150px;
+            }
+
+            .cartas-container {
+                max-height: 64vh;
+                max-height: 64dvh;
+            }
+
+            .carta {
+                min-height: 94px;
+                grid-template-columns: 60px minmax(0, 1fr) 44px;
+            }
+
+            .carta-numero-box {
+                width: 60px;
+                height: 60px;
+            }
+
+            .calendar-card {
+                padding: 18px;
+            }
+        }
+
+        /* =========================================================
+           DESKTOP LARGO
+           ========================================================= */
+
+        @media (min-width: 1200px) {
+            body {
+                padding-top: 32px;
+                padding-bottom: 40px;
+            }
+
+            .app-shell {
+                width: min(100%, 820px);
+            }
+
+            .container {
+                padding: 38px 42px 34px;
+            }
+
+            .profile-ring {
+                width: 176px;
+                height: 176px;
+            }
+
+            .cartas-container {
+                max-height: 650px;
+            }
+
+            .modal-content {
+                width: min(100%, 820px);
+            }
+        }
+
+        /* =========================================================
+           ORIENTAÇÃO LANDSCAPE EM CELULARES
+           ========================================================= */
+
+        @media (max-height: 520px) and (orientation: landscape) {
+            body {
+                padding-top: 8px;
+                padding-bottom: 12px;
+            }
+
+            .topbar {
+                margin-bottom: 6px;
+            }
+
+            .container {
+                padding-top: 14px;
+            }
+
+            .profile-wrap {
+                margin-top: 0;
+                margin-bottom: 8px;
+            }
+
+            .profile-ring {
+                width: 76px;
+                height: 76px;
+            }
+
+            h2 {
+                font-size: 22px;
+            }
+
+            .subtitulo {
+                font-size: 13px;
+            }
+
+            .overview {
+                margin-top: 14px;
+            }
+
+            .cartas-container {
+                max-height: 48vh;
+                max-height: 48dvh;
+            }
+
+            .modal-texto {
+                padding-top: 20px;
+                padding-bottom: 24px;
+            }
+        }
+
+        /* =========================================================
+           PRINT — SOMENTE COMO REPRESENTAÇÃO DE LEITURA
+           ========================================================= */
+
+        @media print {
+            body {
+                background: #fff;
+                padding: 0;
+            }
+
+            body::before,
+            .topbar,
+            .btn-musicas,
+            .acoes,
+            .filters,
+            .calendar-panel,
+            .overview,
+            .profile-wrap,
+            .eyebrow,
+            .subtitulo,
+            .modal-fechar-x,
+            .modal-footer {
+                display: none !important;
+            }
+
+            .app-shell,
+            .container {
+                width: 100%;
+                max-width: none;
+                border: 0;
+                box-shadow: none;
+                background: #fff;
+            }
+
+            .modal {
+                position: static;
+                display: block;
+                padding: 0;
+                background: #fff;
+                opacity: 1;
+                visibility: visible;
+                pointer-events: auto;
+            }
+
+            .modal-content,
+            .carta-folha {
+                width: 100%;
+                max-height: none;
+                border: 0;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            .modal-texto {
+                overflow: visible;
+                color: #000;
+            }
+        }
+
+        /* =========================================================
+           COMPATIBILIDADE COM CURSOR E TOUCH
+           ========================================================= */
+
+        @media (hover: none) {
+            .carta:hover,
+            .icon-button:hover,
+            .filter-button:hover,
+            .btn-logout:hover,
+            .btn-musicas:hover,
+            .day-button:hover,
+            .calendar-nav button:hover,
+            .fechar button:hover {
+                transform: none;
+            }
+
+            .navigation-button .navigation-label {
+                max-width: 0;
+                opacity: 0;
+            }
+        }
+
+        /* =========================================================
+           CONTROLE DE SELEÇÃO DE TEXTO
+           ========================================================= */
+
+        .icon-button,
+        .filter-button,
+        .day-button,
+        .calendar-nav button,
+        .btn-logout,
+        .btn-musicas,
+        .modal-fechar-x,
+        .fechar button,
+        .check {
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        /* =========================================================
+           ESTADOS DE FOCO DE COMPONENTES
+           ========================================================= */
+
+        .filter-button:focus-visible,
+        .calendar-nav button:focus-visible,
+        .btn-logout:focus-visible,
+        .btn-musicas:focus-visible,
+        .modal-fechar-x:focus-visible,
+        .fechar button:focus-visible {
+            outline: 3px solid rgba(155,93,229,.30);
+            outline-offset: 3px;
+        }
+
+        /* =========================================================
+           ÁREA SEGURA DO IPHONE / ANDROID
+           ========================================================= */
+
+        @supports (padding: max(0px)) {
+            .navigation-stack {
+                margin-left: max(0px, env(safe-area-inset-left));
+            }
+
+            .btn-musicas {
+                margin-right: max(0px, env(safe-area-inset-right));
+            }
+        }
+
+        /* =========================================================
+           REFINO DE SCROLL
+           ========================================================= */
+
+        .cartas-container,
+        .modal-texto {
+            overscroll-behavior: contain;
+        }
+
+        .cartas-container {
+            scroll-padding-top: 8px;
+            scroll-padding-bottom: 8px;
+        }
+
+        .modal-texto {
+            scroll-padding-top: 12px;
+            scroll-padding-bottom: 24px;
+        }
+
+        /* =========================================================
+           ÚLTIMO REFINO VISUAL DA COLEÇÃO
+           ========================================================= */
+
+        .overview-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .overview-card::after {
+            content: "";
+            position: absolute;
+            width: 110px;
+            height: 110px;
+            right: -54px;
+            bottom: -65px;
+            border-radius: 50%;
+            background: rgba(155,93,229,.055);
+            pointer-events: none;
+        }
+
+        .overview-label,
+        .lista-titulo,
+        .collection-note {
+            position: relative;
+            z-index: 1;
+        }
+
+        .collection-note {
+            transition: color .18s ease;
+        }
+
+        .overview-card:hover .collection-note {
+            color: #746c7c;
+        }
+
     </style>
 </head>
 
 <body>
     <main class="app-shell">
         <div class="topbar">
-            <button
-                class="icon-button"
-                type="button"
-                onclick="abrirGaleria()"
-                aria-label="Abrir galeria"
-                title="Galeria"
-            >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <rect x="3" y="4" width="18" height="16" rx="3"></rect>
-                    <circle cx="8.5" cy="9" r="1.5"></circle>
-                    <path d="m5.5 17 4.5-4.5 3.5 3.5 2.5-2.5 2.5 3.5"></path>
-                </svg>
-            </button>
+            <nav class="navigation-stack" aria-label="Navegação complementar">
+                <button
+                    class="icon-button navigation-button"
+                    type="button"
+                    onclick="abrirGaleria()"
+                    aria-label="Abrir galeria"
+                    title="Galeria"
+                >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="4" width="18" height="16" rx="3"></rect>
+                        <circle cx="8.5" cy="9" r="1.5"></circle>
+                        <path d="m5.5 17 4.5-4.5 3.5 3.5 2.5-2.5 2.5 3.5"></path>
+                    </svg>
+                    <span class="navigation-label">Galeria</span>
+                </button>
+
+                <button
+                    class="icon-button navigation-button"
+                    type="button"
+                    onclick="abrirMusicas()"
+                    aria-label="Abrir músicas"
+                    title="Músicas"
+                >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M9 18V5l11-2v13"></path>
+                        <circle cx="6" cy="18" r="3"></circle>
+                        <circle cx="17" cy="16" r="3"></circle>
+                    </svg>
+                    <span class="navigation-label">Músicas</span>
+                </button>
+            </nav>
 
             <div class="topbar-spacer" aria-hidden="true"></div>
         </div>
@@ -1127,13 +2566,14 @@
             <h2 id="welcomeMessage"></h2>
 
             <p class="subtitulo">
-                Suas cartas estão aqui. Escolha uma para abrir e continuar a leitura.
+                Tá aí tuas cartas, best(a)
             </p>
 
             <div class="overview">
                 <div class="overview-card">
                     <div class="overview-label">Coleção</div>
                     <div class="lista-titulo">Minhas Cartas</div>
+                    <div class="collection-note" id="collectionNote">50 cartas para guardar</div>
                 </div>
 
                 <div class="contador" id="contador">0/50 lidas</div>
@@ -1232,12 +2672,17 @@
     </main>
 
     <button
-        class="btn-para-voce"
+        class="btn-musicas"
         type="button"
-        onclick="redirectToYou()"
-        aria-label="Abrir for you"
+        onclick="abrirMusicas()"
+        aria-label="Abrir músicas"
     >
-        for you
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M9 18V5l11-2v13"></path>
+            <circle cx="6" cy="18" r="3"></circle>
+            <circle cx="17" cy="16" r="3"></circle>
+        </svg>
+        <span>Músicas</span>
     </button>
 
     <div
@@ -1271,7 +2716,12 @@
                     </button>
                 </header>
 
-                <div class="modal-texto" id="modalTexto">Carregando carta...</div>
+                <div
+                    class="modal-texto"
+                    id="modalTexto"
+                    tabindex="0"
+                    aria-live="polite"
+                >Carregando carta...</div>
 
                 <footer class="modal-footer">
                     <div class="fechar">
@@ -1301,6 +2751,9 @@
         let calendarioAberto = false;
         let mesCalendario = new Date();
         let ultimaCartaAberta = null;
+        let cartasCarregadas = 0;
+        let cartasComErro = 0;
+        let carregamentoIniciadoEm = null;
 
         const MESES = [
             "janeiro", "fevereiro", "março", "abril", "maio", "junho",
@@ -1438,6 +2891,17 @@
 
             contador.innerText =
                 `${quantidade}/${TOTAL_CARTAS} lidas`;
+
+            const nota = document.getElementById("collectionNote");
+            if (nota) {
+                if (quantidade === TOTAL_CARTAS) {
+                    nota.textContent = "Todas as cartas já foram lidas";
+                } else if (quantidade === 0) {
+                    nota.textContent = `${TOTAL_CARTAS} cartas para guardar`;
+                } else {
+                    nota.textContent = `${TOTAL_CARTAS - quantidade} cartas ainda esperam por você`;
+                }
+            }
         }
 
         /* =========================================================
@@ -1449,6 +2913,10 @@
 
             const cartasLidas = obterCartasLidas(username);
 
+            cartasCarregadas = 0;
+            cartasComErro = 0;
+            carregamentoIniciadoEm = performance.now();
+
             atualizarContador(cartasLidas);
             cartasContainer.innerHTML = "";
 
@@ -1456,6 +2924,7 @@
                 const cartaDiv = document.createElement("div");
                 cartaDiv.className = "carta";
                 cartaDiv.dataset.numero = i;
+                cartaDiv.dataset.indisponivel = "false";
                 cartaDiv.style.animationDelay = `${Math.min(i * 0.012, .36)}s`;
 
                 const lida = cartasLidas[i] === true;
@@ -1494,6 +2963,9 @@
                     </span>
                 `;
 
+                cartaDiv.setAttribute("role", "button");
+                cartaDiv.setAttribute("tabindex", "0");
+
                 cartaDiv.addEventListener(
                     "click",
                     function () {
@@ -1504,6 +2976,18 @@
                             i,
                             nomeArquivo
                         );
+                    }
+                );
+
+                cartaDiv.addEventListener(
+                    "keydown",
+                    function (event) {
+                        if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            const nomeArquivo =
+                                `${username}carta${i}.txt`;
+                            abrirCarta(i, nomeArquivo);
+                        }
                     }
                 );
 
@@ -1626,58 +3110,331 @@
             });
         }
 
-        function extrairDataDoTexto(texto) {
-            if (!texto) return null;
-
-            const textoNormalizado = texto
-                .replace(/\u00a0/g, " ")
-                .replace(/\r/g, " ")
-                .replace(/\s+/g, " ")
-                .trim();
-
-            let match;
-
-            /* 2025-09-14 */
-            match = textoNormalizado.match(/\b(19\d{2}|20\d{2})[-\/](0?[1-9]|1[0-2])[-\/](0?[1-9]|[12]\d|3[01])\b/);
-            if (match) {
-                const data = normalizarData(
-                    Number(match[1]),
-                    Number(match[2]),
-                    Number(match[3])
-                );
-                if (data) return data;
+        function obterPrimeiraDataValida(candidatos) {
+            if (!Array.isArray(candidatos) || !candidatos.length) {
+                return null;
             }
 
-            /* 14/09/2025 ou 14-09-2025 */
-            match = textoNormalizado.match(/\b(0?[1-9]|[12]\d|3[01])[-\/](0?[1-9]|1[0-2])[-\/](19\d{2}|20\d{2})\b/);
-            if (match) {
-                const data = normalizarData(
-                    Number(match[3]),
-                    Number(match[2]),
-                    Number(match[1])
-                );
-                if (data) return data;
-            }
+            const ordenados = [...candidatos]
+                .filter(Boolean)
+                .sort((a, b) => a.index - b.index);
 
-            /* 14 de setembro de 2025 / 14 setembro 2025 */
-            const nomesMeses = MESES.join("|");
-            const regexMesExtenso = new RegExp(
-                `\\b(0?[1-9]|[12]\\d|3[01])\\s*(?:de\\s*)?(${nomesMeses})\\s*(?:de\\s*)?(19\\d{2}|20\\d{2})\\b`,
-                "i"
-            );
-
-            match = textoNormalizado.match(regexMesExtenso);
-            if (match) {
-                const mes = MESES.indexOf(match[2].toLowerCase()) + 1;
+            for (const candidato of ordenados) {
                 const data = normalizarData(
-                    Number(match[3]),
-                    mes,
-                    Number(match[1])
+                    Number(candidato.ano),
+                    Number(candidato.mes),
+                    Number(candidato.dia)
                 );
-                if (data) return data;
+
+                if (data) {
+                    return data;
+                }
             }
 
             return null;
+        }
+
+        function dataTemAnoPlausivel(ano) {
+            const valor = Number(ano);
+            return Number.isInteger(valor) && valor >= 1900 && valor <= 2099;
+        }
+
+        function dataTemDiaPlausivel(dia) {
+            const valor = Number(dia);
+            return Number.isInteger(valor) && valor >= 1 && valor <= 31;
+        }
+
+        function dataTemMesPlausivel(mes) {
+            const valor = Number(mes);
+            return Number.isInteger(valor) && valor >= 1 && valor <= 12;
+        }
+
+        function criarCandidatoDeData(index, ano, mes, dia) {
+            if (!dataTemAnoPlausivel(ano)) return null;
+            if (!dataTemMesPlausivel(mes)) return null;
+            if (!dataTemDiaPlausivel(dia)) return null;
+
+            return {
+                index,
+                ano: Number(ano),
+                mes: Number(mes),
+                dia: Number(dia)
+            };
+        }
+
+        function adicionarCandidatoSeValido(lista, candidato) {
+            if (!candidato) return;
+            lista.push(candidato);
+        }
+
+        function removerDatasDuplicadas(candidatos) {
+            const vistos = new Set();
+            const resultado = [];
+
+            for (const candidato of candidatos) {
+                const chave = [
+                    candidato.ano,
+                    candidato.mes,
+                    candidato.dia,
+                    candidato.index
+                ].join("-");
+
+                if (vistos.has(chave)) continue;
+                vistos.add(chave);
+                resultado.push(candidato);
+            }
+
+            return resultado;
+        }
+
+        function encontrarTodasAsDatas(texto) {
+            if (typeof texto !== "string" || !texto.trim()) {
+                return [];
+            }
+
+            const normalizado = normalizarTextoParaDatas(texto);
+            const candidatos = [
+                ...encontrarDatasNumericasAnoPrimeiro(normalizado),
+                ...encontrarDatasNumericasBrasil(normalizado),
+                ...encontrarDatasPorExtenso(normalizado)
+            ];
+
+            return removerDatasDuplicadas(candidatos)
+                .map(candidato => ({
+                    ...candidato,
+                    data: normalizarData(
+                        candidato.ano,
+                        candidato.mes,
+                        candidato.dia
+                    )
+                }))
+                .filter(item => item.data instanceof Date)
+                .sort((a, b) => a.index - b.index);
+        }
+
+        function formatarDataCurta(data) {
+            if (!(data instanceof Date) || Number.isNaN(data.getTime())) {
+                return "Sem data";
+            }
+
+            return data.toLocaleDateString("pt-BR", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric"
+            });
+        }
+
+        function formatarMesAno(data) {
+            if (!(data instanceof Date) || Number.isNaN(data.getTime())) {
+                return "";
+            }
+
+            const texto = data.toLocaleDateString("pt-BR", {
+                month: "long",
+                year: "numeric"
+            });
+
+            return texto.charAt(0).toUpperCase() + texto.slice(1);
+        }
+
+        function obterIsoAtualSeguro() {
+            return dataParaISO(new Date());
+        }
+
+        function extrairDataDoTexto(texto) {
+            if (typeof texto !== "string" || !texto.trim()) {
+                return null;
+            }
+
+            /*
+             * A carta é somente lida. O parser trabalha sobre uma cópia
+             * normalizada e nunca altera o conteúdo que será apresentado.
+             *
+             * A ordem das tentativas é deliberada:
+             * 1. ISO YYYY-MM-DD / YYYY/MM/DD / YYYY.MM.DD;
+             * 2. padrão brasileiro DD/MM/YYYY e equivalentes;
+             * 3. datas escritas em português;
+             * 4. abreviações de meses.
+             *
+             * Cada candidato passa por normalizarData(), que rejeita
+             * automaticamente datas impossíveis como 31/02/2024.
+             */
+            const textoNormalizado = normalizarTextoParaDatas(texto);
+
+            const candidatos = [
+                ...encontrarDatasNumericasAnoPrimeiro(textoNormalizado),
+                ...encontrarDatasNumericasBrasil(textoNormalizado),
+                ...encontrarDatasPorExtenso(textoNormalizado)
+            ];
+
+            if (!candidatos.length) {
+                return null;
+            }
+
+            candidatos.sort((a, b) => a.index - b.index);
+
+            for (const candidato of candidatos) {
+                const data = normalizarData(
+                    candidato.ano,
+                    candidato.mes,
+                    candidato.dia
+                );
+
+                if (data) {
+                    return data;
+                }
+            }
+
+            return null;
+        }
+
+        function normalizarTextoParaDatas(texto) {
+            return String(texto)
+                .replace(/\uFEFF/g, " ")
+                .replace(/\u00A0/g, " ")
+                .replace(/[\u2012\u2013\u2014]/g, "-")
+                .replace(/\r\n?/g, "\n");
+        }
+
+        function encontrarDatasNumericasAnoPrimeiro(texto) {
+            const resultados = [];
+            const regex = /\b(19\d{2}|20\d{2})\s*[-\/.]\s*(0?[1-9]|1[0-2])\s*[-\/.]\s*(0?[1-9]|[12]\d|3[01])\b/g;
+            let match;
+
+            while ((match = regex.exec(texto)) !== null) {
+                resultados.push({
+                    index: match.index,
+                    ano: Number(match[1]),
+                    mes: Number(match[2]),
+                    dia: Number(match[3])
+                });
+            }
+
+            return resultados;
+        }
+
+        function encontrarDatasNumericasBrasil(texto) {
+            const resultados = [];
+            const regex = /\b(0?[1-9]|[12]\d|3[01])\s*[-\/.]\s*(0?[1-9]|1[0-2])\s*[-\/.]\s*(19\d{2}|20\d{2})\b/g;
+            let match;
+
+            while ((match = regex.exec(texto)) !== null) {
+                resultados.push({
+                    index: match.index,
+                    ano: Number(match[3]),
+                    mes: Number(match[2]),
+                    dia: Number(match[1])
+                });
+            }
+
+            return resultados;
+        }
+
+        function normalizarNomeDeMes(nome) {
+            if (!nome) return null;
+
+            const base = removerAcentos(
+                String(nome).trim().toLowerCase()
+            );
+
+            const mapa = {
+                janeiro: 1,
+                fevereiro: 2,
+                marco: 3,
+                abril: 4,
+                maio: 5,
+                junho: 6,
+                julho: 7,
+                agosto: 8,
+                setembro: 9,
+                outubro: 10,
+                novembro: 11,
+                dezembro: 12,
+                jan: 1,
+                fev: 2,
+                mar: 3,
+                abr: 4,
+                mai: 5,
+                jun: 6,
+                jul: 7,
+                ago: 8,
+                set: 9,
+                out: 10,
+                nov: 11,
+                dez: 12
+            };
+
+            return mapa[base] || null;
+        }
+
+        function removerAcentos(valor) {
+            return String(valor)
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "");
+        }
+
+        function encontrarDatasPorExtenso(texto) {
+            const resultados = [];
+            const meses = [
+                "janeiro",
+                "fevereiro",
+                "março",
+                "abril",
+                "maio",
+                "junho",
+                "julho",
+                "agosto",
+                "setembro",
+                "outubro",
+                "novembro",
+                "dezembro"
+            ];
+
+            const abreviados = [
+                "jan",
+                "fev",
+                "mar",
+                "abr",
+                "mai",
+                "jun",
+                "jul",
+                "ago",
+                "set",
+                "out",
+                "nov",
+                "dez"
+            ];
+
+            const todosOsMeses = [...meses, ...abreviados]
+                .map(removerAcentos)
+                .join("|");
+
+            const regex = new RegExp(
+                "\\b(0?[1-9]|[12]\\d|3[01])\\s*(?:de\\s+)?(" +
+                todosOsMeses +
+                ")\\.?\\s*(?:de\\s+)?(19\\d{2}|20\\d{2})\\b",
+                "gi"
+            );
+
+            const textoSemAcentos = removerAcentos(texto);
+            let match;
+
+            while ((match = regex.exec(textoSemAcentos)) !== null) {
+                const mes = normalizarNomeDeMes(match[2]);
+
+                if (!mes) {
+                    continue;
+                }
+
+                resultados.push({
+                    index: match.index,
+                    ano: Number(match[3]),
+                    mes,
+                    dia: Number(match[1])
+                });
+            }
+
+            return resultados;
         }
 
         /* =========================================================
@@ -1731,6 +3488,18 @@
                     indisponivel: false
                 };
 
+                cartasCarregadas++;
+                atualizarEstadoDeCarregamento();
+                agendarAtualizacaoFinalDoCarregamento();
+
+                const card = document.querySelector(
+                    `.carta[data-numero="${numero}"]`
+                );
+
+                if (card) {
+                    card.dataset.indisponivel = "false";
+                }
+
                 atualizarEstadoSemData();
                 renderizarCalendario();
                 atualizarVisibilidadeDasCartas();
@@ -1754,10 +3523,79 @@
                     indisponivel: true
                 };
 
+                cartasCarregadas++;
+                cartasComErro++;
+                atualizarEstadoDeCarregamento();
+                agendarAtualizacaoFinalDoCarregamento();
+
+                const card = document.querySelector(
+                    `.carta[data-numero="${numero}"]`
+                );
+
+                if (card) {
+                    card.dataset.indisponivel = "true";
+                }
+
                 atualizarEstadoSemData();
                 renderizarCalendario();
                 atualizarVisibilidadeDasCartas();
             }
+        }
+
+        function atualizarEstadoDeCarregamento() {
+            const carregando = document.getElementById("loadingState");
+            const container = document.getElementById("cartasContainer");
+
+            if (!carregando || !container) {
+                return;
+            }
+
+            if (cartasCarregadas >= TOTAL_CARTAS) {
+                carregando.remove();
+                return;
+            }
+
+            const percentual = Math.round(
+                (cartasCarregadas / TOTAL_CARTAS) * 100
+            );
+
+            carregando.setAttribute(
+                "aria-label",
+                `Carregando cartas: ${percentual}%`
+            );
+
+            const tempo = carregamentoIniciadoEm
+                ? performance.now() - carregamentoIniciadoEm
+                : 0;
+
+            carregando.dataset.percentual = String(percentual);
+            carregando.dataset.tempo = String(Math.round(tempo));
+        }
+
+        function obterQuantidadeDeCartasDisponiveis() {
+            return Object.values(cartasDados)
+                .filter(item => item && !item.indisponivel)
+                .length;
+        }
+
+        function obterQuantidadeDeCartasComData() {
+            return Object.values(cartasDados)
+                .filter(item => item && item.iso)
+                .length;
+        }
+
+        function obterQuantidadeDeCartasSemData() {
+            return Object.values(cartasDados)
+                .filter(item => item && item.textoCarregado && !item.iso)
+                .length;
+        }
+
+        function obterQuantidadeDeCartasNoDia(iso) {
+            if (!iso) return 0;
+
+            return Object.values(cartasDados)
+                .filter(item => item && item.iso === iso)
+                .length;
         }
 
         /* =========================================================
@@ -1933,6 +3771,10 @@
 
             monthLabel.textContent =
                 `${MESES[mes].charAt(0).toUpperCase() + MESES[mes].slice(1)} ${ano}`;
+            monthLabel.setAttribute(
+                "aria-label",
+                `Calendário de ${MESES[mes]} de ${ano}`
+            );
 
             grid.innerHTML = "";
 
@@ -1947,6 +3789,7 @@
             );
 
             let totalComCartasNoMes = 0;
+            let totalCartasNoMes = 0;
 
             for (let i = 0; i < primeiroDia; i++) {
                 const btn = document.createElement("button");
@@ -1971,6 +3814,8 @@
                 if (possuiCarta) {
                     btn.classList.add("has-cards");
                     totalComCartasNoMes++;
+                    totalCartasNoMes += obterQuantidadeDeCartasNoDia(iso);
+                    btn.title = `${obterQuantidadeDeCartasNoDia(iso)} carta${obterQuantidadeDeCartasNoDia(iso) === 1 ? "" : "s"}`;
                 }
 
                 if (selecionado) {
@@ -2008,7 +3853,7 @@
             info.textContent =
                 totalComCartasNoMes === 0
                     ? "Nenhuma carta neste mês"
-                    : `${totalComCartasNoMes} dia${totalComCartasNoMes === 1 ? "" : "s"} com cartas`;
+                    : `${totalComCartasNoMes} dia${totalComCartasNoMes === 1 ? "" : "s"} com cartas · ${totalCartasNoMes} carta${totalCartasNoMes === 1 ? "" : "s"}`;
         }
 
         /* =========================================================
@@ -2021,6 +3866,7 @@
             const dataModal = document.getElementById("modalData");
 
             ultimaCartaAberta = numero;
+            window._lupleFocoAnterior = document.activeElement;
 
             modal.classList.add("aberto");
             modal.setAttribute("aria-hidden", "false");
@@ -2108,6 +3954,11 @@
 
             requestAnimationFrame(function () {
                 texto.scrollTop = 0;
+
+                const fechar = document.querySelector(".modal-fechar-x");
+                if (fechar) {
+                    fechar.focus();
+                }
             });
         }
 
@@ -2120,6 +3971,13 @@
             modal.classList.remove("aberto");
             modal.setAttribute("aria-hidden", "true");
             document.body.style.overflow = "";
+
+            const focoAnterior = window._lupleFocoAnterior;
+            if (focoAnterior && typeof focoAnterior.focus === "function") {
+                requestAnimationFrame(function () {
+                    focoAnterior.focus();
+                });
+            }
         }
 
         function fecharAoClicarFora(event) {
@@ -2133,9 +3991,39 @@
             function (event) {
                 if (event.key === "Escape") {
                     fecharCarta();
+                    return;
+                }
+
+                if (event.key === "Tab" && document.getElementById("modal")?.classList.contains("aberto")) {
+                    manterFocoDentroDaCarta(event);
                 }
             }
         );
+
+        function manterFocoDentroDaCarta(event) {
+            const modal = document.getElementById("modal");
+            if (!modal) return;
+
+            const elementos = modal.querySelectorAll(
+                "button:not([disabled]), [href], [tabindex]:not([tabindex=\"-1\"])"
+            );
+
+            if (!elementos.length) return;
+
+            const primeiro = elementos[0];
+            const ultimo = elementos[elementos.length - 1];
+
+            if (event.shiftKey && document.activeElement === primeiro) {
+                event.preventDefault();
+                ultimo.focus();
+                return;
+            }
+
+            if (!event.shiftKey && document.activeElement === ultimo) {
+                event.preventDefault();
+                primeiro.focus();
+            }
+        }
 
         /* =========================================================
            GALERIA — NOVA NAVEGAÇÃO, SEM CRIAR A GALERIA
@@ -2156,11 +4044,11 @@
         }
 
         /* =========================================================
-           BOTÃO FOR YOU — URL ORIGINAL PRESERVADA
+           MÚSICAS — NOVA NAVEGAÇÃO
+           A página será criada em uma etapa posterior.
            ========================================================= */
-        function redirectToYou() {
-            window.location.href =
-                "https://youtu.be/xkKzaTt3D3g?si=ldu3R8m5bnH9u9Lu";
+        function abrirMusicas() {
+            window.location.href = "musicas.html";
         }
 
         /* =========================================================
@@ -2169,9 +4057,1275 @@
            ========================================================= */
         window.addEventListener("pageshow", function () {
             if (localStorage.getItem("isLoggedIn")) {
-                atualizarContador(obterCartasLidas(localStorage.getItem("username")));
+                const usuario = localStorage.getItem("username");
+                atualizarContador(obterCartasLidas(usuario));
+                atualizarVisibilidadeDasCartas();
             }
         });
+
+
+
+        /* =========================================================
+           CAMADA DE ROBUSTEZ DA EXPERIÊNCIA
+           ---------------------------------------------------------
+           Estas pequenas funções não substituem o sistema existente.
+           Elas apenas deixam explícitas decisões que, em um projeto
+           pessoal, normalmente ficariam espalhadas pelo código.
+           ========================================================= */
+
+        function cartaEstaDisponivel(numero) {
+            const dado = cartasDados[numero];
+            return Boolean(dado && !dado.indisponivel);
+        }
+
+        function cartaEstaLida(numero) {
+            if (!usernameAtual) return false;
+            const lidas = obterCartasLidas(usernameAtual);
+            return lidas[numero] === true;
+        }
+
+        function obterTituloSeguro(numero) {
+            const dado = cartasDados[numero];
+            if (!dado || !dado.titulo) {
+                return `Carta ${String(numero).padStart(2, "0")}`;
+            }
+            return dado.titulo;
+        }
+
+        function obterDataSegura(numero) {
+            const dado = cartasDados[numero];
+            return dado && dado.data instanceof Date
+                ? dado.data
+                : null;
+        }
+
+        function obterIsoSeguro(numero) {
+            const dado = cartasDados[numero];
+            return dado && dado.iso ? dado.iso : null;
+        }
+
+        function obterCartasDoDia(iso) {
+            if (!iso) return [];
+
+            return Object.values(cartasDados)
+                .filter(item => item && item.iso === iso)
+                .sort((a, b) => a.numero - b.numero);
+        }
+
+        function obterCartasSemData() {
+            return Object.values(cartasDados)
+                .filter(item => item && item.textoCarregado && !item.iso)
+                .sort((a, b) => a.numero - b.numero);
+        }
+
+        function obterTodasAsCartasCarregadas() {
+            return Object.values(cartasDados)
+                .filter(item => item && item.textoCarregado)
+                .sort((a, b) => a.numero - b.numero);
+        }
+
+        function obterPrimeiraCartaDisponivel() {
+            return Object.values(cartasDados)
+                .filter(item => item && !item.indisponivel)
+                .sort((a, b) => a.numero - b.numero)[0] || null;
+        }
+
+        function obterUltimaCartaDisponivel() {
+            const cartas = Object.values(cartasDados)
+                .filter(item => item && !item.indisponivel)
+                .sort((a, b) => b.numero - a.numero);
+
+            return cartas[0] || null;
+        }
+
+        function obterIntervaloDeDatas() {
+            const datas = Object.values(cartasDados)
+                .map(item => item && item.data)
+                .filter(item => item instanceof Date)
+                .sort((a, b) => a - b);
+
+            if (!datas.length) {
+                return null;
+            }
+
+            return {
+                inicio: datas[0],
+                fim: datas[datas.length - 1]
+            };
+        }
+
+        function existeAlgumaCartaComData() {
+            return Object.values(cartasDados)
+                .some(item => item && Boolean(item.iso));
+        }
+
+        function existeAlgumaCartaSemData() {
+            return Object.values(cartasDados)
+                .some(item => item && item.textoCarregado && !item.iso);
+        }
+
+        function obterDiasComCartasNoMes(ano, mes) {
+            const prefixo = `${ano}-${String(mes).padStart(2, "0")}-`;
+
+            return new Set(
+                Object.values(cartasDados)
+                    .filter(item => item && item.iso?.startsWith(prefixo))
+                    .map(item => item.iso)
+            );
+        }
+
+        function obterQuantidadeDeCartasNoMes(ano, mes) {
+            const prefixo = `${ano}-${String(mes).padStart(2, "0")}-`;
+
+            return Object.values(cartasDados)
+                .filter(item => item && item.iso?.startsWith(prefixo))
+                .length;
+        }
+
+        function obterMesesComCartas() {
+            const meses = new Set();
+
+            Object.values(cartasDados).forEach(item => {
+                if (!item || !item.iso) return;
+                meses.add(item.iso.slice(0, 7));
+            });
+
+            return [...meses].sort();
+        }
+
+        function mesIsoParaData(mesIso) {
+            if (!/^\d{4}-\d{2}$/.test(mesIso || "")) {
+                return null;
+            }
+
+            const [ano, mes] = mesIso.split("-").map(Number);
+            return new Date(ano, mes - 1, 1);
+        }
+
+        function dataParaMesIso(data) {
+            if (!(data instanceof Date) || Number.isNaN(data.getTime())) {
+                return null;
+            }
+
+            return `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, "0")}`;
+        }
+
+        function compararIsoData(a, b) {
+            if (!a || !b) return 0;
+            return String(a).localeCompare(String(b));
+        }
+
+        function estaNoMesmoDia(dataA, dataB) {
+            if (!(dataA instanceof Date) || !(dataB instanceof Date)) {
+                return false;
+            }
+
+            return (
+                dataA.getFullYear() === dataB.getFullYear() &&
+                dataA.getMonth() === dataB.getMonth() &&
+                dataA.getDate() === dataB.getDate()
+            );
+        }
+
+        function clonarData(data) {
+            if (!(data instanceof Date)) return null;
+            return new Date(data.getTime());
+        }
+
+        function criarDataNoPrimeiroDiaDoMes(data) {
+            if (!(data instanceof Date)) {
+                return new Date();
+            }
+
+            return new Date(
+                data.getFullYear(),
+                data.getMonth(),
+                1
+            );
+        }
+
+        function avancarMes(data, quantidade) {
+            const base = criarDataNoPrimeiroDiaDoMes(data);
+            base.setMonth(base.getMonth() + Number(quantidade || 0));
+            return base;
+        }
+
+        function recuarMes(data, quantidade) {
+            return avancarMes(data, -Math.abs(Number(quantidade || 0)));
+        }
+
+        function obterNomeDoMes(numeroDoMes) {
+            const indice = Number(numeroDoMes);
+            if (indice < 0 || indice > 11) return "";
+            return MESES[indice] || "";
+        }
+
+        function obterNomeDoDia(numeroDoDia) {
+            const dias = [
+                "domingo",
+                "segunda-feira",
+                "terça-feira",
+                "quarta-feira",
+                "quinta-feira",
+                "sexta-feira",
+                "sábado"
+            ];
+
+            return dias[Number(numeroDoDia)] || "";
+        }
+
+        function construirRotuloDeData(data) {
+            if (!(data instanceof Date) || Number.isNaN(data.getTime())) {
+                return "Sem data";
+            }
+
+            return `${data.getDate()} de ${obterNomeDoMes(data.getMonth())} de ${data.getFullYear()}`;
+        }
+
+        function construirRotuloDeDataAcessivel(data) {
+            if (!(data instanceof Date) || Number.isNaN(data.getTime())) {
+                return "Data não disponível";
+            }
+
+            return `${obterNomeDoDia(data.getDay())}, ${construirRotuloDeData(data)}`;
+        }
+
+        function extrairAnoDoIso(iso) {
+            if (!iso) return null;
+            const ano = Number(String(iso).slice(0, 4));
+            return Number.isInteger(ano) ? ano : null;
+        }
+
+        function extrairMesDoIso(iso) {
+            if (!iso) return null;
+            const mes = Number(String(iso).slice(5, 7));
+            return Number.isInteger(mes) ? mes : null;
+        }
+
+        function extrairDiaDoIso(iso) {
+            if (!iso) return null;
+            const dia = Number(String(iso).slice(8, 10));
+            return Number.isInteger(dia) ? dia : null;
+        }
+
+        function isoEhValido(iso) {
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(iso || "")) {
+                return false;
+            }
+
+            const ano = extrairAnoDoIso(iso);
+            const mes = extrairMesDoIso(iso);
+            const dia = extrairDiaDoIso(iso);
+
+            return Boolean(normalizarData(ano, mes, dia));
+        }
+
+        function garantirIsoOuNull(iso) {
+            return isoEhValido(iso) ? iso : null;
+        }
+
+        function converterIsoParaData(iso) {
+            if (!isoEhValido(iso)) return null;
+
+            const ano = extrairAnoDoIso(iso);
+            const mes = extrairMesDoIso(iso);
+            const dia = extrairDiaDoIso(iso);
+
+            return normalizarData(ano, mes, dia);
+        }
+
+        function selecionarDataSemPerderFiltro(iso) {
+            if (!isoEhValido(iso)) {
+                filtrarTodas();
+                return;
+            }
+
+            filtrarPorData(iso);
+        }
+
+        function limparFiltroAtual() {
+            filtrarTodas();
+        }
+
+        function filtroAtualEhTodas() {
+            return !dataSelecionada && !filtroSemData;
+        }
+
+        function filtroAtualEhData() {
+            return Boolean(dataSelecionada);
+        }
+
+        function filtroAtualEhSemData() {
+            return Boolean(filtroSemData);
+        }
+
+        function obterDescricaoDoFiltroAtual() {
+            if (dataSelecionada) {
+                const data = converterIsoParaData(dataSelecionada);
+                return data
+                    ? `Cartas de ${construirRotuloDeData(data)}`
+                    : "Cartas filtradas";
+            }
+
+            if (filtroSemData) {
+                return "Cartas sem data reconhecida";
+            }
+
+            return "Todas as cartas";
+        }
+
+        function sincronizarDescricaoDoFiltro() {
+            const status = document.getElementById("filterStatus");
+            if (!status) return;
+            status.textContent = obterDescricaoDoFiltroAtual();
+        }
+
+        function garantirCalendarioConsistente() {
+            if (!(mesCalendario instanceof Date) || Number.isNaN(mesCalendario.getTime())) {
+                mesCalendario = new Date();
+            }
+
+            mesCalendario = criarDataNoPrimeiroDiaDoMes(mesCalendario);
+        }
+
+        function garantirDataSelecionadaConsistente() {
+            if (!dataSelecionada) return;
+            if (!isoEhValido(dataSelecionada)) {
+                dataSelecionada = null;
+            }
+        }
+
+        function garantirEstadoDeFiltroConsistente() {
+            garantirDataSelecionadaConsistente();
+
+            if (dataSelecionada) {
+                filtroSemData = false;
+            }
+
+            atualizarBotoesFiltro();
+            sincronizarDescricaoDoFiltro();
+        }
+
+        function prepararCalendarioParaDataSelecionada() {
+            garantirEstadoDeFiltroConsistente();
+
+            if (!dataSelecionada) return;
+
+            const data = converterIsoParaData(dataSelecionada);
+            if (!data) return;
+
+            mesCalendario = criarDataNoPrimeiroDiaDoMes(data);
+        }
+
+        function selecionarHojeSeExistirCarta() {
+            const hoje = obterIsoAtualSeguro();
+            if (obterQuantidadeDeCartasNoDia(hoje) > 0) {
+                filtrarPorData(hoje);
+            }
+        }
+
+        function obterCartasOrdenadasPorData() {
+            return Object.values(cartasDados)
+                .filter(Boolean)
+                .sort((a, b) => {
+                    if (a.iso && b.iso) {
+                        const porData = compararIsoData(a.iso, b.iso);
+                        if (porData !== 0) return porData;
+                    }
+
+                    if (a.iso && !b.iso) return -1;
+                    if (!a.iso && b.iso) return 1;
+                    return a.numero - b.numero;
+                });
+        }
+
+        function obterCartasOrdenadasPorNumero() {
+            return Object.values(cartasDados)
+                .filter(Boolean)
+                .sort((a, b) => a.numero - b.numero);
+        }
+
+        function obterResumoDaColecao() {
+            const total = obterCartasOrdenadasPorNumero().length;
+            const disponiveis = obterQuantidadeDeCartasDisponiveis();
+            const comData = obterQuantidadeDeCartasComData();
+            const semData = obterQuantidadeDeCartasSemData();
+
+            return {
+                total,
+                disponiveis,
+                comData,
+                semData,
+                indisponiveis: total - disponiveis
+            };
+        }
+
+        function atualizarAcessibilidadeDoResumo() {
+            const resumo = obterResumoDaColecao();
+            const contador = document.getElementById("contador");
+
+            if (!contador) return;
+
+            contador.setAttribute(
+                "aria-label",
+                `${contador.textContent}. ${resumo.comData} cartas com data e ${resumo.semData} sem data.`
+            );
+        }
+
+        function marcarCartaComoIndisponivelVisualmente(numero) {
+            const card = document.querySelector(
+                `.carta[data-numero="${numero}"]`
+            );
+
+            if (!card) return;
+
+            card.dataset.indisponivel = "true";
+            card.setAttribute("aria-disabled", "true");
+        }
+
+        function marcarCartaComoDisponivelVisualmente(numero) {
+            const card = document.querySelector(
+                `.carta[data-numero="${numero}"]`
+            );
+
+            if (!card) return;
+
+            card.dataset.indisponivel = "false";
+            card.removeAttribute("aria-disabled");
+        }
+
+        function atualizarAriaDasCartas() {
+            document.querySelectorAll(".carta").forEach(card => {
+                const numero = Number(card.dataset.numero);
+                const dados = cartasDados[numero];
+
+                if (!dados) return;
+
+                card.setAttribute(
+                    "aria-label",
+                    `${obterTituloSeguro(numero)}. Carta ${String(numero).padStart(2, "0")}. ${dados.iso ? construirRotuloDeData(dados.data) : "Sem data"}.`
+                );
+            });
+        }
+
+        function atualizarAposCarregamentoCompleto() {
+            atualizarEstadoSemData();
+            atualizarVisibilidadeDasCartas();
+            renderizarCalendario();
+            atualizarAcessibilidadeDoResumo();
+            atualizarAriaDasCartas();
+        }
+
+        function agendarAtualizacaoFinalDoCarregamento() {
+            if (cartasCarregadas < TOTAL_CARTAS) return;
+
+            requestAnimationFrame(function () {
+                atualizarAposCarregamentoCompleto();
+            });
+        }
+
+        function prepararCardParaToque(card) {
+            if (!card || card.dataset.touchPrepared === "true") return;
+
+            card.dataset.touchPrepared = "true";
+
+            card.addEventListener("pointerdown", function () {
+                card.classList.add("tocando");
+            });
+
+            const removerToque = function () {
+                card.classList.remove("tocando");
+            };
+
+            card.addEventListener("pointerup", removerToque);
+            card.addEventListener("pointercancel", removerToque);
+            card.addEventListener("pointerleave", removerToque);
+        }
+
+        function prepararCardsParaToque() {
+            document.querySelectorAll(".carta").forEach(prepararCardParaToque);
+        }
+
+        function anunciarEstadoDoFiltro() {
+            const status = document.getElementById("filterStatus");
+            if (!status) return;
+
+            status.setAttribute("role", "status");
+            status.setAttribute("aria-live", "polite");
+        }
+
+        function anunciarCarregamento() {
+            const carregando = document.getElementById("loadingState");
+            if (!carregando) return;
+
+            carregando.setAttribute("role", "status");
+            carregando.setAttribute("aria-live", "polite");
+        }
+
+        function prepararAcessibilidadeInicial() {
+            anunciarEstadoDoFiltro();
+            anunciarCarregamento();
+            garantirCalendarioConsistente();
+            garantirEstadoDeFiltroConsistente();
+        }
+
+        function observarMudancasNaLista() {
+            const container = document.getElementById("cartasContainer");
+            if (!container || typeof MutationObserver === "undefined") {
+                return;
+            }
+
+            const observer = new MutationObserver(function () {
+                prepararCardsParaToque();
+                atualizarAriaDasCartas();
+            });
+
+            observer.observe(container, {
+                childList: true,
+                subtree: true
+            });
+        }
+
+        function prepararExperienciaCompleta() {
+            prepararAcessibilidadeInicial();
+            observarMudancasNaLista();
+            atualizarAcessibilidadeDoResumo();
+        }
+
+        prepararExperienciaCompleta();
+        agendarAtualizacaoFinalDoCarregamento();
+
+
+        /* =========================================================
+           UTILITÁRIOS DE DOM E ESTADO
+           ========================================================= */
+
+        function selecionarElemento(seletor, raiz = document) {
+            if (!raiz || typeof raiz.querySelector !== "function") {
+                return null;
+            }
+
+            return raiz.querySelector(seletor);
+        }
+
+        function selecionarElementos(seletor, raiz = document) {
+            if (!raiz || typeof raiz.querySelectorAll !== "function") {
+                return [];
+            }
+
+            return [...raiz.querySelectorAll(seletor)];
+        }
+
+        function definirTexto(seletor, valor) {
+            const elemento = selecionarElemento(seletor);
+            if (!elemento) return false;
+            elemento.textContent = String(valor ?? "");
+            return true;
+        }
+
+        function definirAtributo(seletor, nome, valor) {
+            const elemento = selecionarElemento(seletor);
+            if (!elemento) return false;
+
+            if (valor === null || valor === undefined) {
+                elemento.removeAttribute(nome);
+            } else {
+                elemento.setAttribute(nome, String(valor));
+            }
+
+            return true;
+        }
+
+        function alternarClasse(seletor, classe, ativo) {
+            const elemento = selecionarElemento(seletor);
+            if (!elemento) return false;
+            elemento.classList.toggle(classe, Boolean(ativo));
+            return true;
+        }
+
+        function obterElementoDaCarta(numero) {
+            return document.querySelector(
+                `.carta[data-numero="${Number(numero)}"]`
+            );
+        }
+
+        function obterIndicadorDaCarta(numero) {
+            return document.getElementById(`check${Number(numero)}`);
+        }
+
+        function obterTituloDaCartaElemento(numero) {
+            return document.getElementById(`tituloCarta${Number(numero)}`);
+        }
+
+        function obterDataDaCartaElemento(numero) {
+            return document.getElementById(`dataCarta${Number(numero)}`);
+        }
+
+        function atualizarEstadoVisualDaCarta(numero) {
+            const elemento = obterElementoDaCarta(numero);
+            const check = obterIndicadorDaCarta(numero);
+
+            if (!elemento || !check) return;
+
+            const lida = cartaEstaLida(numero);
+
+            check.classList.toggle("lida", lida);
+            check.textContent = lida ? "✓" : "○";
+            check.setAttribute(
+                "aria-label",
+                lida ? "Carta lida" : "Carta não lida"
+            );
+
+            elemento.dataset.lida = lida ? "true" : "false";
+        }
+
+        function atualizarTodasAsCartasVisualmente() {
+            for (let numero = 1; numero <= TOTAL_CARTAS; numero++) {
+                atualizarEstadoVisualDaCarta(numero);
+            }
+        }
+
+        function atualizarEstadoDoOverview() {
+            const overview = document.querySelector(".overview-card");
+            if (!overview) return;
+
+            const lidas = obterCartasLidas(usernameAtual || "");
+            const quantidade = Object.keys(lidas)
+                .filter(numero => lidas[numero] === true)
+                .length;
+
+            overview.dataset.completa = quantidade === TOTAL_CARTAS
+                ? "true"
+                : "false";
+            overview.dataset.vazia = quantidade === 0
+                ? "true"
+                : "false";
+        }
+
+        function atualizarInterfaceDaLeitura() {
+            atualizarTodasAsCartasVisualmente();
+            atualizarEstadoDoOverview();
+            atualizarAcessibilidadeDoResumo();
+        }
+
+        function marcarComoLidaEAtualizarInterface(numero) {
+            if (!usernameAtual) return;
+
+            marcarComoLida(usernameAtual, numero);
+            atualizarEstadoVisualDaCarta(numero);
+            atualizarEstadoDoOverview();
+            atualizarAcessibilidadeDoResumo();
+        }
+
+        function obterNomeArquivoDaCarta(numero) {
+            if (!usernameAtual) return null;
+            return `${usernameAtual}carta${Number(numero)}.txt`;
+        }
+
+        function obterDadosDaCartaOuCriar(numero) {
+            const numeroSeguro = Number(numero);
+
+            if (!cartasDados[numeroSeguro]) {
+                cartasDados[numeroSeguro] = {
+                    numero: numeroSeguro,
+                    nomeArquivo: obterNomeArquivoDaCarta(numeroSeguro),
+                    titulo: `Carta ${String(numeroSeguro).padStart(2, "0")}`,
+                    data: null,
+                    iso: null,
+                    textoCarregado: false,
+                    indisponivel: false
+                };
+            }
+
+            return cartasDados[numeroSeguro];
+        }
+
+        function atualizarDadosDaCarta(numero, dadosParciais) {
+            const atual = obterDadosDaCartaOuCriar(numero);
+            cartasDados[numero] = {
+                ...atual,
+                ...dadosParciais,
+                numero: Number(numero)
+            };
+            return cartasDados[numero];
+        }
+
+        function limparEstadoTemporarioDaCarta(numero) {
+            const dados = obterDadosDaCartaOuCriar(numero);
+
+            dados.textoCarregado = false;
+            dados.indisponivel = false;
+            dados.texto = undefined;
+
+            return dados;
+        }
+
+        function obterStatusDaCarta(numero) {
+            const dados = cartasDados[Number(numero)];
+
+            if (!dados) {
+                return "aguardando";
+            }
+
+            if (dados.indisponivel) {
+                return "indisponivel";
+            }
+
+            if (!dados.textoCarregado) {
+                return "carregando";
+            }
+
+            return "disponivel";
+        }
+
+        function atualizarStatusSemDataComSeguranca() {
+            try {
+                atualizarEstadoSemData();
+            } catch (erro) {
+                console.warn("Não foi possível atualizar o filtro sem data.", erro);
+            }
+        }
+
+        function atualizarCalendarioComSeguranca() {
+            try {
+                renderizarCalendario();
+            } catch (erro) {
+                console.warn("Não foi possível atualizar o calendário.", erro);
+            }
+        }
+
+        function atualizarListaComSeguranca() {
+            try {
+                atualizarVisibilidadeDasCartas();
+            } catch (erro) {
+                console.warn("Não foi possível atualizar a lista.", erro);
+            }
+        }
+
+        function atualizarTudoComSeguranca() {
+            atualizarStatusSemDataComSeguranca();
+            atualizarCalendarioComSeguranca();
+            atualizarListaComSeguranca();
+            atualizarInterfaceDaLeitura();
+        }
+
+        /* =========================================================
+           DATA — APOIO A CASOS ESPECÍFICOS
+           ========================================================= */
+
+        function dataNumericaParaIso(dia, mes, ano) {
+            const data = normalizarData(
+                Number(ano),
+                Number(mes),
+                Number(dia)
+            );
+
+            return data ? dataParaISO(data) : null;
+        }
+
+        function dataExtensaParaIso(dia, nomeMes, ano) {
+            const mes = normalizarNomeDeMes(nomeMes);
+            if (!mes) return null;
+            return dataNumericaParaIso(dia, mes, ano);
+        }
+
+        function candidatoDataEhSeguro(candidato) {
+            if (!candidato) return false;
+
+            return (
+                dataTemAnoPlausivel(candidato.ano) &&
+                dataTemMesPlausivel(candidato.mes) &&
+                dataTemDiaPlausivel(candidato.dia)
+            );
+        }
+
+        function filtrarCandidatosValidos(candidatos) {
+            return (Array.isArray(candidatos) ? candidatos : [])
+                .filter(candidatoDataEhSeguro)
+                .filter(candidato => {
+                    return Boolean(
+                        normalizarData(
+                            candidato.ano,
+                            candidato.mes,
+                            candidato.dia
+                        )
+                    );
+                });
+        }
+
+        function escolherPrimeiroCandidato(candidatos) {
+            const validos = filtrarCandidatosValidos(candidatos)
+                .sort((a, b) => a.index - b.index);
+
+            return validos[0] || null;
+        }
+
+        function candidatoParaData(candidato) {
+            if (!candidatoDataEhSeguro(candidato)) return null;
+
+            return normalizarData(
+                candidato.ano,
+                candidato.mes,
+                candidato.dia
+            );
+        }
+
+        function textoContemDataReconhecivel(texto) {
+            return Boolean(extrairDataDoTexto(texto));
+        }
+
+        function extrairIsoDoTexto(texto) {
+            const data = extrairDataDoTexto(texto);
+            return data ? dataParaISO(data) : null;
+        }
+
+        function extrairDataFormatadaDoTexto(texto) {
+            const data = extrairDataDoTexto(texto);
+            return data ? formatarDataCompleta(data) : "Sem data";
+        }
+
+        function extrairTodasAsDatasFormatadasDoTexto(texto) {
+            return encontrarTodasAsDatas(texto)
+                .map(item => item.data)
+                .filter(Boolean)
+                .map(formatarDataCompleta);
+        }
+
+        function validarParserDeData() {
+            const resultados = executarTesteInternoDeDatas();
+            const invalidos = resultados.filter(item => {
+                return (
+                    item.exemplo.includes("31/02") ||
+                    item.exemplo.includes("99/99") ||
+                    item.exemplo.includes("10 dias")
+                ) && item.data !== null;
+            });
+
+            return {
+                passou: invalidos.length === 0,
+                resultados
+            };
+        }
+
+        /* =========================================================
+           CALENDÁRIO — NAVEGAÇÃO SEGURA
+           ========================================================= */
+
+        function irParaMesAtual() {
+            mesCalendario = criarDataNoPrimeiroDiaDoMes(new Date());
+            renderizarCalendario();
+        }
+
+        function irParaMesDaPrimeiraCarta() {
+            const primeira = obterPrimeiraCartaDisponivel();
+            if (!primeira || !primeira.data) return;
+
+            mesCalendario = criarDataNoPrimeiroDiaDoMes(primeira.data);
+            renderizarCalendario();
+        }
+
+        function irParaMesDaUltimaCarta() {
+            const ultima = obterUltimaCartaDisponivel();
+            if (!ultima || !ultima.data) return;
+
+            mesCalendario = criarDataNoPrimeiroDiaDoMes(ultima.data);
+            renderizarCalendario();
+        }
+
+        function obterMesAnterior() {
+            return recuarMes(mesCalendario, 1);
+        }
+
+        function obterProximoMes() {
+            return avancarMes(mesCalendario, 1);
+        }
+
+        function atualizarLimitesVisuaisDoCalendario() {
+            const anteriores = obterMesesComCartas();
+            const anterior = document.querySelector('.calendar-nav button[aria-label="Mês anterior"]');
+            const proximo = document.querySelector('.calendar-nav button[aria-label="Próximo mês"]');
+
+            if (!anteriores.length) {
+                if (anterior) anterior.disabled = false;
+                if (proximo) proximo.disabled = false;
+                return;
+            }
+
+            const atual = dataParaMesIso(mesCalendario);
+            const primeiro = anteriores[0];
+            const ultimo = anteriores[anteriores.length - 1];
+
+            if (anterior) {
+                anterior.disabled = atual <= primeiro;
+                anterior.setAttribute(
+                    "aria-disabled",
+                    anterior.disabled ? "true" : "false"
+                );
+            }
+
+            if (proximo) {
+                proximo.disabled = atual >= ultimo;
+                proximo.setAttribute(
+                    "aria-disabled",
+                    proximo.disabled ? "true" : "false"
+                );
+            }
+        }
+
+        function renderizarCalendarioComLimites() {
+            renderizarCalendario();
+            atualizarLimitesVisuaisDoCalendario();
+        }
+
+        /* =========================================================
+           FILTRO — ESTADOS HUMANOS
+           ========================================================= */
+
+        function selecionarTodasAsCartas() {
+            filtrarTodas();
+            sincronizarDescricaoDoFiltro();
+        }
+
+        function selecionarCartasSemData() {
+            if (!existeAlgumaCartaSemData()) {
+                filtrarTodas();
+                return;
+            }
+
+            filtrarSemData();
+            sincronizarDescricaoDoFiltro();
+        }
+
+        function selecionarCartasDaData(iso) {
+            if (!isoEhValido(iso)) {
+                return;
+            }
+
+            filtrarPorData(iso);
+            prepararCalendarioParaDataSelecionada();
+            renderizarCalendarioComLimites();
+        }
+
+        function obterResultadoDoFiltroAtual() {
+            const cartas = obterCartasOrdenadasPorNumero();
+
+            if (dataSelecionada) {
+                return cartas.filter(item => item.iso === dataSelecionada);
+            }
+
+            if (filtroSemData) {
+                return cartas.filter(item => !item.iso && item.textoCarregado);
+            }
+
+            return cartas;
+        }
+
+        function obterQuantidadeDoFiltroAtual() {
+            return obterResultadoDoFiltroAtual().length;
+        }
+
+        function atualizarContagemDoFiltro() {
+            const status = document.getElementById("filterStatus");
+            if (!status) return;
+
+            const quantidade = obterQuantidadeDoFiltroAtual();
+
+            if (dataSelecionada) {
+                const data = converterIsoParaData(dataSelecionada);
+                const rotulo = data
+                    ? construirRotuloDeData(data)
+                    : "data selecionada";
+                status.textContent = `${quantidade} carta${quantidade === 1 ? "" : "s"} em ${rotulo}`;
+                return;
+            }
+
+            if (filtroSemData) {
+                status.textContent = `${quantidade} carta${quantidade === 1 ? "" : "s"} sem data reconhecida`;
+                return;
+            }
+
+            status.textContent = `Mostrando ${quantidade} carta${quantidade === 1 ? "" : "s"}`;
+        }
+
+        /* =========================================================
+           CARTA — CICLO DE LEITURA
+           ========================================================= */
+
+        function prepararAberturaDaCarta(numero) {
+            const dados = obterDadosDaCartaOuCriar(numero);
+            const titulo = obterTituloSeguro(numero);
+            const data = obterDataSegura(numero);
+
+            return {
+                numero: Number(numero),
+                nomeArquivo: dados.nomeArquivo || obterNomeArquivoDaCarta(numero),
+                titulo,
+                data,
+                iso: data ? dataParaISO(data) : null
+            };
+        }
+
+        function atualizarCabecalhoDaCartaAberta(numero) {
+            const dados = prepararAberturaDaCarta(numero);
+            const titulo = document.getElementById("modalTitulo");
+            const data = document.getElementById("modalData");
+            const folha = document.querySelector(".carta-folha");
+
+            if (titulo) {
+                titulo.textContent = dados.titulo;
+            }
+
+            if (data) {
+                data.textContent = dados.data
+                    ? construirRotuloDeData(dados.data)
+                    : "";
+            }
+
+            if (folha) {
+                folha.dataset.temData = dados.data ? "true" : "false";
+            }
+        }
+
+        function marcarModalComoCarregando(ativo) {
+            const texto = document.getElementById("modalTexto");
+            if (!texto) return;
+
+            texto.dataset.carregando = ativo ? "true" : "false";
+            if (!ativo) {
+                delete texto.dataset.carregando;
+            }
+        }
+
+        function marcarModalComoErro(ativo) {
+            const texto = document.getElementById("modalTexto");
+            if (!texto) return;
+
+            texto.dataset.erro = ativo ? "true" : "false";
+            if (!ativo) {
+                delete texto.dataset.erro;
+            }
+        }
+
+        function atualizarTextoDaCartaAberta(textoOriginal) {
+            const elemento = document.getElementById("modalTexto");
+            if (!elemento) return;
+
+            marcarModalComoCarregando(false);
+            marcarModalComoErro(false);
+            elemento.className = "modal-texto";
+            elemento.textContent = String(textoOriginal ?? "");
+            elemento.scrollTop = 0;
+        }
+
+        function mostrarErroDaCartaAberta(mensagem) {
+            const elemento = document.getElementById("modalTexto");
+            if (!elemento) return;
+
+            marcarModalComoCarregando(false);
+            marcarModalComoErro(true);
+            elemento.className = "modal-texto erro-carta";
+            elemento.textContent = String(mensagem || "Não foi possível carregar esta carta.");
+        }
+
+        function prepararModalParaAbertura(numero) {
+            const modal = document.getElementById("modal");
+            const texto = document.getElementById("modalTexto");
+
+            if (!modal || !texto) return;
+
+            ultimaCartaAberta = Number(numero);
+            modal.classList.add("aberto");
+            modal.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+
+            texto.className = "modal-texto";
+            texto.textContent = "Carregando carta...";
+            marcarModalComoCarregando(true);
+            marcarModalComoErro(false);
+        }
+
+        function finalizarModalDeAbertura() {
+            const texto = document.getElementById("modalTexto");
+            if (!texto) return;
+
+            requestAnimationFrame(function () {
+                texto.scrollTop = 0;
+            });
+        }
+
+        function fecharModalSeAberto() {
+            const modal = document.getElementById("modal");
+            if (!modal || !modal.classList.contains("aberto")) {
+                return false;
+            }
+
+            fecharCarta();
+            return true;
+        }
+
+        /* =========================================================
+           PERSISTÊNCIA — CUIDADO COM O LOGOUT
+           ========================================================= */
+
+        function preservarEstadoAntesDoLogout() {
+            if (!usernameAtual) return;
+
+            const estado = obterCartasLidas(usernameAtual);
+            const chave = obterChaveStorage(usernameAtual);
+
+            try {
+                localStorage.setItem(chave, JSON.stringify(estado));
+            } catch (erro) {
+                console.warn(
+                    "Não foi possível reafirmar o estado antes do logout.",
+                    erro
+                );
+            }
+        }
+
+        function validarPersistenciaDasCartas() {
+            if (!usernameAtual) {
+                return {
+                    valido: false,
+                    motivo: "Nenhum usuário carregado."
+                };
+            }
+
+            const chave = obterChaveStorage(usernameAtual);
+            const salvo = localStorage.getItem(chave);
+
+            if (!salvo) {
+                return {
+                    valido: true,
+                    quantidade: 0
+                };
+            }
+
+            try {
+                const dados = JSON.parse(salvo);
+                const quantidade = Object.keys(dados || {})
+                    .filter(numero => dados[numero] === true)
+                    .length;
+
+                return {
+                    valido: true,
+                    quantidade
+                };
+            } catch (erro) {
+                return {
+                    valido: false,
+                    motivo: erro.message
+                };
+            }
+        }
+
+        /* =========================================================
+           NAVEGAÇÃO — ROTAS EXISTENTES
+           ========================================================= */
+
+        function navegarParaGaleria() {
+            window.location.href = "galeria.html";
+        }
+
+        function navegarParaMusicas() {
+            window.location.href = "musicas.html";
+        }
+
+        function verificarRotasComplementares() {
+            return {
+                galeria: "galeria.html",
+                musicas: "musicas.html"
+            };
+        }
+
+        /* =========================================================
+           DIAGNÓSTICO SILENCIOSO
+           ---------------------------------------------------------
+           O diagnóstico não aparece para o usuário. Ele existe para
+           tornar a manutenção futura do arquivo mais segura e para que
+           uma revisão manual consiga verificar rapidamente o estado
+           essencial da aplicação.
+           ========================================================= */
+
+        function obterDiagnosticoDoSistema() {
+            const resumo = obterResumoDaColecao();
+            const persistencia = validarPersistenciaDasCartas();
+
+            return {
+                usuario: usernameAtual,
+                totalEsperado: TOTAL_CARTAS,
+                totalConhecido: resumo.total,
+                disponiveis: resumo.disponiveis,
+                comData: resumo.comData,
+                semData: resumo.semData,
+                indisponiveis: resumo.indisponiveis,
+                filtro: obterDescricaoDoFiltroAtual(),
+                calendarioAberto,
+                persistencia,
+                rotas: verificarRotasComplementares()
+            };
+        }
+
+        function executarDiagnosticoSilencioso() {
+            try {
+                return obterDiagnosticoDoSistema();
+            } catch (erro) {
+                console.warn("Diagnóstico indisponível.", erro);
+                return null;
+            }
+        }
+
+        /* =========================================================
+           INICIALIZAÇÃO TARDIA
+           ========================================================= */
+
+        function finalizarInicializacaoDaInterface() {
+            atualizarInterfaceDaLeitura();
+            atualizarTudoComSeguranca();
+            prepararCardsParaToque();
+            atualizarLimitesVisuaisDoCalendario();
+        }
+
+        if (document.readyState === "complete") {
+            requestAnimationFrame(finalizarInicializacaoDaInterface);
+        } else {
+            window.addEventListener(
+                "load",
+                function () {
+                    requestAnimationFrame(finalizarInicializacaoDaInterface);
+                },
+                { once: true }
+            );
+        }
+
+
+
+        function executarTesteInternoDeDatas() {
+            const exemplos = [
+                "Carta escrita em 10/12/2024.",
+                "Carta escrita em 10-12-2024.",
+                "Carta escrita em 10.12.2024.",
+                "Carta escrita em 2024-12-10.",
+                "Carta escrita em 2024/12/10.",
+                "Carta escrita em 2024.12.10.",
+                "Carta escrita em 10 de dezembro de 2024.",
+                "Carta escrita em 10 Dezembro 2024.",
+                "Carta escrita em 10 de Dezembro de 2024.",
+                "Carta escrita em 10 dez 2024.",
+                "Carta escrita em 31/02/2024.",
+                "Carta escrita em 99/99/2024.",
+                "esperei por 10 dias antes de responder."
+            ];
+
+            return exemplos.map(exemplo => ({
+                exemplo,
+                data: extrairDataDoTexto(exemplo)
+                    ? dataParaISO(extrairDataDoTexto(exemplo))
+                    : null
+            }));
+        }
+
+
 
         atualizarStatusFiltro();
     </script>
