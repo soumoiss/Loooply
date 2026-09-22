@@ -2,23 +2,16 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#f3efff">
+    <meta name="color-scheme" content="light">
 
     <title>Home - MoissWorld</title>
 
-    <!--
-        QUILLEN
-        A família Quillen é de Storytype Studio / Heru Utama Putra.
-        Para usar a fonte localmente, coloque "Quillen.otf" na mesma
-        pasta deste HTML. A página também possui fallback elegante.
-        Fonte consultada: Fonts2u / FontSpace.
-    -->
-
     <style>
         /* =========================================================
-           FONTE
+           QUILLEN
            ========================================================= */
-
         @font-face {
             font-family: "Quillen";
             src:
@@ -29,29 +22,36 @@
             font-weight: 400;
         }
 
-
         /* =========================================================
-           CONFIGURAÇÃO GERAL
+           TOKENS VISUAIS
            ========================================================= */
-
         :root {
-            --bg: #05030a;
-            --bg-soft: #0b0712;
-
-            --neon: #b84dff;
-            --neon-strong: #d78aff;
-            --neon-soft: rgba(184, 77, 255, 0.14);
-            --neon-border: rgba(184, 77, 255, 0.65);
-
-            --text: #f6eaff;
-            --muted: #bda9c9;
-
-            --danger: #ff526d;
-
-            --glass: rgba(12, 7, 19, 0.82);
-            --glass-strong: rgba(10, 5, 16, 0.96);
-
-            --radius: 22px;
+            --bg: #f4f0ff;
+            --bg-2: #eee8ff;
+            --surface: rgba(255, 255, 255, 0.92);
+            --surface-solid: #ffffff;
+            --surface-soft: #f8f5ff;
+            --surface-lilac: #f1eaff;
+            --primary: #9b5de5;
+            --primary-strong: #8750cf;
+            --primary-soft: #eadcff;
+            --primary-pale: #f4edff;
+            --text: #29252f;
+            --muted: #817b89;
+            --muted-2: #aaa4b0;
+            --line: rgba(102, 82, 126, 0.12);
+            --line-strong: rgba(125, 91, 164, 0.20);
+            --success: #8f63d8;
+            --paper: #f4ebdd;
+            --paper-2: #f8f1e7;
+            --paper-text: #342f2a;
+            --danger: #9d5f71;
+            --shadow-sm: 0 5px 18px rgba(80, 56, 115, 0.07);
+            --shadow-md: 0 16px 38px rgba(80, 56, 115, 0.11);
+            --shadow-lg: 0 28px 80px rgba(65, 45, 94, 0.18);
+            --radius-lg: 28px;
+            --radius-md: 20px;
+            --radius-sm: 16px;
         }
 
         * {
@@ -67,302 +67,446 @@
 
         body {
             min-height: 100vh;
-
-            background:
-                radial-gradient(
-                    circle at 50% -10%,
-                    rgba(184, 77, 255, 0.20),
-                    transparent 35%
-                ),
-                radial-gradient(
-                    circle at 0% 100%,
-                    rgba(126, 42, 255, 0.12),
-                    transparent 35%
-                ),
-                var(--bg);
-
+            min-height: 100dvh;
+            overflow-x: hidden;
             color: var(--text);
-
             font-family:
-                system-ui,
+                Inter,
+                ui-sans-serif,
                 -apple-system,
                 BlinkMacSystemFont,
                 "Segoe UI",
+                Roboto,
+                Helvetica,
+                Arial,
                 sans-serif;
-
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-
+            background:
+                radial-gradient(circle at 10% -8%, rgba(177, 131, 255, 0.22), transparent 31%),
+                radial-gradient(circle at 94% 8%, rgba(220, 204, 255, 0.48), transparent 28%),
+                linear-gradient(135deg, var(--bg), var(--bg-2));
             padding:
-                max(24px, env(safe-area-inset-top))
+                max(18px, env(safe-area-inset-top))
                 max(14px, env(safe-area-inset-right))
-                max(90px, env(safe-area-inset-bottom))
+                max(30px, env(safe-area-inset-bottom))
                 max(14px, env(safe-area-inset-left));
-
-            overflow-x: hidden;
         }
-
-
-        /* brilho ambiente */
 
         body::before {
             content: "";
-
             position: fixed;
             inset: 0;
-
             pointer-events: none;
-
-            background:
-                linear-gradient(
-                    120deg,
-                    transparent 0%,
-                    rgba(184, 77, 255, 0.025) 50%,
-                    transparent 100%
-                );
-
             z-index: -1;
+            opacity: .34;
+            background-image:
+                linear-gradient(rgba(255,255,255,.35) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.25) 1px, transparent 1px);
+            background-size: 38px 38px;
+            mask-image: linear-gradient(to bottom, black, transparent 76%);
         }
 
+        button,
+        input {
+            font: inherit;
+        }
+
+        button {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button:focus-visible,
+        [tabindex]:focus-visible {
+            outline: 3px solid rgba(155, 93, 229, .30);
+            outline-offset: 3px;
+        }
 
         /* =========================================================
-           CONTAINER PRINCIPAL
+           APP / CABEÇALHO
            ========================================================= */
+        .app-shell {
+            width: min(100%, 780px);
+            margin: 0 auto;
+            animation: pageIn .45s ease both;
+        }
 
+        @keyframes pageIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .topbar-spacer {
+            width: 46px;
+            height: 46px;
+            flex: 0 0 46px;
+        }
+
+        .icon-button {
+            width: 46px;
+            height: 46px;
+            flex: 0 0 46px;
+            display: grid;
+            place-items: center;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: rgba(255,255,255,.78);
+            color: var(--primary-strong);
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+        }
+
+        .icon-button:hover {
+            transform: translateY(-2px);
+            background: #fff;
+            box-shadow: var(--shadow-md);
+        }
+
+        .icon-button:active {
+            transform: scale(.96);
+        }
+
+        .icon-button svg {
+            width: 21px;
+            height: 21px;
+        }
+
+        /* =========================================================
+           CARTÃO PRINCIPAL
+           ========================================================= */
         .container {
-            width: min(100%, 680px);
-
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(255,255,255,0.035),
-                    rgba(255,255,255,0.012)
-                ),
-                var(--glass);
-
-            border:
-                1px solid
-                var(--neon-border);
-
-            border-radius: var(--radius);
-
+            width: 100%;
             padding: clamp(20px, 5vw, 34px);
-
-            box-shadow:
-                0 0 0 1px rgba(184, 77, 255, 0.04),
-                0 0 35px rgba(184, 77, 255, 0.12),
-                0 25px 80px rgba(0, 0, 0, 0.55);
-
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-
-            text-align: center;
-
-            animation: aparecer 0.45s ease both;
+            border: 1px solid rgba(120, 92, 155, .10);
+            border-radius: var(--radius-lg);
+            background: var(--surface);
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
         }
-
-        @keyframes aparecer {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-
-        /* =========================================================
-           FOTO DO USUÁRIO
-           ========================================================= */
 
         .profile-wrap {
             display: flex;
             justify-content: center;
-            align-items: center;
-
-            margin-bottom: 15px;
+            margin: 4px 0 16px;
         }
 
         .profile-ring {
-            position: relative;
-
-            width: clamp(128px, 27vw, 170px);
-            height: clamp(128px, 27vw, 170px);
-
+            width: clamp(124px, 31vw, 168px);
+            height: clamp(124px, 31vw, 168px);
             padding: 5px;
-
             border-radius: 50%;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    var(--neon-strong),
-                    var(--neon),
-                    #6f19c9
-                );
-
-            box-shadow:
-                0 0 18px rgba(184, 77, 255, 0.55),
-                0 0 50px rgba(184, 77, 255, 0.18);
-        }
-
-        .profile-ring::after {
-            content: "";
-
-            position: absolute;
-            inset: -7px;
-
-            border-radius: 50%;
-
-            border:
-                1px solid
-                rgba(216, 138, 255, 0.22);
-
-            animation: pulsar 2.8s ease-in-out infinite;
-        }
-
-        @keyframes pulsar {
-            0%, 100% {
-                opacity: 0.35;
-                transform: scale(0.98);
-            }
-
-            50% {
-                opacity: 0.8;
-                transform: scale(1.025);
-            }
+            background: linear-gradient(145deg, #c49af5, var(--primary), #b07ae9);
+            box-shadow: 0 13px 34px rgba(131, 83, 189, .18);
         }
 
         .profile-pic {
             display: block;
-
             width: 100%;
             height: 100%;
-
-            border-radius: 50%;
-
             object-fit: cover;
-
-            background: #10091a;
-
-            border: 3px solid #09040d;
+            border-radius: 50%;
+            border: 4px solid rgba(255,255,255,.94);
+            background: #eee8f7;
         }
 
-
-        /* =========================================================
-           CABEÇALHO
-           ========================================================= */
-
         .eyebrow {
-            color: var(--neon-strong);
-
-            font-size: 12px;
-            font-weight: 700;
-
-            letter-spacing: 0.20em;
+            text-align: center;
+            color: var(--primary-strong);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .18em;
             text-transform: uppercase;
-
-            margin-bottom: 6px;
-
-            opacity: 0.9;
+            margin-bottom: 7px;
         }
 
         h2 {
-            color: var(--text);
-
+            text-align: center;
             font-size: clamp(25px, 6vw, 34px);
-
-            line-height: 1.1;
-
-            margin-bottom: 8px;
-
-            text-shadow:
-                0 0 18px rgba(184, 77, 255, 0.28);
+            line-height: 1.12;
+            letter-spacing: -.03em;
+            margin-bottom: 7px;
         }
 
         .subtitulo {
+            max-width: 520px;
+            margin: 0 auto;
+            text-align: center;
             color: var(--muted);
-
             font-size: 14px;
-
-            line-height: 1.5;
-
-            margin-bottom: 24px;
+            line-height: 1.55;
         }
 
-
         /* =========================================================
-           CABEÇALHO DA LISTA
+           RESUMO / FILTROS
            ========================================================= */
-
-        .lista-topo {
-            display: flex;
-
-            align-items: center;
-            justify-content: space-between;
-
+        .overview {
+            display: grid;
+            grid-template-columns: 1fr auto;
             gap: 12px;
+            align-items: stretch;
+            margin-top: 26px;
+            margin-bottom: 14px;
+        }
 
-            margin-bottom: 10px;
+        .overview-card {
+            min-width: 0;
+            padding: 15px 17px;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, #fff, #faf7ff);
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .overview-label {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            margin-bottom: 4px;
         }
 
         .lista-titulo {
-            color: var(--text);
-
-            font-size: 14px;
-            font-weight: 700;
-
-            letter-spacing: 0.05em;
-
-            text-align: left;
+            font-size: clamp(22px, 5vw, 28px);
+            line-height: 1.05;
+            font-weight: 800;
+            letter-spacing: -.035em;
         }
 
         .contador {
-            flex-shrink: 0;
-
-            color: var(--neon-strong);
-
-            background: var(--neon-soft);
-
-            border:
-                1px solid
-                rgba(184, 77, 255, 0.30);
-
-            border-radius: 999px;
-
-            padding: 5px 10px;
-
-            font-size: 12px;
-            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 92px;
+            padding: 10px 13px;
+            border-radius: 15px;
+            background: var(--primary-pale);
+            border: 1px solid rgba(155,93,229,.14);
+            color: var(--primary-strong);
+            font-size: 13px;
+            font-weight: 800;
+            white-space: nowrap;
         }
 
+        .filters {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .filter-button {
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 0 15px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: rgba(255,255,255,.84);
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 800;
+            box-shadow: 0 3px 12px rgba(80,56,115,.04);
+            transition: transform .18s ease, background .18s ease, color .18s ease, border-color .18s ease;
+        }
+
+        .filter-button:hover {
+            transform: translateY(-1px);
+            color: var(--primary-strong);
+            border-color: rgba(155,93,229,.20);
+        }
+
+        .filter-button.active {
+            color: #fff;
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 8px 20px rgba(155,93,229,.20);
+        }
+
+        .filter-button svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        .filter-status {
+            flex: 1;
+            min-width: 160px;
+            color: var(--muted);
+            font-size: 12px;
+            text-align: right;
+        }
+
+        /* =========================================================
+           CALENDÁRIO
+           ========================================================= */
+        .calendar-panel {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transform: translateY(-5px);
+            margin-bottom: 0;
+            transition: max-height .30s ease, opacity .22s ease, transform .30s ease, margin-bottom .30s ease;
+        }
+
+        .calendar-panel.aberto {
+            max-height: 520px;
+            opacity: 1;
+            transform: translateY(0);
+            margin-bottom: 18px;
+        }
+
+        .calendar-card {
+            padding: 17px;
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            background: rgba(255,255,255,.84);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .calendar-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .calendar-month {
+            font-size: 17px;
+            font-weight: 850;
+            letter-spacing: -.02em;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 6px;
+        }
+
+        .calendar-nav button {
+            width: 36px;
+            height: 36px;
+            display: grid;
+            place-items: center;
+            border: 1px solid var(--line);
+            border-radius: 11px;
+            background: #fff;
+            color: var(--primary-strong);
+            cursor: pointer;
+            transition: transform .16s ease, background .16s ease;
+        }
+
+        .calendar-nav button:hover {
+            transform: translateY(-1px);
+            background: var(--primary-pale);
+        }
+
+        .weekdays,
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 5px;
+        }
+
+        .weekdays {
+            margin-bottom: 6px;
+        }
+
+        .weekday {
+            text-align: center;
+            color: var(--muted-2);
+            font-size: 10px;
+            font-weight: 850;
+            text-transform: uppercase;
+        }
+
+        .day-button {
+            position: relative;
+            min-height: 40px;
+            border: 1px solid transparent;
+            border-radius: 12px;
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 750;
+            transition: background .16s ease, color .16s ease, transform .16s ease;
+        }
+
+        .day-button:hover {
+            background: var(--primary-pale);
+            transform: translateY(-1px);
+        }
+
+        .day-button.muted-day {
+            color: #d0cad7;
+            cursor: default;
+        }
+
+        .day-button.has-cards::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: 5px;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+        }
+
+        .day-button.selected {
+            color: #fff;
+            background: var(--primary);
+            box-shadow: 0 7px 16px rgba(155,93,229,.22);
+        }
+
+        .day-button.selected::after {
+            background: #fff;
+        }
+
+        .calendar-foot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--line);
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .calendar-foot strong {
+            color: var(--primary-strong);
+        }
 
         /* =========================================================
            LISTA DE CARTAS
            ========================================================= */
-
         .cartas-container {
             width: 100%;
-
-            max-height: min(55vh, 540px);
-
+            max-height: min(61vh, 610px);
             overflow-y: auto;
             overflow-x: hidden;
-
-            padding: 3px 4px 3px 1px;
-
+            padding: 2px 3px 3px 1px;
             scrollbar-width: thin;
-            scrollbar-color:
-                var(--neon)
-                transparent;
+            scrollbar-color: rgba(155,93,229,.45) transparent;
         }
 
         .cartas-container::-webkit-scrollbar {
-            width: 6px;
+            width: 7px;
         }
 
         .cartas-container::-webkit-scrollbar-track {
@@ -370,548 +514,371 @@
         }
 
         .cartas-container::-webkit-scrollbar-thumb {
-            background: var(--neon);
+            background: rgba(155,93,229,.42);
             border-radius: 999px;
         }
-
-
-        /* =========================================================
-           CARTA DA LISTA
-           ========================================================= */
 
         .carta {
             position: relative;
-
             width: 100%;
-
-            display: flex;
-
+            min-height: 88px;
+            display: grid;
+            grid-template-columns: 55px minmax(0, 1fr) 42px;
             align-items: center;
-
-            gap: 14px;
-
-            background:
-                linear-gradient(
-                    105deg,
-                    rgba(184, 77, 255, 0.10),
-                    rgba(255,255,255,0.018)
-                );
-
-            border:
-                1px solid
-                rgba(184, 77, 255, 0.34);
-
-            border-radius: 16px;
-
-            padding: 14px 14px 14px 16px;
-
-            margin-bottom: 9px;
-
+            gap: 13px;
+            margin-bottom: 10px;
+            padding: 13px 13px 13px 11px;
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            background: linear-gradient(135deg, #fff, #fcfaff);
+            box-shadow: 0 5px 16px rgba(75, 54, 104, .055);
             cursor: pointer;
-
-            color: var(--text);
-
             text-align: left;
-
-            transition:
-                transform 0.18s ease,
-                border-color 0.18s ease,
-                background 0.18s ease,
-                box-shadow 0.18s ease;
+            transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease, opacity .18s ease;
+            animation: cardIn .32s ease both;
         }
 
-        .carta::before {
-            content: "";
-
-            width: 3px;
-            min-width: 3px;
-            height: 32px;
-
-            border-radius: 999px;
-
-            background:
-                linear-gradient(
-                    to bottom,
-                    var(--neon-strong),
-                    var(--neon)
-                );
-
-            opacity: 0.55;
-
-            transition:
-                height 0.18s ease,
-                opacity 0.18s ease;
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(7px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .carta:hover {
             transform: translateY(-2px);
-
-            background:
-                linear-gradient(
-                    105deg,
-                    rgba(184, 77, 255, 0.18),
-                    rgba(255,255,255,0.03)
-                );
-
-            border-color:
-                rgba(216, 138, 255, 0.75);
-
-            box-shadow:
-                0 7px 25px rgba(184, 77, 255, 0.10);
-        }
-
-        .carta:hover::before {
-            height: 42px;
-            opacity: 1;
+            border-color: rgba(155,93,229,.18);
+            background: #fff;
+            box-shadow: 0 12px 25px rgba(75,54,104,.10);
         }
 
         .carta:active {
-            transform: scale(0.985);
+            transform: scale(.988);
+        }
+
+        .carta.oculta {
+            display: none;
+        }
+
+        .carta-numero-box {
+            width: 55px;
+            height: 55px;
+            display: grid;
+            place-items: center;
+            border-radius: 17px;
+            background: var(--surface-lilac);
+            color: var(--primary-strong);
+            font-size: 13px;
+            font-weight: 900;
+            letter-spacing: .03em;
         }
 
         .carta-info {
-            flex: 1;
             min-width: 0;
         }
 
-        .carta-numero {
+        .carta-numero-label {
             display: block;
-
-            color: var(--neon-strong);
-
-            font-family:
-                system-ui,
-                -apple-system,
-                sans-serif;
-
+            color: var(--muted-2);
             font-size: 10px;
-            font-weight: 800;
-
-            letter-spacing: 0.14em;
-
-            margin-bottom: 4px;
-
-            opacity: 0.85;
+            font-weight: 850;
+            letter-spacing: .10em;
+            text-transform: uppercase;
+            margin-bottom: 3px;
         }
 
         .carta-titulo {
             display: block;
-
             color: var(--text);
-
-            /*
-             * Quillen é aplicada principalmente ao título
-             * da carta, como solicitado.
-             */
-            font-family:
-                "Quillen",
-                Georgia,
-                "Times New Roman",
-                serif;
-
-            font-size: clamp(17px, 4vw, 21px);
-
-            line-height: 1.25;
-
-            letter-spacing: 0.01em;
-
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-family: "Quillen", Georgia, "Times New Roman", serif;
+            font-size: clamp(18px, 4.3vw, 23px);
+            line-height: 1.22;
+            letter-spacing: .005em;
+            white-space: normal;
+            overflow-wrap: anywhere;
         }
 
+        .carta-data {
+            display: block;
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.3;
+        }
 
-        /* =========================================================
-           CHECK
-           ========================================================= */
+        .carta-data.sem-data {
+            color: #b1aab8;
+        }
 
         .check {
-            width: 34px;
-            height: 34px;
-
-            min-width: 34px;
-
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
             display: grid;
             place-items: center;
-
             border-radius: 50%;
-
-            color: #7b667f;
-
-            background: rgba(255,255,255,0.035);
-
-            border:
-                1px solid
-                rgba(255,255,255,0.07);
-
+            border: 1px solid rgba(117, 101, 132, .13);
+            background: #f7f5f8;
+            color: #b2acb6;
             font-size: 15px;
-
-            transition:
-                0.2s ease;
+            cursor: default;
+            transition: transform .18s ease, background .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease;
         }
 
         .check.lida {
             color: #fff;
-
-            background:
-                rgba(184, 77, 255, 0.22);
-
-            border-color:
-                rgba(216, 138, 255, 0.65);
-
-            box-shadow:
-                0 0 12px rgba(184, 77, 255, 0.30);
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 7px 16px rgba(155,93,229,.23);
         }
 
+        .empty-state {
+            display: none;
+            padding: 28px 16px;
+            text-align: center;
+            color: var(--muted);
+            border: 1px dashed rgba(117,101,132,.16);
+            border-radius: 18px;
+            background: rgba(255,255,255,.48);
+        }
+
+        .empty-state.visible {
+            display: block;
+        }
+
+        .empty-state strong {
+            display: block;
+            color: var(--text);
+            margin-bottom: 5px;
+        }
+
+        .carregando {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            min-height: 92px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .loader-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: .35; transform: scale(.85); }
+            50% { opacity: 1; transform: scale(1); }
+        }
 
         /* =========================================================
-           RODAPÉ / BOTÃO SAIR
+           AÇÕES
            ========================================================= */
-
         .acoes {
-            display: flex;
-
-            justify-content: center;
-
-            margin-top: 22px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 18px;
         }
 
         .btn-logout {
-            min-width: 140px;
-
-            padding: 12px 22px;
-
-            font-size: 15px;
-            font-weight: 800;
-
-            border:
-                1px solid
-                rgba(216, 138, 255, 0.70);
-
-            background:
-                rgba(184, 77, 255, 0.14);
-
-            color: #f9eaff;
-
+            min-height: 48px;
+            width: 100%;
+            padding: 0 20px;
+            border: 1px solid rgba(117,101,132,.13);
+            border-radius: 16px;
+            background: #fff;
+            color: #6f6876;
             cursor: pointer;
-
-            border-radius: 999px;
-
-            font-family:
-                system-ui,
-                -apple-system,
-                sans-serif;
-
-            transition:
-                0.2s ease;
+            font-size: 14px;
+            font-weight: 800;
+            transition: transform .18s ease, background .18s ease, color .18s ease, box-shadow .18s ease;
         }
 
         .btn-logout:hover {
-            background:
-                var(--neon);
-
-            color: #fff;
-
-            box-shadow:
-                0 0 22px rgba(184, 77, 255, 0.38);
+            transform: translateY(-1px);
+            color: var(--primary-strong);
+            background: var(--primary-pale);
+            box-shadow: var(--shadow-sm);
         }
-
-
-        /* =========================================================
-           BOTÃO FOR YOU
-           ========================================================= */
 
         .btn-para-voce {
             position: fixed;
-
             right: max(16px, env(safe-area-inset-right));
             bottom: max(16px, env(safe-area-inset-bottom));
-
-            min-height: 48px;
-
-            padding: 0 19px;
-
-            font-size: 14px;
-            font-weight: 800;
-
-            border:
-                1px solid
-                rgba(216, 138, 255, 0.75);
-
-            background:
-                rgba(10, 5, 16, 0.88);
-
-            color: var(--neon-strong);
-
-            cursor: pointer;
-
-            border-radius: 999px;
-
-            font-family:
-                system-ui,
-                -apple-system,
-                sans-serif;
-
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-
-            box-shadow:
-                0 8px 30px rgba(0,0,0,0.35);
-
-            transition:
-                0.2s ease;
-
             z-index: 100;
+            min-height: 50px;
+            padding: 0 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 1px solid rgba(255,255,255,.60);
+            border-radius: 17px;
+            background: rgba(155,93,229,.94);
+            color: #fff;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 850;
+            box-shadow: 0 13px 30px rgba(96,62,133,.22);
+            transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
         }
 
         .btn-para-voce:hover {
-            background: var(--neon);
-
-            color: #fff;
-
-            box-shadow:
-                0 0 24px rgba(184, 77, 255, 0.45);
+            transform: translateY(-2px);
+            background: var(--primary-strong);
+            box-shadow: 0 17px 35px rgba(96,62,133,.27);
         }
 
+        .btn-para-voce:active {
+            transform: scale(.97);
+        }
 
         /* =========================================================
-           MODAL
+           MODAL / CARTA FÍSICA
            ========================================================= */
-
         .modal {
             position: fixed;
-
             inset: 0;
-
+            z-index: 1000;
             display: flex;
-
             align-items: center;
             justify-content: center;
-
-            padding: 16px;
-
-            background:
-                rgba(2, 1, 4, 0.78);
-
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-
+            padding:
+                max(14px, env(safe-area-inset-top))
+                max(12px, env(safe-area-inset-right))
+                max(14px, env(safe-area-inset-bottom))
+                max(12px, env(safe-area-inset-left));
+            background: rgba(91, 72, 114, .24);
+            backdrop-filter: blur(13px);
+            -webkit-backdrop-filter: blur(13px);
             opacity: 0;
             visibility: hidden;
-
             pointer-events: none;
-
-            transition:
-                opacity 0.22s ease,
-                visibility 0.22s ease;
-
-            z-index: 1000;
+            transition: opacity .24s ease, visibility .24s ease;
         }
 
         .modal.aberto {
             opacity: 1;
-
             visibility: visible;
-
             pointer-events: auto;
         }
 
-
-        /* =========================================================
-           JANELA DA CARTA
-           ========================================================= */
-
         .modal-content {
-            width: min(100%, 720px);
-
-            max-height: min(88vh, 820px);
-
+            width: min(100%, 780px);
+            max-height: min(94vh, 900px);
+            max-height: min(94dvh, 900px);
             display: flex;
-
             flex-direction: column;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(23, 12, 32, 0.98),
-                    rgba(6, 3, 10, 0.99)
-                );
-
-            border:
-                1px solid
-                rgba(216, 138, 255, 0.60);
-
-            border-radius: 24px;
-
-            box-shadow:
-                0 0 0 1px rgba(184, 77, 255, 0.06),
-                0 0 60px rgba(184, 77, 255, 0.18),
-                0 30px 100px rgba(0,0,0,0.75);
-
-            overflow: hidden;
-
-            transform:
-                translateY(15px)
-                scale(0.97);
-
-            transition:
-                transform 0.24s ease;
+            transform: translateY(18px) scale(.985);
+            transition: transform .28s cubic-bezier(.2,.8,.2,1);
         }
 
         .modal.aberto .modal-content {
-            transform:
-                translateY(0)
-                scale(1);
+            transform: translateY(0) scale(1);
         }
 
+        .carta-folha {
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(116,91,66,.14);
+            border-radius: 24px;
+            background:
+                radial-gradient(circle at 18% 8%, rgba(255,255,255,.58), transparent 24%),
+                linear-gradient(135deg, var(--paper-2), var(--paper));
+            box-shadow: 0 30px 90px rgba(62, 45, 30, .25);
+        }
 
-        /* =========================================================
-           CABEÇALHO DO MODAL
-           ========================================================= */
+        .carta-folha::before {
+            content: "";
+            position: absolute;
+            pointer-events: none;
+        }
 
         .modal-header {
+            flex: 0 0 auto;
             display: flex;
-
-            align-items: flex-start;
-
+            align-items: center;
             justify-content: space-between;
+            gap: 15px;
+            padding: 17px 19px 13px;
+            border-bottom: 1px solid rgba(116,91,66,.12);
+        }
 
-            gap: 16px;
-
-            padding:
-                20px
-                20px
-                15px;
-
-            border-bottom:
-                1px solid
-                rgba(184, 77, 255, 0.16);
+        .modal-heading {
+            min-width: 0;
         }
 
         .modal-label {
-            color: var(--neon-strong);
-
-            font-family:
-                system-ui,
-                -apple-system,
-                sans-serif;
-
+            color: #a18a72;
             font-size: 10px;
-            font-weight: 800;
-
-            letter-spacing: 0.16em;
-
+            font-weight: 850;
+            letter-spacing: .14em;
             text-transform: uppercase;
-
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .modal-content h3 {
-            color: #fff;
-
-            font-family:
-                "Quillen",
-                Georgia,
-                serif;
-
-            font-size: clamp(23px, 5vw, 32px);
-
-            line-height: 1.15;
-
+            color: var(--paper-text);
+            font-family: "Quillen", Georgia, "Times New Roman", serif;
+            font-size: clamp(21px, 5vw, 30px);
             font-weight: 400;
-
-            margin: 0;
+            line-height: 1.16;
+            overflow-wrap: anywhere;
         }
 
-
-        /* =========================================================
-           BOTÃO X
-           ========================================================= */
+        .modal-date {
+            margin-top: 4px;
+            color: #8c7965;
+            font-size: 11px;
+        }
 
         .modal-fechar-x {
-            flex-shrink: 0;
-
-            width: 40px;
-            height: 40px;
-
-            border-radius: 50%;
-
-            border:
-                1px solid
-                rgba(216, 138, 255, 0.25);
-
-            background:
-                rgba(255,255,255,0.035);
-
-            color: var(--muted);
-
-            cursor: pointer;
-
-            font-size: 22px;
-
+            width: 42px;
+            height: 42px;
+            flex: 0 0 42px;
             display: grid;
             place-items: center;
-
-            transition: 0.18s ease;
+            border: 1px solid rgba(116,91,66,.14);
+            border-radius: 50%;
+            background: rgba(255,255,255,.34);
+            color: #806e5d;
+            cursor: pointer;
+            font-size: 21px;
+            transition: transform .17s ease, background .17s ease;
         }
 
         .modal-fechar-x:hover {
-            color: #fff;
-
-            background:
-                rgba(184, 77, 255, 0.18);
-
-            border-color:
-                rgba(216, 138, 255, 0.65);
+            transform: rotate(3deg);
+            background: rgba(255,255,255,.62);
         }
 
-
-        /* =========================================================
-           TEXTO DA CARTA
-           ========================================================= */
-
         .modal-texto {
-            color: #f5edf9;
-
-            /*
-             * Quillen também é usada no conteúdo.
-             * Se o arquivo de fonte não estiver presente,
-             * Georgia assume automaticamente.
-             */
+            min-height: 0;
+            flex: 1;
+            overflow-y: auto;
+            padding: clamp(25px, 6vw, 52px) clamp(21px, 7vw, 64px) 38px;
+            color: var(--paper-text);
             font-family:
-                "Quillen",
                 Georgia,
                 "Times New Roman",
+                Baskerville,
                 serif;
-
-            font-size: clamp(17px, 4vw, 20px);
-
-            line-height: 1.75;
-
+            font-size: clamp(18px, 4.5vw, 22px);
+            line-height: 1.72;
+            letter-spacing: .005em;
             white-space: pre-wrap;
-
-            overflow-y: auto;
-
-            flex: 1;
-
-            min-height: 0;
-
-            padding:
-                22px 22px 12px;
-
-            word-wrap: break-word;
-
             overflow-wrap: anywhere;
-
             scrollbar-width: thin;
-
-            scrollbar-color:
-                var(--neon)
-                transparent;
+            scrollbar-color: rgba(128,105,82,.36) transparent;
         }
 
         .modal-texto::-webkit-scrollbar {
-            width: 6px;
+            width: 7px;
         }
 
         .modal-texto::-webkit-scrollbar-track {
@@ -919,315 +886,359 @@
         }
 
         .modal-texto::-webkit-scrollbar-thumb {
-            background: var(--neon);
+            background: rgba(128,105,82,.32);
             border-radius: 999px;
         }
 
-
-        /* =========================================================
-           RODAPÉ DO MODAL
-           ========================================================= */
-
         .modal-footer {
+            flex: 0 0 auto;
             display: flex;
-
             justify-content: flex-end;
-
-            padding:
-                14px
-                20px
-                20px;
-
-            border-top:
-                1px solid
-                rgba(184, 77, 255, 0.12);
+            padding: 10px 19px 16px;
+            border-top: 1px solid rgba(116,91,66,.10);
         }
 
         .fechar button {
             min-height: 44px;
-
-            padding: 0 20px;
-
-            border:
-                1px solid
-                rgba(216, 138, 255, 0.65);
-
-            background:
-                var(--neon);
-
-            color: #fff;
-
-            border-radius: 999px;
-
+            padding: 0 18px;
+            border: 1px solid rgba(116,91,66,.14);
+            border-radius: 14px;
+            background: rgba(255,255,255,.42);
+            color: #6e5d4d;
             cursor: pointer;
-
-            font-family:
-                system-ui,
-                -apple-system,
-                sans-serif;
-
-            font-size: 14px;
-
+            font-size: 13px;
             font-weight: 800;
-
-            transition: 0.18s ease;
+            transition: transform .17s ease, background .17s ease;
         }
 
         .fechar button:hover {
-            background:
-                var(--neon-strong);
-
-            box-shadow:
-                0 0 20px rgba(184, 77, 255, 0.35);
+            transform: translateY(-1px);
+            background: rgba(255,255,255,.70);
         }
-
-
-        /* =========================================================
-           CARREGAMENTO
-           ========================================================= */
-
-        .carregando {
-            color: var(--neon-strong);
-
-            padding: 25px;
-
-            text-align: center;
-
-            font-family:
-                system-ui,
-                -apple-system,
-                sans-serif;
-        }
-
-
-        /* =========================================================
-           ERRO
-           ========================================================= */
 
         .erro-carta {
-            color: #ff9aaa !important;
-
-            font-family:
-                system-ui,
-                -apple-system,
-                sans-serif !important;
-
+            color: var(--danger) !important;
+            font-family: ui-sans-serif, system-ui, sans-serif !important;
             font-size: 14px !important;
-
-            line-height: 1.6 !important;
+            line-height: 1.65 !important;
         }
 
-
         /* =========================================================
-           CELULAR
+           RESPONSIVIDADE
            ========================================================= */
+        @media (min-width: 760px) {
+            .container {
+                padding: 34px 36px;
+            }
 
-        @media (max-width: 600px) {
+            .acoes {
+                grid-template-columns: minmax(180px, 280px);
+                justify-content: center;
+            }
+        }
 
+        @media (max-width: 560px) {
             body {
-                padding-top: 18px;
+                padding-top: max(12px, env(safe-area-inset-top));
             }
 
             .container {
-                border-radius: 19px;
-
-                padding: 20px 14px;
+                padding: 19px 13px 16px;
+                border-radius: 24px;
             }
 
-            .profile-ring {
-                width: 142px;
-                height: 142px;
+            .topbar {
+                margin-bottom: 9px;
             }
 
-            .cartas-container {
-                max-height: 57vh;
-            }
-
-            .carta {
-                padding: 13px 11px 13px 12px;
-
-                gap: 9px;
-
+            .icon-button,
+            .topbar-spacer {
+                width: 43px;
+                height: 43px;
+                flex-basis: 43px;
                 border-radius: 14px;
             }
 
+            .profile-ring {
+                width: 132px;
+                height: 132px;
+            }
+
+            .overview {
+                grid-template-columns: 1fr auto;
+            }
+
+            .overview-card {
+                padding: 14px;
+            }
+
+            .filter-status {
+                width: 100%;
+                flex-basis: 100%;
+                text-align: left;
+            }
+
+            .cartas-container {
+                max-height: 58vh;
+                max-height: 58dvh;
+            }
+
+            .carta {
+                grid-template-columns: 48px minmax(0, 1fr) 39px;
+                min-height: 83px;
+                gap: 10px;
+                padding: 11px 10px 11px 9px;
+                border-radius: 18px;
+            }
+
+            .carta-numero-box {
+                width: 48px;
+                height: 48px;
+                border-radius: 15px;
+                font-size: 12px;
+            }
+
             .carta-titulo {
-                font-size: 17px;
+                font-size: 18px;
             }
 
             .check {
-                width: 32px;
-                height: 32px;
-                min-width: 32px;
+                width: 38px;
+                height: 38px;
+                min-width: 38px;
+            }
+
+            .calendar-card {
+                padding: 13px;
+            }
+
+            .day-button {
+                min-height: 37px;
+                border-radius: 10px;
             }
 
             .modal {
-                padding: 9px;
+                padding: 8px;
             }
 
             .modal-content {
-                max-height: 92vh;
+                width: 100%;
+                max-height: 97vh;
+                max-height: 97dvh;
+            }
 
+            .carta-folha {
                 border-radius: 20px;
             }
 
             .modal-header {
-                padding:
-                    16px
-                    15px
-                    13px;
+                padding: 14px 14px 11px;
             }
 
             .modal-texto {
-                padding:
-                    18px
-                    15px
-                    10px;
-
-                font-size: 17px;
-
+                padding: 24px 18px 30px;
+                font-size: 18px;
                 line-height: 1.68;
             }
 
             .modal-footer {
-                padding:
-                    11px
-                    15px
-                    15px;
+                padding: 9px 14px 13px;
             }
 
+            .fechar,
             .fechar button {
                 width: 100%;
             }
 
             .btn-para-voce {
-                min-height: 45px;
-
-                padding: 0 16px;
+                min-height: 48px;
+                right: max(12px, env(safe-area-inset-right));
+                bottom: max(12px, env(safe-area-inset-bottom));
             }
         }
 
+        @media (max-width: 380px) {
+            .overview {
+                grid-template-columns: 1fr;
+            }
 
-        /* =========================================================
-           REDUÇÃO DE MOVIMENTO
-           ========================================================= */
+            .contador {
+                justify-self: start;
+            }
+
+            .filters {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .filter-button {
+                width: 100%;
+                padding-inline: 10px;
+            }
+        }
 
         @media (prefers-reduced-motion: reduce) {
-
             *,
             *::before,
             *::after {
                 scroll-behavior: auto !important;
-
-                animation-duration: 0.01ms !important;
+                animation-duration: .01ms !important;
                 animation-iteration-count: 1 !important;
-
-                transition-duration: 0.01ms !important;
+                transition-duration: .01ms !important;
             }
         }
     </style>
 </head>
 
 <body>
-
-    <!-- =========================================================
-         CONTAINER PRINCIPAL
-         ========================================================= -->
-
-    <div class="container">
-
-        <div class="profile-wrap">
-            <div class="profile-ring">
-
-                <img
-                    src=""
-                    alt="Foto de Perfil"
-                    class="profile-pic"
-                    id="profilePic"
-                >
-
-            </div>
-        </div>
-
-
-        <div class="eyebrow">
-            MoissWorld
-        </div>
-
-        <h2 id="welcomeMessage"></h2>
-
-        <p class="subtitulo">
-            Taí as cartas que te escrevi, best(a)
-        </p>
-
-
-        <!-- =====================================================
-             TOPO DA LISTA
-             ===================================================== -->
-
-        <div class="lista-topo">
-
-            <span class="lista-titulo">
-                SUAS CARTAS
-            </span>
-
-            <span
-                class="contador"
-                id="contador"
-            >
-                0/50 lidas
-            </span>
-
-        </div>
-
-
-        <!-- =====================================================
-             LISTA DE CARTAS
-             ===================================================== -->
-
-        <div
-            class="cartas-container"
-            id="cartasContainer"
-        >
-            <div class="carregando">
-                Carregando cartas...
-            </div>
-        </div>
-
-
-        <!-- =====================================================
-             BOTÃO SAIR
-             ===================================================== -->
-
-        <div class="acoes">
-
+    <main class="app-shell">
+        <div class="topbar">
             <button
-                class="btn-logout"
-                onclick="logout()"
+                class="icon-button"
+                type="button"
+                onclick="abrirGaleria()"
+                aria-label="Abrir galeria"
+                title="Galeria"
             >
-                Sair
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="4" width="18" height="16" rx="3"></rect>
+                    <circle cx="8.5" cy="9" r="1.5"></circle>
+                    <path d="m5.5 17 4.5-4.5 3.5 3.5 2.5-2.5 2.5 3.5"></path>
+                </svg>
             </button>
 
+            <div class="topbar-spacer" aria-hidden="true"></div>
         </div>
 
-    </div>
+        <section class="container" aria-label="Minhas cartas">
+            <div class="profile-wrap">
+                <div class="profile-ring">
+                    <img
+                        src=""
+                        alt="Foto de perfil"
+                        class="profile-pic"
+                        id="profilePic"
+                    >
+                </div>
+            </div>
 
+            <div class="eyebrow">MoissWorld</div>
 
-    <!-- =========================================================
-         BOTÃO FOR YOU
-         ========================================================= -->
+            <h2 id="welcomeMessage"></h2>
+
+            <p class="subtitulo">
+                Suas cartas estão aqui. Escolha uma para abrir e continuar a leitura.
+            </p>
+
+            <div class="overview">
+                <div class="overview-card">
+                    <div class="overview-label">Coleção</div>
+                    <div class="lista-titulo">Minhas Cartas</div>
+                </div>
+
+                <div class="contador" id="contador">0/50 lidas</div>
+            </div>
+
+            <div class="filters" aria-label="Filtros das cartas">
+                <button
+                    class="filter-button active"
+                    type="button"
+                    id="btnTodas"
+                    onclick="filtrarTodas()"
+                >
+                    Todas
+                </button>
+
+                <button
+                    class="filter-button"
+                    type="button"
+                    id="btnCalendario"
+                    onclick="alternarCalendario()"
+                    aria-expanded="false"
+                    aria-controls="calendarPanel"
+                >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="4.5" width="18" height="16" rx="3"></rect>
+                        <path d="M8 2.8v4M16 2.8v4M3 9h18"></path>
+                    </svg>
+                    Filtrar por data
+                </button>
+
+                <button
+                    class="filter-button"
+                    type="button"
+                    id="btnSemData"
+                    onclick="filtrarSemData()"
+                    style="display:none"
+                >
+                    Sem data
+                </button>
+
+                <span class="filter-status" id="filterStatus">Mostrando todas as cartas</span>
+            </div>
+
+            <div class="calendar-panel" id="calendarPanel" aria-hidden="true">
+                <div class="calendar-card">
+                    <div class="calendar-head">
+                        <div class="calendar-month" id="calendarMonth">Calendário</div>
+
+                        <div class="calendar-nav">
+                            <button type="button" onclick="mudarMes(-1)" aria-label="Mês anterior">‹</button>
+                            <button type="button" onclick="mudarMes(1)" aria-label="Próximo mês">›</button>
+                        </div>
+                    </div>
+
+                    <div class="weekdays" aria-hidden="true">
+                        <span class="weekday">Dom</span>
+                        <span class="weekday">Seg</span>
+                        <span class="weekday">Ter</span>
+                        <span class="weekday">Qua</span>
+                        <span class="weekday">Qui</span>
+                        <span class="weekday">Sex</span>
+                        <span class="weekday">Sáb</span>
+                    </div>
+
+                    <div class="calendar-grid" id="calendarGrid"></div>
+
+                    <div class="calendar-foot">
+                        <span><strong>•</strong> dia com cartas</span>
+                        <span id="calendarInfo">Aguardando datas...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cartas-container" id="cartasContainer">
+                <div class="carregando" id="loadingState">
+                    <span class="loader-dot" aria-hidden="true"></span>
+                    Carregando cartas...
+                </div>
+            </div>
+
+            <div class="empty-state" id="emptyState">
+                <strong>Nenhuma carta encontrada</strong>
+                Não há cartas correspondentes ao filtro selecionado.
+            </div>
+
+            <div class="acoes">
+                <button
+                    class="btn-logout"
+                    type="button"
+                    onclick="logout()"
+                >
+                    Sair
+                </button>
+            </div>
+        </section>
+    </main>
 
     <button
         class="btn-para-voce"
+        type="button"
         onclick="redirectToYou()"
+        aria-label="Abrir for you"
     >
         for you
     </button>
-
-
-    <!-- =========================================================
-         MODAL DA CARTA
-         ========================================================= -->
 
     <div
         class="modal"
@@ -1235,7 +1246,6 @@
         onclick="fecharAoClicarFora(event)"
         aria-hidden="true"
     >
-
         <div
             class="modal-content"
             role="dialog"
@@ -1243,400 +1253,221 @@
             aria-labelledby="modalTitulo"
             onclick="event.stopPropagation()"
         >
-
-            <div class="modal-header">
-
-                <div>
-
-                    <div class="modal-label">
-                        Carta
+            <article class="carta-folha">
+                <header class="modal-header">
+                    <div class="modal-heading">
+                        <div class="modal-label">Carta</div>
+                        <h3 id="modalTitulo">Carregando...</h3>
+                        <div class="modal-date" id="modalData"></div>
                     </div>
 
-                    <h3 id="modalTitulo">
-                        Carregando...
-                    </h3>
-
-                </div>
-
-                <button
-                    class="modal-fechar-x"
-                    onclick="fecharCarta()"
-                    aria-label="Fechar carta"
-                >
-                    ×
-                </button>
-
-            </div>
-
-
-            <div
-                class="modal-texto"
-                id="modalTexto"
-            >
-                Carregando carta...
-            </div>
-
-
-            <div class="modal-footer">
-
-                <div class="fechar">
-
                     <button
+                        class="modal-fechar-x"
+                        type="button"
                         onclick="fecharCarta()"
+                        aria-label="Fechar carta"
                     >
-                        Fechar carta
+                        ×
                     </button>
+                </header>
 
-                </div>
+                <div class="modal-texto" id="modalTexto">Carregando carta...</div>
 
-            </div>
-
+                <footer class="modal-footer">
+                    <div class="fechar">
+                        <button type="button" onclick="fecharCarta()">Fechar carta</button>
+                    </div>
+                </footer>
+            </article>
         </div>
-
     </div>
 
-
     <script>
-
         /* =========================================================
-           CONFIGURAÇÃO
+           CONFIGURAÇÃO ORIGINAL PRESERVADA
            ========================================================= */
-
         const TOTAL_CARTAS = 50;
-
-        /*
-         * O estado das cartas é salvo no localStorage.
-         *
-         * Isso é deliberado: uma página web não pode criar/
-         * alterar silenciosamente um arquivo no dispositivo do
-         * usuário. O localStorage é o armazenamento persistente
-         * próprio do navegador e continua existindo depois que
-         * a página é fechada.
-         */
 
         const STORAGE_PREFIX =
             "moissworld_cartas_lidas_";
 
+        /* =========================================================
+           ESTADO VISUAL NOVO
+           ========================================================= */
+        const cartasDados = {};
+        let usernameAtual = null;
+        let dataSelecionada = null;
+        let filtroSemData = false;
+        let calendarioAberto = false;
+        let mesCalendario = new Date();
+        let ultimaCartaAberta = null;
+
+        const MESES = [
+            "janeiro", "fevereiro", "março", "abril", "maio", "junho",
+            "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"
+        ];
+
+        const MESES_ABREV = [
+            "jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"
+        ];
 
         /* =========================================================
            INICIALIZAÇÃO
            ========================================================= */
-
         document.addEventListener(
             "DOMContentLoaded",
             function () {
-
-                /*
-                 * Verifica se o usuário está logado.
-                 */
-
-                if (
-                    !localStorage.getItem(
-                        "isLoggedIn"
-                    )
-                ) {
-
-                    window.location.href =
-                        "login.html";
-
+                if (!localStorage.getItem("isLoggedIn")) {
+                    window.location.href = "login.html";
                     return;
                 }
 
+                const username = localStorage.getItem("username");
+                const profilePic = localStorage.getItem("profilePic");
+                usernameAtual = username;
 
-                /*
-                 * Obtém os dados do usuário.
-                 */
-
-                const username =
-                    localStorage.getItem(
-                        "username"
-                    );
-
-                const profilePic =
-                    localStorage.getItem(
-                        "profilePic"
-                    );
-
-
-                /*
-                 * Atualiza a interface.
-                 */
-
-                document.getElementById(
-                    "welcomeMessage"
-                ).innerText =
+                document.getElementById("welcomeMessage").innerText =
                     `Bem-vindo(a), ${username}`;
 
-
-                /*
-                 * Foto do usuário.
-                 */
-
                 if (profilePic) {
-
-                    document.getElementById(
-                        "profilePic"
-                    ).src = profilePic;
-
+                    document.getElementById("profilePic").src = profilePic;
                 }
 
-
-                /*
-                 * Carrega as 50 cartas.
-                 */
-
+                atualizarContador(obterCartasLidas(username));
+                renderizarCalendario();
                 carregarCartas(username);
-
             }
         );
 
-
         /* =========================================================
-           CHAVE DE PERSISTÊNCIA
+           CHAVE DE PERSISTÊNCIA ORIGINAL
            ========================================================= */
-
         function obterChaveStorage(username) {
-
             return (
                 STORAGE_PREFIX +
                 encodeURIComponent(username || "usuario")
             );
-
         }
 
-
         /* =========================================================
-           LER ESTADO DAS CARTAS
+           LER ESTADO DAS CARTAS ORIGINAL
            ========================================================= */
-
         function obterCartasLidas(username) {
-
-            const chave =
-                obterChaveStorage(username);
+            const chave = obterChaveStorage(username);
 
             try {
-
-                const salvo =
-                    localStorage.getItem(chave);
+                const salvo = localStorage.getItem(chave);
 
                 if (!salvo) {
                     return {};
                 }
 
-                const dados =
-                    JSON.parse(salvo);
+                const dados = JSON.parse(salvo);
 
-                if (
-                    dados &&
-                    typeof dados === "object"
-                ) {
+                if (dados && typeof dados === "object") {
                     return dados;
                 }
 
                 return {};
-
             } catch (erro) {
-
                 console.warn(
                     "Não foi possível ler o estado das cartas:",
                     erro
                 );
-
                 return {};
             }
         }
 
-
         /* =========================================================
-           SALVAR ESTADO DAS CARTAS
+           SALVAR ESTADO DAS CARTAS ORIGINAL
            ========================================================= */
-
-        function salvarCartasLidas(
-            username,
-            cartasLidas
-        ) {
-
-            const chave =
-                obterChaveStorage(username);
+        function salvarCartasLidas(username, cartasLidas) {
+            const chave = obterChaveStorage(username);
 
             try {
-
-                /*
-                 * Salva imediatamente.
-                 */
-
                 localStorage.setItem(
                     chave,
                     JSON.stringify(cartasLidas)
                 );
 
-                atualizarContador(
-                    cartasLidas
-                );
-
+                atualizarContador(cartasLidas);
             } catch (erro) {
-
                 console.error(
                     "Não foi possível salvar o estado das cartas:",
                     erro
                 );
-
             }
         }
 
-
         /* =========================================================
-           MARCAR COMO LIDA
+           MARCAR COMO LIDA ORIGINAL
            ========================================================= */
-
-        function marcarComoLida(
-            username,
-            numero
-        ) {
-
-            const cartasLidas =
-                obterCartasLidas(username);
+        function marcarComoLida(username, numero) {
+            const cartasLidas = obterCartasLidas(username);
 
             cartasLidas[numero] = true;
-
-            /*
-             * Salvamento instantâneo.
-             */
 
             salvarCartasLidas(
                 username,
                 cartasLidas
             );
 
-            const check =
-                document.getElementById(
-                    `check${numero}`
-                );
+            const check = document.getElementById(`check${numero}`);
 
             if (check) {
-
-                check.classList.add(
-                    "lida"
-                );
-
+                check.classList.add("lida");
+                check.setAttribute("aria-label", "Carta lida");
             }
         }
 
-
         /* =========================================================
-           CONTADOR
+           CONTADOR ORIGINAL + APRESENTAÇÃO NOVA
            ========================================================= */
-
-        function atualizarContador(
-            cartasLidas
-        ) {
-
-            const contador =
-                document.getElementById(
-                    "contador"
-                );
+        function atualizarContador(cartasLidas) {
+            const contador = document.getElementById("contador");
 
             if (!contador) {
                 return;
             }
 
-            const quantidade =
-                Object.keys(cartasLidas)
-                    .filter(
-                        numero =>
-                            cartasLidas[numero] === true
-                    )
-                    .length;
+            const quantidade = Object.keys(cartasLidas)
+                .filter(
+                    numero => cartasLidas[numero] === true
+                )
+                .length;
 
             contador.innerText =
                 `${quantidade}/${TOTAL_CARTAS} lidas`;
-
         }
-
 
         /* =========================================================
            CARREGAR LISTA DE CARTAS
            ========================================================= */
-
         function carregarCartas(username) {
-
             const cartasContainer =
-                document.getElementById(
-                    "cartasContainer"
-                );
+                document.getElementById("cartasContainer");
 
+            const cartasLidas = obterCartasLidas(username);
 
-            /*
-             * Recupera imediatamente o estado salvo.
-             */
-
-            const cartasLidas =
-                obterCartasLidas(username);
-
-
-            /*
-             * Atualiza contador.
-             */
-
-            atualizarContador(
-                cartasLidas
-            );
-
-
-            /*
-             * Limpa o carregamento.
-             */
-
+            atualizarContador(cartasLidas);
             cartasContainer.innerHTML = "";
 
+            for (let i = 1; i <= TOTAL_CARTAS; i++) {
+                const cartaDiv = document.createElement("div");
+                cartaDiv.className = "carta";
+                cartaDiv.dataset.numero = i;
+                cartaDiv.style.animationDelay = `${Math.min(i * 0.012, .36)}s`;
 
-            /*
-             * Mantém exatamente o padrão original:
-             *
-             * usuarioCarta1.txt
-             * usuarioCarta2.txt
-             * ...
-             * usuarioCarta50.txt
-             */
-
-            for (
-                let i = 1;
-                i <= TOTAL_CARTAS;
-                i++
-            ) {
-
-                const cartaDiv =
-                    document.createElement("div");
-
-
-                cartaDiv.className =
-                    "carta";
-
-
-                cartaDiv.dataset.numero =
-                    i;
-
-
-                /*
-                 * Estado persistente.
-                 */
-
-                const lida =
-                    cartasLidas[i] === true;
-
-
-                /*
-                 * Começamos mostrando Carta XX.
-                 * Assim que o TXT for carregado,
-                 * o título passa a ser o começo da carta.
-                 */
+                const lida = cartasLidas[i] === true;
 
                 cartaDiv.innerHTML = `
+                    <div class="carta-numero-box" aria-hidden="true">
+                        ${String(i).padStart(2, "0")}
+                    </div>
 
                     <div class="carta-info">
-
-                        <span class="carta-numero">
-                            CARTA ${String(i).padStart(2, "0")}
+                        <span class="carta-numero-label">
+                            Carta ${String(i).padStart(2, "0")}
                         </span>
 
                         <span
@@ -1646,6 +1477,12 @@
                             Carregando título...
                         </span>
 
+                        <span
+                            class="carta-data"
+                            id="dataCarta${i}"
+                        >
+                            Procurando data...
+                        </span>
                     </div>
 
                     <span
@@ -1653,20 +1490,13 @@
                         id="check${i}"
                         aria-label="${lida ? "Carta lida" : "Carta não lida"}"
                     >
-                        ✔
+                        ${lida ? "✓" : "○"}
                     </span>
-
                 `;
-
-
-                /*
-                 * Clique abre a carta no modal.
-                 */
 
                 cartaDiv.addEventListener(
                     "click",
                     function () {
-
                         const nomeArquivo =
                             `${username}carta${i}.txt`;
 
@@ -1674,507 +1504,676 @@
                             i,
                             nomeArquivo
                         );
-
                     }
                 );
 
-
-                cartasContainer.appendChild(
-                    cartaDiv
+                /* O indicador não abre a carta acidentalmente. */
+                const check = cartaDiv.querySelector(".check");
+                check.addEventListener(
+                    "click",
+                    function (event) {
+                        event.stopPropagation();
+                    }
                 );
 
+                cartasContainer.appendChild(cartaDiv);
+
+                cartasDados[i] = {
+                    numero: i,
+                    nomeArquivo: `${username}carta${i}.txt`,
+                    titulo: "Carregando título...",
+                    data: null,
+                    textoCarregado: false,
+                    indisponivel: false
+                };
 
                 /*
-                 * O título é buscado do TXT sem impedir
-                 * o restante da página de funcionar.
+                 * Mantém o carregamento assíncrono dos TXT.
+                 * O restante da interface não fica bloqueado.
                  */
-
                 carregarTituloDaCarta(
                     i,
                     `${username}carta${i}.txt`
                 );
-
             }
 
+            atualizarVisibilidadeDasCartas();
+            atualizarEstadoSemData();
         }
 
-
         /* =========================================================
-           EXTRAIR TÍTULO DO COMEÇO DA CARTA
+           EXTRAIR TÍTULO — REGRA ORIGINAL PRESERVADA
            ========================================================= */
-
         function gerarTituloDoTexto(texto) {
-
-            /*
-             * Remove espaços/quebras desnecessárias do início.
-             */
-
-            const limpo =
-                texto
-                    .replace(/^\s+/, "")
-                    .replace(/\r/g, "");
-
+            const limpo = texto
+                .replace(/^\s+/, "")
+                .replace(/\r/g, "");
 
             if (!limpo) {
-
                 return "Carta sem conteúdo";
-
             }
 
-
-            /*
-             * A regra solicitada:
-             *
-             * pula aproximadamente as primeiras 5–7 palavras.
-             *
-             * Aqui usamos 6 como ponto central.
-             */
-
-            const palavras =
-                limpo
-                    .split(/\s+/)
-                    .filter(Boolean);
-
+            const palavras = limpo
+                .split(/\s+/)
+                .filter(Boolean);
 
             if (palavras.length <= 6) {
-
                 return palavras
                     .slice(0, 9)
                     .join(" ");
-
             }
 
+            let titulo = palavras
+                .slice(6, 14)
+                .join(" ");
 
-            /*
-             * Pula as primeiras seis palavras
-             * e usa as próximas até formar um título.
-             */
-
-            let titulo =
-                palavras
-                    .slice(6, 14)
-                    .join(" ");
-
-
-            /*
-             * Limpeza visual.
-             */
-
-            titulo =
-                titulo
-                    .replace(/\s+/g, " ")
-                    .trim();
-
-
-            /*
-             * Evita título vazio.
-             */
+            titulo = titulo
+                .replace(/\s+/g, " ")
+                .trim();
 
             if (!titulo) {
-
-                titulo =
-                    palavras
-                        .slice(0, 8)
-                        .join(" ");
-
+                titulo = palavras
+                    .slice(0, 8)
+                    .join(" ");
             }
 
-
-            /*
-             * Mantém pontuação e acentos originais.
-             * Só acrescentamos reticências quando
-             * realmente cortamos o trecho.
-             */
-
-            const houveCorte =
-                palavras.length > 14;
+            const houveCorte = palavras.length > 14;
 
             if (
                 houveCorte &&
                 !/[.!?…]$/.test(titulo)
             ) {
-
                 titulo += "…";
-
             }
 
-
             return titulo;
-
         }
 
+        /* =========================================================
+           DATA — NOVA CAMADA DE ORGANIZAÇÃO
+           ========================================================= */
+        function normalizarData(ano, mes, dia) {
+            const data = new Date(ano, mes - 1, dia);
+
+            if (
+                data.getFullYear() !== ano ||
+                data.getMonth() !== mes - 1 ||
+                data.getDate() !== dia
+            ) {
+                return null;
+            }
+
+            return data;
+        }
+
+        function dataParaISO(data) {
+            if (!data) return null;
+
+            const ano = data.getFullYear();
+            const mes = String(data.getMonth() + 1).padStart(2, "0");
+            const dia = String(data.getDate()).padStart(2, "0");
+
+            return `${ano}-${mes}-${dia}`;
+        }
+
+        function formatarDataCompleta(data) {
+            if (!data) return "Sem data";
+
+            return data.toLocaleDateString("pt-BR", {
+                day: "2-digit",
+                month: "long",
+                year: "numeric"
+            });
+        }
+
+        function extrairDataDoTexto(texto) {
+            if (!texto) return null;
+
+            const textoNormalizado = texto
+                .replace(/\u00a0/g, " ")
+                .replace(/\r/g, " ")
+                .replace(/\s+/g, " ")
+                .trim();
+
+            let match;
+
+            /* 2025-09-14 */
+            match = textoNormalizado.match(/\b(19\d{2}|20\d{2})[-\/](0?[1-9]|1[0-2])[-\/](0?[1-9]|[12]\d|3[01])\b/);
+            if (match) {
+                const data = normalizarData(
+                    Number(match[1]),
+                    Number(match[2]),
+                    Number(match[3])
+                );
+                if (data) return data;
+            }
+
+            /* 14/09/2025 ou 14-09-2025 */
+            match = textoNormalizado.match(/\b(0?[1-9]|[12]\d|3[01])[-\/](0?[1-9]|1[0-2])[-\/](19\d{2}|20\d{2})\b/);
+            if (match) {
+                const data = normalizarData(
+                    Number(match[3]),
+                    Number(match[2]),
+                    Number(match[1])
+                );
+                if (data) return data;
+            }
+
+            /* 14 de setembro de 2025 / 14 setembro 2025 */
+            const nomesMeses = MESES.join("|");
+            const regexMesExtenso = new RegExp(
+                `\\b(0?[1-9]|[12]\\d|3[01])\\s*(?:de\\s*)?(${nomesMeses})\\s*(?:de\\s*)?(19\\d{2}|20\\d{2})\\b`,
+                "i"
+            );
+
+            match = textoNormalizado.match(regexMesExtenso);
+            if (match) {
+                const mes = MESES.indexOf(match[2].toLowerCase()) + 1;
+                const data = normalizarData(
+                    Number(match[3]),
+                    mes,
+                    Number(match[1])
+                );
+                if (data) return data;
+            }
+
+            return null;
+        }
 
         /* =========================================================
-           CARREGAR TÍTULO DO TXT
+           CARREGAR TÍTULO + DATA DO TXT
            ========================================================= */
-
-        async function carregarTituloDaCarta(
-            numero,
-            nomeArquivo
-        ) {
-
+        async function carregarTituloDaCarta(numero, nomeArquivo) {
             const elemento =
-                document.getElementById(
-                    `tituloCarta${numero}`
-                );
-
+                document.getElementById(`tituloCarta${numero}`);
+            const elementoData =
+                document.getElementById(`dataCarta${numero}`);
 
             if (!elemento) {
                 return;
             }
 
-
             try {
-
-                const resposta =
-                    await fetch(
-                        encodeURI(nomeArquivo),
-                        {
-                            method: "GET",
-                            cache: "no-cache"
-                        }
-                    );
-
+                const resposta = await fetch(
+                    encodeURI(nomeArquivo),
+                    {
+                        method: "GET",
+                        cache: "no-cache"
+                    }
+                );
 
                 if (!resposta.ok) {
-
-                    throw new Error(
-                        `HTTP ${resposta.status}`
-                    );
-
+                    throw new Error(`HTTP ${resposta.status}`);
                 }
 
+                const conteudo = await resposta.text();
+                const titulo = gerarTituloDoTexto(conteudo);
+                const data = extrairDataDoTexto(conteudo);
 
-                const conteudo =
-                    await resposta.text();
+                elemento.textContent = titulo;
 
+                if (elementoData) {
+                    elementoData.textContent = data
+                        ? formatarDataCompleta(data)
+                        : "Sem data";
 
-                const titulo =
-                    gerarTituloDoTexto(
-                        conteudo
-                    );
+                    elementoData.classList.toggle("sem-data", !data);
+                }
 
+                cartasDados[numero] = {
+                    ...(cartasDados[numero] || {}),
+                    numero,
+                    nomeArquivo,
+                    titulo,
+                    data,
+                    iso: dataParaISO(data),
+                    textoCarregado: true,
+                    indisponivel: false
+                };
 
-                elemento.innerText =
-                    titulo;
-
-
+                atualizarEstadoSemData();
+                renderizarCalendario();
+                atualizarVisibilidadeDasCartas();
             } catch (erro) {
+                elemento.textContent =
+                    `Carta ${String(numero).padStart(2, "0")}`;
 
-                /*
-                 * Se não conseguir ler o arquivo,
-                 * não quebramos a carta.
-                 */
+                if (elementoData) {
+                    elementoData.textContent = "Carta indisponível";
+                    elementoData.classList.add("sem-data");
+                }
 
-                elemento.innerText =
-                    "Carta " +
-                    String(numero).padStart(2, "0");
+                cartasDados[numero] = {
+                    ...(cartasDados[numero] || {}),
+                    numero,
+                    nomeArquivo,
+                    titulo: `Carta ${String(numero).padStart(2, "0")}`,
+                    data: null,
+                    iso: null,
+                    textoCarregado: false,
+                    indisponivel: true
+                };
 
+                atualizarEstadoSemData();
+                renderizarCalendario();
+                atualizarVisibilidadeDasCartas();
             }
-
         }
 
+        /* =========================================================
+           FILTROS
+           ========================================================= */
+        function filtrarTodas() {
+            dataSelecionada = null;
+            filtroSemData = false;
+            atualizarBotoesFiltro();
+            atualizarVisibilidadeDasCartas();
+            atualizarStatusFiltro();
+        }
+
+        function filtrarPorData(iso) {
+            dataSelecionada = iso;
+            filtroSemData = false;
+            atualizarBotoesFiltro();
+            atualizarVisibilidadeDasCartas();
+            atualizarStatusFiltro();
+            renderizarCalendario();
+        }
+
+        function filtrarSemData() {
+            dataSelecionada = null;
+            filtroSemData = true;
+            atualizarBotoesFiltro();
+            atualizarVisibilidadeDasCartas();
+            atualizarStatusFiltro();
+        }
+
+        function atualizarBotoesFiltro() {
+            const btnTodas = document.getElementById("btnTodas");
+            const btnCalendario = document.getElementById("btnCalendario");
+            const btnSemData = document.getElementById("btnSemData");
+
+            btnTodas.classList.toggle(
+                "active",
+                !dataSelecionada && !filtroSemData
+            );
+
+            btnCalendario.classList.toggle(
+                "active",
+                Boolean(dataSelecionada)
+            );
+
+            if (btnSemData) {
+                btnSemData.classList.toggle("active", filtroSemData);
+            }
+        }
+
+        function atualizarStatusFiltro() {
+            const status = document.getElementById("filterStatus");
+
+            if (dataSelecionada) {
+                const [ano, mes, dia] = dataSelecionada
+                    .split("-")
+                    .map(Number);
+                const data = new Date(ano, mes - 1, dia);
+                status.textContent =
+                    `Cartas de ${data.toLocaleDateString("pt-BR", {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric"
+                    })}`;
+                return;
+            }
+
+            if (filtroSemData) {
+                status.textContent = "Cartas sem data reconhecida";
+                return;
+            }
+
+            status.textContent = "Mostrando todas as cartas";
+        }
+
+        function atualizarVisibilidadeDasCartas() {
+            const cards = document.querySelectorAll(".carta");
+            let visiveis = 0;
+
+            cards.forEach(card => {
+                const numero = Number(card.dataset.numero);
+                const dados = cartasDados[numero];
+                let mostrar = true;
+
+                if (dataSelecionada) {
+                    mostrar = Boolean(
+                        dados &&
+                        dados.iso === dataSelecionada
+                    );
+                } else if (filtroSemData) {
+                    mostrar = Boolean(
+                        dados &&
+                        !dados.iso
+                    );
+                }
+
+                card.classList.toggle("oculta", !mostrar);
+                if (mostrar) visiveis++;
+            });
+
+            const emptyState = document.getElementById("emptyState");
+            emptyState.classList.toggle("visible", visiveis === 0 && cards.length > 0);
+        }
+
+        function atualizarEstadoSemData() {
+            const btnSemData = document.getElementById("btnSemData");
+            if (!btnSemData) return;
+
+            const existemSemData = Object.values(cartasDados)
+                .some(dado => dado && dado.textoCarregado && !dado.iso);
+
+            btnSemData.style.display = existemSemData ? "inline-flex" : "none";
+        }
 
         /* =========================================================
-           ABRIR CARTA
+           CALENDÁRIO
            ========================================================= */
+        function alternarCalendario() {
+            calendarioAberto = !calendarioAberto;
 
-        async function abrirCarta(
-            numero,
-            nomeArquivo
-        ) {
+            const panel = document.getElementById("calendarPanel");
+            const button = document.getElementById("btnCalendario");
 
-            const modal =
-                document.getElementById(
-                    "modal"
+            panel.classList.toggle("aberto", calendarioAberto);
+            panel.setAttribute("aria-hidden", String(!calendarioAberto));
+            button.setAttribute("aria-expanded", String(calendarioAberto));
+
+            if (calendarioAberto) {
+                prepararMesInicialDoCalendario();
+                renderizarCalendario();
+            }
+        }
+
+        function prepararMesInicialDoCalendario() {
+            if (dataSelecionada) {
+                const [ano, mes] = dataSelecionada.split("-").map(Number);
+                mesCalendario = new Date(ano, mes - 1, 1);
+                return;
+            }
+
+            const datadas = Object.values(cartasDados)
+                .map(item => item && item.data)
+                .filter(Boolean)
+                .sort((a, b) => a - b);
+
+            if (datadas.length) {
+                mesCalendario = new Date(
+                    datadas[datadas.length - 1].getFullYear(),
+                    datadas[datadas.length - 1].getMonth(),
+                    1
                 );
+            }
+        }
 
-            const titulo =
-                document.getElementById(
-                    "modalTitulo"
-                );
+        function mudarMes(delta) {
+            mesCalendario = new Date(
+                mesCalendario.getFullYear(),
+                mesCalendario.getMonth() + delta,
+                1
+            );
+            renderizarCalendario();
+        }
 
-            const texto =
-                document.getElementById(
-                    "modalTexto"
-                );
+        function renderizarCalendario() {
+            const monthLabel = document.getElementById("calendarMonth");
+            const grid = document.getElementById("calendarGrid");
+            const info = document.getElementById("calendarInfo");
 
+            if (!monthLabel || !grid || !info) return;
 
-            /*
-             * Abre imediatamente a janela.
-             */
+            const ano = mesCalendario.getFullYear();
+            const mes = mesCalendario.getMonth();
 
-            modal.classList.add(
-                "aberto"
+            monthLabel.textContent =
+                `${MESES[mes].charAt(0).toUpperCase() + MESES[mes].slice(1)} ${ano}`;
+
+            grid.innerHTML = "";
+
+            const primeiroDia = new Date(ano, mes, 1).getDay();
+            const ultimoDia = new Date(ano, mes + 1, 0).getDate();
+            const diasAnterior = new Date(ano, mes, 0).getDate();
+
+            const mapaDias = new Set(
+                Object.values(cartasDados)
+                    .filter(item => item && item.iso)
+                    .map(item => item.iso)
             );
 
-            modal.setAttribute(
-                "aria-hidden",
-                "false"
-            );
+            let totalComCartasNoMes = 0;
 
+            for (let i = 0; i < primeiroDia; i++) {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "day-button muted-day";
+                btn.disabled = true;
+                btn.textContent = String(diasAnterior - primeiroDia + i + 1);
+                grid.appendChild(btn);
+            }
 
-            /*
-             * Título temporário.
-             */
+            for (let dia = 1; dia <= ultimoDia; dia++) {
+                const iso = `${ano}-${String(mes + 1).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "day-button";
+                btn.textContent = String(dia);
+                btn.setAttribute("aria-label", `${dia} de ${MESES[mes]} de ${ano}`);
+
+                const possuiCarta = mapaDias.has(iso);
+                const selecionado = dataSelecionada === iso;
+
+                if (possuiCarta) {
+                    btn.classList.add("has-cards");
+                    totalComCartasNoMes++;
+                }
+
+                if (selecionado) {
+                    btn.classList.add("selected");
+                    btn.setAttribute("aria-pressed", "true");
+                } else {
+                    btn.setAttribute("aria-pressed", "false");
+                }
+
+                if (possuiCarta) {
+                    btn.addEventListener("click", function () {
+                        filtrarPorData(iso);
+                    });
+                } else {
+                    btn.addEventListener("click", function () {
+                        filtrarPorData(iso);
+                    });
+                }
+
+                grid.appendChild(btn);
+            }
+
+            const totalCelulas = primeiroDia + ultimoDia;
+            const restantes = (7 - (totalCelulas % 7)) % 7;
+
+            for (let i = 1; i <= restantes; i++) {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "day-button muted-day";
+                btn.disabled = true;
+                btn.textContent = String(i);
+                grid.appendChild(btn);
+            }
+
+            info.textContent =
+                totalComCartasNoMes === 0
+                    ? "Nenhuma carta neste mês"
+                    : `${totalComCartasNoMes} dia${totalComCartasNoMes === 1 ? "" : "s"} com cartas`;
+        }
+
+        /* =========================================================
+           ABRIR CARTA — MECANISMO ORIGINAL PRESERVADO
+           ========================================================= */
+        async function abrirCarta(numero, nomeArquivo) {
+            const modal = document.getElementById("modal");
+            const titulo = document.getElementById("modalTitulo");
+            const texto = document.getElementById("modalTexto");
+            const dataModal = document.getElementById("modalData");
+
+            ultimaCartaAberta = numero;
+
+            modal.classList.add("aberto");
+            modal.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
 
             titulo.innerText =
                 `Carta ${String(numero).padStart(2, "0")}`;
 
+            dataModal.textContent = "";
 
-            /*
-             * Estado de carregamento.
-             */
+            texto.className = "modal-texto";
+            texto.textContent = "Carregando carta...";
 
-            texto.className =
-                "modal-texto";
-
-            texto.innerText =
-                "Carregando carta...";
-
-
-            /*
-             * Marca como lida e salva imediatamente.
-             */
-
-            const username =
-                localStorage.getItem(
-                    "username"
-                );
+            const username = localStorage.getItem("username");
 
             marcarComoLida(
                 username,
                 numero
             );
 
-
-            /*
-             * Busca o TXT dentro do próprio site.
-             */
-
             try {
-
-                const resposta =
-                    await fetch(
-                        encodeURI(nomeArquivo),
-                        {
-                            method: "GET",
-                            cache: "no-cache"
-                        }
-                    );
-
+                const resposta = await fetch(
+                    encodeURI(nomeArquivo),
+                    {
+                        method: "GET",
+                        cache: "no-cache"
+                    }
+                );
 
                 if (!resposta.ok) {
-
                     throw new Error(
                         `Arquivo não encontrado (${resposta.status})`
                     );
-
                 }
 
+                const conteudo = await resposta.text();
 
                 /*
-                 * Extrai o texto do arquivo.
+                 * IMPORTANTE: textContent.
+                 * O TXT nunca é interpretado como HTML.
                  */
+                texto.textContent = conteudo;
 
-                const conteudo =
-                    await resposta.text();
+                titulo.innerText = gerarTituloDoTexto(conteudo);
 
+                const data = extrairDataDoTexto(conteudo);
+                dataModal.textContent = data
+                    ? formatarDataCompleta(data)
+                    : "";
 
-                /*
-                 * Mostra o conteúdo.
-                 *
-                 * textContent preserva o texto como texto,
-                 * sem executar HTML que esteja dentro do TXT.
-                 */
+                cartasDados[numero] = {
+                    ...(cartasDados[numero] || {}),
+                    numero,
+                    nomeArquivo,
+                    titulo: gerarTituloDoTexto(conteudo),
+                    data,
+                    iso: dataParaISO(data),
+                    textoCarregado: true,
+                    indisponivel: false
+                };
 
-                texto.textContent =
-                    conteudo;
+                const elementoData =
+                    document.getElementById(`dataCarta${numero}`);
 
+                if (elementoData) {
+                    elementoData.textContent = data
+                        ? formatarDataCompleta(data)
+                        : "Sem data";
+                    elementoData.classList.toggle("sem-data", !data);
+                }
 
-                /*
-                 * O título do modal usa o mesmo começo
-                 * que aparece na lista.
-                 */
-
-                titulo.innerText =
-                    gerarTituloDoTexto(
-                        conteudo
-                    );
-
-
+                renderizarCalendario();
             } catch (erro) {
-
                 console.error(
                     "Erro ao carregar carta:",
                     erro
                 );
 
-
-                texto.className =
-                    "modal-texto erro-carta";
-
-
-                texto.innerText =
-                    `Não foi possível carregar esta carta.
-
-Arquivo procurado:
-${nomeArquivo}
-
-Verifique se o arquivo .txt está no mesmo local desta página.
-
-Erro:
-${erro.message}`;
-
+                texto.className = "modal-texto erro-carta";
+                texto.textContent =
+                    `Não foi possível carregar esta carta.\n\n` +
+                    `Arquivo procurado:\n${nomeArquivo}\n\n` +
+                    `Verifique se o arquivo .txt está no mesmo local desta página.`;
             }
 
+            requestAnimationFrame(function () {
+                texto.scrollTop = 0;
+            });
         }
 
-
         /* =========================================================
-           FECHAR CARTA
+           FECHAR CARTA — FILTRO É PRESERVADO
            ========================================================= */
-
         function fecharCarta() {
+            const modal = document.getElementById("modal");
 
-            const modal =
-                document.getElementById(
-                    "modal"
-                );
-
-
-            modal.classList.remove(
-                "aberto"
-            );
-
-            modal.setAttribute(
-                "aria-hidden",
-                "true"
-            );
-
+            modal.classList.remove("aberto");
+            modal.setAttribute("aria-hidden", "true");
+            document.body.style.overflow = "";
         }
 
-
-        /* =========================================================
-           FECHAR CLICANDO FORA
-           ========================================================= */
-
-        function fecharAoClicarFora(
-            event
-        ) {
-
-            if (
-                event.target.id === "modal"
-            ) {
-
+        function fecharAoClicarFora(event) {
+            if (event.target.id === "modal") {
                 fecharCarta();
-
             }
-
         }
-
-
-        /* =========================================================
-           TECLA ESC
-           ========================================================= */
 
         document.addEventListener(
             "keydown",
             function (event) {
-
-                if (
-                    event.key === "Escape"
-                ) {
-
+                if (event.key === "Escape") {
                     fecharCarta();
-
                 }
-
             }
         );
 
-
         /* =========================================================
-           LOGOUT
+           GALERIA — NOVA NAVEGAÇÃO, SEM CRIAR A GALERIA
            ========================================================= */
-
-        function logout() {
-
-            /*
-             * Mantém o comportamento original:
-             * limpar a sessão e voltar ao login.
-             *
-             * O estado das cartas NÃO é apagado,
-             * porque fica em uma chave separada.
-             */
-
-            localStorage.removeItem(
-                "isLoggedIn"
-            );
-
-            localStorage.removeItem(
-                "username"
-            );
-
-            localStorage.removeItem(
-                "profilePic"
-            );
-
-            window.location.href =
-                "login.html";
-
+        function abrirGaleria() {
+            window.location.href = "galeria.html";
         }
 
+        /* =========================================================
+           LOGOUT ORIGINAL — NÃO APAGA ESTADO DAS CARTAS
+           ========================================================= */
+        function logout() {
+            localStorage.removeItem("isLoggedIn");
+            localStorage.removeItem("username");
+            localStorage.removeItem("profilePic");
+
+            window.location.href = "login.html";
+        }
 
         /* =========================================================
-           BOTÃO FOR YOU
+           BOTÃO FOR YOU — URL ORIGINAL PRESERVADA
            ========================================================= */
-
         function redirectToYou() {
-
             window.location.href =
                 "https://youtu.be/xkKzaTt3D3g?si=ldu3R8m5bnH9u9Lu";
-
         }
 
-
         /* =========================================================
-           VOLTAR PARA O TOPO DO TEXTO AO ABRIR
+           ATALHO: FECHAR CARTA COM BACK DO NAVEGADOR QUANDO POSSÍVEL
+           Não altera a navegação normal da página.
            ========================================================= */
-
-        document.addEventListener(
-            "click",
-            function (event) {
-
-                const botao =
-                    event.target.closest(
-                        ".carta"
-                    );
-
-                if (!botao) {
-                    return;
-                }
-
-                setTimeout(
-                    function () {
-
-                        const texto =
-                            document.getElementById(
-                                "modalTexto"
-                            );
-
-                        if (texto) {
-                            texto.scrollTop = 0;
-                        }
-
-                    },
-                    50
-                );
-
+        window.addEventListener("pageshow", function () {
+            if (localStorage.getItem("isLoggedIn")) {
+                atualizarContador(obterCartasLidas(localStorage.getItem("username")));
             }
-        );
+        });
 
+        atualizarStatusFiltro();
     </script>
-
 </body>
 </html>
