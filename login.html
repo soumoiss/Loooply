@@ -1,147 +1,168 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - MoissWorld</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch&display=swap" rel="stylesheet">
-    
-    <style>
-        /* Configuração geral */
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #000;
-            font-family: 'Cabin Sketch', cursive;
-            color: #00FF00;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .login-container {
-            background-color: rgba(0, 0, 0, 0.9);
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px #00FF00;
-            text-align: center;
-            width: 90%;
-            max-width: 400px;
-            animation: fadeIn 1s ease-in-out;
-        }
-
-        .login-container h2 {
-            margin-bottom: 20px;
-            font-size: 32px;
-            color: #00FF00;
-            text-shadow: 0 0 5px #00FF00;
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-            text-align: left;
-        }
-
-        label {
-            font-size: 18px;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            font-size: 18px;
-            border: 2px solid #00FF00;
-            background: transparent;
-            color: #00FF00;
-            outline: none;
-            border-radius: 5px;
-            transition: all 0.3s;
-        }
-
-        input:focus {
-            border-color: #fff;
-            box-shadow: 0 0 8px #00FF00;
-        }
-
-        .btn-login {
-            width: 100%;
-            padding: 10px;
-            font-size: 20px;
-            border: 2px solid #00FF00;
-            background: #00FF00;
-            color: #000;
-            cursor: pointer;
-            font-weight: bold;
-            border-radius: 5px;
-            transition: all 0.3s;
-        }
-
-        .btn-login:hover {
-            background: transparent;
-            color: #00FF00;
-        }
-
-        .error-message {
-            color: red;
-            margin-top: 10px;
-            font-size: 16px;
-            display: none;
-            text-shadow: 0 0 5px red;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - Looply</title>
+<link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch&display=swap" rel="stylesheet">
+<style>
+:root{
+    --bg:#f7f3ff;--bg2:#eee7ff;--card:rgba(255,255,255,.80);
+    --neon:#a855f7;--neon-light:#c084fc;--neon-strong:#7e22ce;
+    --text:#24152f;--border:rgba(168,85,247,.32);
+    --shadow:rgba(126,34,206,.18);--error:#dc2626;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;min-height:100%}
+body{
+    margin:0;padding:20px;min-height:100vh;overflow-x:hidden;
+    background:
+      radial-gradient(circle at 15% 15%,rgba(192,132,252,.24),transparent 28%),
+      radial-gradient(circle at 85% 80%,rgba(168,85,247,.18),transparent 30%),
+      linear-gradient(135deg,var(--bg),var(--bg2));
+    background-attachment:fixed;
+    font-family:'Cabin Sketch',cursive;color:var(--text);
+    display:flex;justify-content:center;align-items:center;position:relative;
+}
+body::before,body::after{
+    content:"";position:fixed;width:240px;height:240px;border-radius:50%;
+    pointer-events:none;filter:blur(55px);opacity:.28;z-index:0;
+}
+body::before{top:-90px;left:-90px;background:var(--neon-light)}
+body::after{right:-100px;bottom:-100px;background:var(--neon)}
+.login-container{
+    position:relative;z-index:1;width:min(92vw,430px);padding:42px 34px 34px;
+    border:1px solid rgba(255,255,255,.85);border-radius:28px;background:var(--card);
+    box-shadow:0 25px 70px var(--shadow),0 0 0 1px rgba(168,85,247,.08),0 0 35px rgba(168,85,247,.16);
+    backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+    text-align:center;animation:fadeIn .75s cubic-bezier(.2,.8,.2,1);overflow:hidden;
+}
+.login-container::before{
+    content:"";position:absolute;top:0;left:8%;width:84%;height:2px;
+    background:linear-gradient(90deg,transparent,var(--neon-light),var(--neon),var(--neon-light),transparent);
+    box-shadow:0 0 18px var(--neon);
+}
+.login-container h2{
+    position:relative;z-index:1;margin:0 0 28px;font-size:clamp(30px,8vw,38px);
+    line-height:1.1;color:var(--neon-strong);
+    text-shadow:0 0 8px rgba(168,85,247,.22),0 0 20px rgba(168,85,247,.12);
+    letter-spacing:.5px;
+}
+.input-group{margin-bottom:18px;text-align:left}
+label{font-size:18px;display:block;margin:0 0 7px 4px;color:var(--text)}
+input{
+    display:block;width:100%;min-height:54px;padding:12px 16px;
+    font-family:'Cabin Sketch',cursive;font-size:18px;border:1.5px solid var(--border);
+    background:rgba(255,255,255,.72);color:var(--text);outline:none;border-radius:15px;
+    transition:border-color .25s ease,box-shadow .25s ease,transform .25s ease,background .25s ease;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+}
+input::placeholder{color:#8d7a98;opacity:.9}
+input:hover{border-color:rgba(168,85,247,.55)}
+input:focus{
+    border-color:var(--neon);background:rgba(255,255,255,.96);
+    box-shadow:0 0 0 4px rgba(168,85,247,.10),0 0 22px rgba(168,85,247,.18);
+    transform:translateY(-1px);
+}
+.btn-login{
+    width:100%;min-height:56px;margin-top:7px;padding:12px 20px;
+    font-family:'Cabin Sketch',cursive;font-size:20px;border:1.5px solid var(--neon);
+    background:linear-gradient(135deg,var(--neon),var(--neon-strong));color:#fff;
+    cursor:pointer;font-weight:bold;border-radius:15px;
+    transition:transform .25s ease,box-shadow .25s ease,filter .25s ease;
+    box-shadow:0 10px 24px rgba(126,34,206,.22),0 0 20px rgba(168,85,247,.18);
+}
+.btn-login:hover{transform:translateY(-2px);filter:brightness(1.05);box-shadow:0 14px 30px rgba(126,34,206,.28),0 0 28px rgba(168,85,247,.28)}
+.btn-login:active{transform:translateY(0) scale(.985)}
+.btn-login:focus-visible{outline:3px solid rgba(168,85,247,.24);outline-offset:3px}
+.error-message{
+    color:var(--error);margin:14px 0 0;font-size:16px;display:none;
+    text-shadow:0 0 5px rgba(220,38,38,.15);animation:errorIn .25s ease;
+}
+.error-message.show{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(24px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes errorIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:480px){
+    body{padding:14px}.login-container{width:100%;padding:34px 22px 25px;border-radius:23px}
+    .login-container h2{margin-bottom:24px}input,.btn-login{min-height:53px}
+}
+@media(prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
 </head>
 <body>
-
-    <div class="login-container">
-        <h2>MoissWorld - Login</h2>
-        <div class="input-group">
-            <label for="username">Usuário:</label>
-            <input type="text" id="username" placeholder="Digite seu nome de usuário">
-        </div>
-        <div class="input-group">
-            <label for="password">Senha:</label>
-            <input type="password" id="password" placeholder="Digite sua senha">
-        </div>
-        <button class="btn-login" onclick="login()">Fazer login</button>
-        <p class="error-message" id="error-message">Usuários alterados! Solicite novo usuário e nova senha ao ADM.</p>
+<div class="login-container">
+    <h2>Looply - Login</h2>
+    <div class="input-group">
+        <label for="username">Usuário:</label>
+        <input type="text" id="username" placeholder="Digite seu nome de usuário" autocomplete="username" autocapitalize="none" spellcheck="false">
     </div>
+    <div class="input-group">
+        <label for="password">Senha:</label>
+        <input type="password" id="password" placeholder="Digite sua senha" autocomplete="current-password">
+    </div>
+    <button class="btn-login" id="loginButton" type="button" onclick="login()">Fazer login</button>
+    <p class="error-message" id="error-message">Usuários alterados! Solicite novo usuário e nova senha ao ADM.</p>
+</div>
 
-    <script>
-        // Dados fixos dos usuários
-        const users = {
-            "Patati": { password: "patati@123", profilePic: "user1_perf.png" },
-            "Misol": { password: "misol@1234", profilePic: "user2_perf.png" },
-            "Lilika": { password: "lilika@1234", profilePic: "user3_perf.png" }
-        };
+<script>
+const users={
+    "Patati":{password:"patati@123",profilePic:"user1_perf.png"},
+    "Misol":{password:"misol@1234",profilePic:"user2_perf.png"},
+    "Lilika":{password:"lilika@1234",profilePic:"user3_perf.png"},
+    "YARA":{password:"yaraa@0309",profilePic:"user4_perf.png"}
+};
 
-        function login() {
-            let username = document.getElementById("username").value.trim();
-            let password = document.getElementById("password").value.trim();
-            let errorMessage = document.getElementById("error-message");
+const LOGIN_KEY="isLoggedIn";
+const USERNAME_KEY="username";
+const PROFILE_PIC_KEY="profilePic";
 
-            // Verifica se o usuário está na lista fixa
-            if (users[username] && users[username].password === password) {
-                // Armazena credenciais no Local Storage
-                localStorage.setItem("isLoggedIn", "true");
-                localStorage.setItem("username", username);
-                localStorage.setItem("profilePic", users[username].profilePic);
+document.addEventListener("DOMContentLoaded",function(){
+    const isLoggedIn=localStorage.getItem(LOGIN_KEY);
+    const username=localStorage.getItem(USERNAME_KEY);
+    const profilePic=localStorage.getItem(PROFILE_PIC_KEY);
 
-                window.location.href = "home.html"; // Redireciona para a página inicial
-            } else {
-                // Mostra erro se as credenciais forem inválidas
-                errorMessage.style.display = "block";
-                setTimeout(() => { errorMessage.style.display = "none"; }, 3000);
-            }
-        }
-    </script>
+    if(isLoggedIn==="true" && username && users[username] && profilePic===users[username].profilePic){
+        window.location.replace("home.html");
+        return;
+    }
 
+    const usernameInput=document.getElementById("username");
+    const passwordInput=document.getElementById("password");
+    usernameInput.focus();
+
+    [usernameInput,passwordInput].forEach(function(input){
+        input.addEventListener("input",hideError);
+        input.addEventListener("keydown",function(event){
+            if(event.key==="Enter"){event.preventDefault();login();}
+        });
+    });
+});
+
+function login(){
+    const username=document.getElementById("username").value.trim();
+    const password=document.getElementById("password").value.trim();
+    const errorMessage=document.getElementById("error-message");
+    const loginButton=document.getElementById("loginButton");
+
+    hideError();
+
+    if(users[username] && users[username].password===password){
+        localStorage.setItem(LOGIN_KEY,"true");
+        localStorage.setItem(USERNAME_KEY,username);
+        localStorage.setItem(PROFILE_PIC_KEY,users[username].profilePic);
+        loginButton.disabled=true;
+        window.location.replace("home.html");
+    }else{
+        errorMessage.classList.add("show");
+        setTimeout(hideError,3000);
+    }
+}
+
+function hideError(){
+    document.getElementById("error-message").classList.remove("show");
+}
+</script>
 </body>
 </html>
