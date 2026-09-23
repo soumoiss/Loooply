@@ -3,122 +3,256 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MoissWorld Logo</title>
+  <title>Looply</title>
   <link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch&display=swap" rel="stylesheet">
-  
+
   <style>
+    :root {
+      --neon: #a855f7;
+      --neon-light: #c084fc;
+      --neon-strong: #7e22ce;
+      --text: #4c1d95;
+      --bg: #faf7ff;
+      --card: rgba(255,255,255,.72);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       padding: 0;
-      background-color: #000;
+      min-height: 100vh;
+      overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      overflow: hidden;
+      position: relative;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(192,132,252,.32), transparent 32%),
+        radial-gradient(circle at 80% 80%, rgba(168,85,247,.24), transparent 35%),
+        linear-gradient(135deg, #ffffff 0%, #f5edff 48%, #eee0ff 100%);
       font-family: 'Cabin Sketch', cursive;
-      color: #fff;
-      transition: background-color 0.3s, color 0.3s;
+      color: var(--text);
       text-align: center;
     }
 
-    .logo-container {
+    body::before,
+    body::after {
+      content: "";
       position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(2px);
+    }
+
+    body::before {
+      width: 240px;
+      height: 240px;
+      top: -100px;
+      left: -80px;
+      background: rgba(192,132,252,.18);
+      box-shadow: 0 0 80px rgba(168,85,247,.25);
+    }
+
+    body::after {
+      width: 300px;
+      height: 300px;
+      right: -130px;
+      bottom: -130px;
+      background: rgba(168,85,247,.14);
+      box-shadow: 0 0 100px rgba(126,34,206,.20);
+    }
+
+    .logo-container {
+      position: relative;
+      z-index: 2;
+      width: min(88vw, 420px);
+      padding: 42px 28px 38px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      animation: logoAnimation 2s forwards;
+      border: 1px solid rgba(168,85,247,.24);
+      border-radius: 32px;
+      background: var(--card);
+      box-shadow:
+        0 20px 60px rgba(91,33,182,.12),
+        0 0 35px rgba(168,85,247,.16),
+        inset 0 1px 0 rgba(255,255,255,.9);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      animation: logoAnimation 1.4s cubic-bezier(.2,.8,.2,1) forwards;
     }
 
     .logo-circle {
-      width: 100px;
-      height: 100px;
-      border: 10px solid #00FF00;
+      width: 108px;
+      height: 108px;
+      border: 8px solid var(--neon);
       border-radius: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
-      animation: spin 3s linear infinite;
+      background: rgba(255,255,255,.48);
+      box-shadow:
+        0 0 10px rgba(168,85,247,.65),
+        0 0 30px rgba(168,85,247,.38),
+        inset 0 0 20px rgba(192,132,252,.18);
+      animation: spin 2.6s linear infinite;
+    }
+
+    .logo-circle svg {
+      filter: drop-shadow(0 0 5px rgba(168,85,247,.75));
+    }
+
+    .logo-circle path {
+      stroke: var(--neon);
     }
 
     .logo-text {
-      font-size: 48px;
-      font-weight: bold;
-      color: #00FF00;
       margin-top: 20px;
+      font-size: clamp(44px, 12vw, 58px);
+      line-height: 1;
+      font-weight: bold;
+      letter-spacing: .5px;
+      color: var(--neon-strong);
+      text-shadow:
+        0 0 5px rgba(168,85,247,.35),
+        0 0 18px rgba(168,85,247,.22);
     }
 
     .company-name {
-      position: absolute;
-      bottom: 20px;
-      color: #00FF00;
+      position: fixed;
+      z-index: 3;
+      bottom: 22px;
+      left: 0;
+      right: 0;
+      color: var(--neon-strong);
       font-size: 18px;
+      opacity: .78;
+    }
+
+    .company-name h6 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: bold;
+      text-shadow: 0 0 8px rgba(168,85,247,.25);
     }
 
     .message {
-      position: absolute;
-      bottom: 80px;
-      font-size: 24px;
-      color: #00FF00;
+      position: fixed;
+      z-index: 3;
+      bottom: 74px;
+      left: 0;
+      right: 0;
+      font-size: clamp(19px, 5vw, 24px);
+      color: var(--neon-strong);
       font-weight: bold;
+      text-shadow: 0 0 8px rgba(168,85,247,.22);
+      animation: messageIn .7s ease forwards;
     }
 
     @keyframes spin {
-      from {
-        transform: rotate(0deg);
-      }
-      to {
-        transform: rotate(360deg);
-      }
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
 
     @keyframes logoAnimation {
       0% {
-        transform: scale(0);
+        transform: scale(.72) translateY(18px);
         opacity: 0;
       }
-      50% {
-        transform: scale(1);
+      70% {
+        transform: scale(1.03) translateY(0);
         opacity: 1;
       }
       100% {
-        transform: scale(1.2);
+        transform: scale(1);
         opacity: 1;
+      }
+    }
+
+    @keyframes messageIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .logo-container {
+        padding: 34px 22px 32px;
+        border-radius: 26px;
+      }
+
+      .logo-circle {
+        width: 94px;
+        height: 94px;
+        border-width: 7px;
+      }
+
+      .company-name {
+        bottom: 16px;
+      }
+
+      .message {
+        bottom: 62px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .logo-container,
+      .logo-circle,
+      .message {
+        animation: none;
       }
     }
   </style>
 </head>
+
 <body>
   <div class="logo-container">
     <div class="logo-circle">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="50" height="50">
-        <path d="M50 15 A35 35 0 0 1 85 50" stroke="#00FF00" stroke-width="5" fill="none" />
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="50" height="50" aria-hidden="true">
+        <path d="M50 15 A35 35 0 0 1 85 50"
+              stroke="#a855f7"
+              stroke-width="5"
+              fill="none"
+              stroke-linecap="round" />
       </svg>
     </div>
+
     <div class="logo-text">Looply</div>
   </div>
+
   <div class="company-name">
     <h6>MoissWorld</h6>
   </div>
-  <div class="message" id="message" style="display: none;">
+
+  <div class="message" id="message" style="display:none;">
     Cartas aos amigos ;)
   </div>
 
   <script>
     window.addEventListener('load', () => {
-      // Verifica se o usuário já está logado no Local Storage
-      if (localStorage.getItem("isLogdIn") === "true") {
-        window.location.href = "home.html"; // Redireciona para a página inicial
-      } else {
-        // Exibe a mensagem e mantém o fluxo normal
-        document.getElementById('message').style.display = 'block';
-
-        // Redireciona para login.html após 7 segundos
-        setTimeout(() => {
-          window.location.href = "login.html";
-        }, 7000);
+      // Usa a mesma chave de login do sistema Looply.
+      if (localStorage.getItem("isLoggedIn") === "true") {
+        window.location.replace("home.html");
+        return;
       }
+
+      document.getElementById("message").style.display = "block";
+
+      // Antes: 7000 ms.
+      // Redução de 30%: 7000 × 0,70 = 4900 ms.
+      setTimeout(() => {
+        window.location.replace("login.html");
+      }, 4900);
     });
   </script>
 </body>
