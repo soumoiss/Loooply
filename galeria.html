@@ -145,7 +145,7 @@ button {
 
 .tabs {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 10px;
     margin-bottom: 26px;
 }
@@ -159,9 +159,9 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     font-family: Arial, sans-serif;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     cursor: pointer;
     box-shadow: 0 5px 18px rgba(91, 50, 120, .04);
@@ -176,7 +176,7 @@ button {
 }
 
 .tab-icon {
-    font-size: 23px;
+    font-size: 21px;
     line-height: 1;
 }
 
@@ -224,8 +224,11 @@ button {
 
 .photo-card {
     position: relative;
+    width: 100%;
     aspect-ratio: 1 / 1;
+    padding: 0;
     overflow: hidden;
+    border: 0;
     border-radius: 20px;
     background: #eee8f1;
     box-shadow: var(--shadow);
@@ -292,13 +295,6 @@ button {
     margin: 0;
     color: #302b34;
     font-size: 25px;
-}
-
-.empty-text {
-    margin: 12px 0 0;
-    color: var(--muted);
-    font-family: Arial, sans-serif;
-    font-size: 15px;
 }
 
 .exclusive-box {
@@ -424,7 +420,7 @@ button {
     }
 
     .tabs {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .tab {
@@ -439,6 +435,12 @@ button {
         gap: 6px;
     }
 }
+
+@media (max-width: 360px) {
+    .tabs {
+        grid-template-columns: 1fr;
+    }
+}
 </style>
 </head>
 
@@ -447,7 +449,7 @@ button {
 <div class="app">
 
     <header class="topbar">
-        <button class="back-button" type="button" onclick="window.location.href='home.html'">‹</button>
+        <button class="back-button" type="button" id="back-button" aria-label="Voltar">‹</button>
         <div class="top-title">Nossos Momentos</div>
     </header>
 
@@ -526,7 +528,7 @@ button {
                 </div>
             </section>
 
-            <button class="home-button" type="button" onclick="window.location.href='home.html'">
+            <button class="home-button" type="button" id="home-button">
                 Voltar para home
             </button>
 
@@ -536,7 +538,7 @@ button {
 </div>
 
 <div class="lightbox" id="lightbox">
-    <button class="lightbox-close" type="button" id="lightbox-close">×</button>
+    <button class="lightbox-close" type="button" id="lightbox-close" aria-label="Fechar">×</button>
     <img id="lightbox-image" src="" alt="">
 </div>
 
@@ -554,30 +556,6 @@ const EXTENSOES = {
     videos: ["mp4", "webm", "mov", "m4v", "avi", "mkv"]
 };
 
-const MIME = {
-    jpg: "image/jpeg",
-    jpeg: "image/jpeg",
-    png: "image/png",
-    gif: "image/gif",
-    webp: "image/webp",
-    avif: "image/avif",
-    bmp: "image/bmp",
-    svg: "image/svg+xml",
-    mp3: "audio/mpeg",
-    wav: "audio/wav",
-    ogg: "audio/ogg",
-    m4a: "audio/mp4",
-    aac: "audio/aac",
-    flac: "audio/flac",
-    opus: "audio/ogg",
-    mp4: "video/mp4",
-    webm: "video/webm",
-    mov: "video/quicktime",
-    m4v: "video/mp4",
-    avi: "video/x-msvideo",
-    mkv: "video/x-matroska"
-};
-
 let catalogoPublico = {
     fotos: [],
     audios: [],
@@ -591,6 +569,12 @@ let catalogoExclusivo = {
 };
 
 let branchAtual = "";
+let repositorioAtual = {
+    owner: "",
+    repo: ""
+};
+
+let historicoLightbox = false;
 
 function normalizarTexto(valor) {
     return String(valor || "")
@@ -606,7 +590,12 @@ function extrairUsuario(valor) {
     }
 
     if (typeof valor === "object") {
-        return valor.nome || valor.username || valor.usuario || valor.user || valor.name || "";
+        return valor.nome ||
+            valor.username ||
+            valor.usuario ||
+            valor.user ||
+            valor.name ||
+            "";
     }
 
     const texto = String(valor).trim();
@@ -615,7 +604,12 @@ function extrairUsuario(valor) {
         const objeto = JSON.parse(texto);
 
         if (objeto && typeof objeto === "object") {
-            return objeto.nome || objeto.username || objeto.usuario || objeto.user || objeto.name || "";
+            return objeto.nome ||
+                objeto.username ||
+                objeto.usuario ||
+                objeto.user ||
+                objeto.name ||
+                "";
         }
     } catch (_) {}
 
@@ -623,67 +617,116 @@ function extrairUsuario(valor) {
 }
 
 function obterUsuarioAtual() {
-    const fontes = [
-        window.usuarioAtual,
-        window.usuarioLogado,
-        window.currentUser,
-        window.loggedUser
-    ];
-
-    for (const fonte of fontes) {
-        const usuario = extrairUsuario(fonte);
-
-        if (usuario) {
-            return usuario;
-        }
-    }
-
     const chaves = [
+        "username",
         "usuarioAtual",
         "usuarioLogado",
         "currentUser",
         "loggedUser",
         "usuario",
-        "username",
         "user"
     ];
 
     for (const chave of chaves) {
-        const valores = [
-            localStorage.getItem(chave),
-            sessionStorage.getItem(chave)
-        ];
+        const valorLocal = localStorage.getItem(chave);
+        const usuarioLocal = extrairUsuario(valorLocal);
 
-        for (const valor of valores) {
-            const usuario = extrairUsuario(valor);
+        if (usuarioLocal) {
+            return usuarioLocal;
+        }
 
-            if (usuario) {
-                return usuario;
-            }
+        const valorSessao = sessionStorage.getItem(chave);
+        const usuarioSessao = extrairUsuario(valorSessao);
+
+        if (usuarioSessao) {
+            return usuarioSessao;
         }
     }
 
     return "";
 }
 
-function descobrirRepositorio() {
-    let owner = REPOSITORIO.owner;
-    let repo = REPOSITORIO.repo;
-
-    const host = window.location.hostname;
-    const pathname = window.location.pathname.replace(/^\/+|\/+$/g, "");
-
-    if (!owner && host.endsWith(".github.io")) {
-        owner = host.split(".")[0];
+async function testarRepositorio(owner, repo) {
+    if (!owner || !repo) {
+        return false;
     }
 
-    if (!repo && host.endsWith(".github.io")) {
-        repo = pathname ? pathname.split("/")[0] : `${owner}.github.io`;
+    try {
+        const resposta = await fetch(
+            `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`,
+            {
+                headers: {
+                    "Accept": "application/vnd.github+json",
+                    "X-GitHub-Api-Version": "2022-11-28"
+                }
+            }
+        );
+
+        return resposta.ok;
+    } catch (_) {
+        return false;
+    }
+}
+
+async function descobrirRepositorio() {
+    if (REPOSITORIO.owner && REPOSITORIO.repo) {
+        return {
+            owner: REPOSITORIO.owner,
+            repo: REPOSITORIO.repo
+        };
+    }
+
+    const host = window.location.hostname;
+    const partes = window.location.pathname
+        .split("/")
+        .map(item => item.trim())
+        .filter(Boolean);
+
+    if (!host.endsWith(".github.io")) {
+        return {
+            owner: "",
+            repo: ""
+        };
+    }
+
+    const owner = host.split(".")[0];
+
+    const primeiroSegmento = partes[0] || "";
+
+    const eArquivo =
+        primeiroSegmento.includes(".") ||
+        primeiroSegmento.toLowerCase().endsWith(".html");
+
+    if (!eArquivo && primeiroSegmento) {
+        const projeto = primeiroSegmento;
+
+        if (await testarRepositorio(owner, projeto)) {
+            return {
+                owner,
+                repo: projeto
+            };
+        }
+    }
+
+    const repositorioPrincipal = `${owner}.github.io`;
+
+    if (await testarRepositorio(owner, repositorioPrincipal)) {
+        return {
+            owner,
+            repo: repositorioPrincipal
+        };
+    }
+
+    if (primeiroSegmento) {
+        return {
+            owner,
+            repo: primeiroSegmento
+        };
     }
 
     return {
         owner,
-        repo
+        repo: repositorioPrincipal
     };
 }
 
@@ -692,10 +735,18 @@ async function obterBranch(owner, repo) {
         return REPOSITORIO.branch;
     }
 
-    const resposta = await fetch(`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`);
+    const resposta = await fetch(
+        `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`,
+        {
+            headers: {
+                "Accept": "application/vnd.github+json",
+                "X-GitHub-Api-Version": "2022-11-28"
+            }
+        }
+    );
 
     if (!resposta.ok) {
-        throw new Error();
+        throw new Error("Repositorio não encontrado");
     }
 
     const dados = await resposta.json();
@@ -736,41 +787,75 @@ function ordenarArquivos(lista) {
     );
 }
 
+function criarUrlRaw(path, branch) {
+    const partes = String(path)
+        .split("/")
+        .map(encodeURIComponent)
+        .join("/");
+
+    return `https://raw.githubusercontent.com/${encodeURIComponent(repositorioAtual.owner)}/${encodeURIComponent(repositorioAtual.repo)}/${encodeURIComponent(branch)}/${partes}`;
+}
+
 function criarArquivo(path, nome, branch) {
-    const partes = path.split("/");
     const tipo = identificarTipo(nome);
 
     if (!tipo) {
         return null;
     }
 
-    const url = `https://raw.githubusercontent.com/${encodeURIComponent(REPOSITORIO.owner)}/${encodeURIComponent(REPOSITORIO.repo)}/${encodeURIComponent(branch)}/${partes.map(encodeURIComponent).join("/")}`;
-
     return {
         name: nome,
         path,
         type: tipo,
-        url,
+        url: criarUrlRaw(path, branch),
         extensao: obterExtensao(nome)
     };
 }
 
-function processarArvore(tree, branch) {
+function localizarPastaUsuario(nomesPastas, usuario) {
+    if (!usuario || !nomesPastas.length) {
+        return "";
+    }
+
+    const usuarioNormalizado = normalizarTexto(usuario);
+
+    const exata = nomesPastas.find(
+        nome => String(nome).trim().toLowerCase() === String(usuario).trim().toLowerCase()
+    );
+
+    if (exata) {
+        return exata;
+    }
+
+    const normalizada = nomesPastas.find(
+        nome => normalizarTexto(nome) === usuarioNormalizado
+    );
+
+    return normalizada || "";
+}
+
+function processarArvore(tree, branch, usuario) {
     const raiz = REPOSITORIO.pastaMidia.replace(/^\/+|\/+$/g, "");
+    const prefixo = `${raiz}/`;
+
     const publicos = {
         fotos: [],
         audios: [],
         videos: []
     };
 
-    const pastas = new Map();
+    const exclusivos = {
+        fotos: [],
+        audios: [],
+        videos: []
+    };
+
+    const pastas = new Set();
 
     for (const item of tree) {
         if (item.type !== "blob") {
             continue;
         }
-
-        const prefixo = `${raiz}/`;
 
         if (!item.path.startsWith(prefixo)) {
             continue;
@@ -783,7 +868,13 @@ function processarArvore(tree, branch) {
         }
 
         const partes = relativo.split("/");
-        const arquivo = criarArquivo(item.path, partes[partes.length - 1], branch);
+        const nome = partes[partes.length - 1];
+
+        if (partes.length > 1) {
+            pastas.add(partes[0]);
+        }
+
+        const arquivo = criarArquivo(item.path, nome, branch);
 
         if (!arquivo) {
             continue;
@@ -791,44 +882,92 @@ function processarArvore(tree, branch) {
 
         if (partes.length === 1) {
             publicos[arquivo.type].push(arquivo);
-            continue;
         }
+    }
 
-        const pastaUsuario = partes[0];
-        const chave = normalizarTexto(pastaUsuario);
+    const pastaUsuario = localizarPastaUsuario(
+        [...pastas],
+        usuario
+    );
 
-        if (!pastas.has(chave)) {
-            pastas.set(chave, []);
+    if (pastaUsuario) {
+        const prefixoUsuario = `${prefixo}${pastaUsuario}/`;
+
+        for (const item of tree) {
+            if (item.type !== "blob") {
+                continue;
+            }
+
+            if (!item.path.startsWith(prefixoUsuario)) {
+                continue;
+            }
+
+            const partes = item.path.split("/");
+            const nome = partes[partes.length - 1];
+
+            const arquivo = criarArquivo(
+                item.path,
+                nome,
+                branch
+            );
+
+            if (!arquivo) {
+                continue;
+            }
+
+            exclusivos[arquivo.type].push(arquivo);
         }
-
-        pastas.get(chave).push(arquivo);
     }
 
     return {
         publicos,
-        pastas
+        exclusivos,
+        truncada: false
     };
 }
 
 async function obterArvore(owner, repo, branch) {
-    const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/git/trees/${encodeURIComponent(branch)}?recursive=1`;
+    const url =
+        `https://api.github.com/repos/` +
+        `${encodeURIComponent(owner)}/` +
+        `${encodeURIComponent(repo)}/git/trees/` +
+        `${encodeURIComponent(branch)}?recursive=1`;
 
-    const resposta = await fetch(url);
+    const resposta = await fetch(url, {
+        headers: {
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28"
+        }
+    });
 
     if (!resposta.ok) {
-        throw new Error();
+        throw new Error("Falha ao obter árvore");
     }
 
     return await resposta.json();
 }
 
 async function obterConteudoPasta(owner, repo, caminho) {
-    const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${caminho.split("/").map(encodeURIComponent).join("/")}?ref=${encodeURIComponent(branchAtual)}`;
+    const caminhoCodificado = caminho
+        .split("/")
+        .map(encodeURIComponent)
+        .join("/");
 
-    const resposta = await fetch(url);
+    const url =
+        `https://api.github.com/repos/` +
+        `${encodeURIComponent(owner)}/` +
+        `${encodeURIComponent(repo)}/contents/${caminhoCodificado}` +
+        `?ref=${encodeURIComponent(branchAtual)}`;
+
+    const resposta = await fetch(url, {
+        headers: {
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28"
+        }
+    });
 
     if (!resposta.ok) {
-        throw new Error();
+        throw new Error("Falha ao obter pasta");
     }
 
     return await resposta.json();
@@ -841,23 +980,36 @@ async function buscarArquivosRecursivamente(owner, repo, itens) {
         if (item.type === "file") {
             const tipo = identificarTipo(item.name);
 
-            if (tipo) {
-                arquivos.push({
-                    name: item.name,
-                    path: item.path,
-                    type: tipo,
-                    url: item.download_url,
-                    extensao: obterExtensao(item.name)
-                });
+            if (!tipo) {
+                continue;
             }
+
+            arquivos.push({
+                name: item.name,
+                path: item.path,
+                type: tipo,
+                url: item.download_url || criarUrlRaw(item.path, branchAtual),
+                extensao: obterExtensao(item.name)
+            });
 
             continue;
         }
 
         if (item.type === "dir") {
             try {
-                const filhos = await obterConteudoPasta(owner, repo, item.path);
-                const encontrados = await buscarArquivosRecursivamente(owner, repo, filhos);
+                const filhos = await obterConteudoPasta(
+                    owner,
+                    repo,
+                    item.path
+                );
+
+                const encontrados =
+                    await buscarArquivosRecursivamente(
+                        owner,
+                        repo,
+                        filhos
+                    );
+
                 arquivos.push(...encontrados);
             } catch (_) {}
         }
@@ -866,9 +1018,14 @@ async function buscarArquivosRecursivamente(owner, repo, itens) {
     return arquivos;
 }
 
-async function obterCatalogoPorContents(owner, repo) {
+async function obterCatalogoPorContents(owner, repo, usuario) {
     const raiz = REPOSITORIO.pastaMidia.replace(/^\/+|\/+$/g, "");
-    const itens = await obterConteudoPasta(owner, repo, raiz);
+
+    const itens = await obterConteudoPasta(
+        owner,
+        repo,
+        raiz
+    );
 
     const publicos = {
         fotos: [],
@@ -876,56 +1033,79 @@ async function obterCatalogoPorContents(owner, repo) {
         videos: []
     };
 
-    const pastas = new Map();
+    const exclusivos = {
+        fotos: [],
+        audios: [],
+        videos: []
+    };
+
+    const nomesPastas = [];
 
     for (const item of itens) {
         if (item.type === "file") {
             const tipo = identificarTipo(item.name);
 
-            if (tipo) {
-                publicos[tipo].push({
-                    name: item.name,
-                    path: item.path,
-                    type: tipo,
-                    url: item.download_url,
-                    extensao: obterExtensao(item.name)
-                });
+            if (!tipo) {
+                continue;
             }
+
+            publicos[tipo].push({
+                name: item.name,
+                path: item.path,
+                type: tipo,
+                url: item.download_url || criarUrlRaw(item.path, branchAtual),
+                extensao: obterExtensao(item.name)
+            });
 
             continue;
         }
 
         if (item.type === "dir") {
-            pastas.set(normalizarTexto(item.name), {
-                nome: item.name,
-                path: item.path
-            });
+            nomesPastas.push(item.name);
         }
     }
 
-    const usuario = obterUsuarioAtual();
-    const chaveUsuario = normalizarTexto(usuario);
+    const pastaUsuario = localizarPastaUsuario(
+        nomesPastas,
+        usuario
+    );
 
-    if (chaveUsuario && pastas.has(chaveUsuario)) {
-        const pasta = pastas.get(chaveUsuario);
+    if (pastaUsuario) {
+        const caminhoUsuario = `${raiz}/${pastaUsuario}`;
 
         try {
-            const itensUsuario = await obterConteudoPasta(owner, repo, pasta.path);
-            const arquivosUsuario = await buscarArquivosRecursivamente(owner, repo, itensUsuario);
+            const itensUsuario = await obterConteudoPasta(
+                owner,
+                repo,
+                caminhoUsuario
+            );
 
-            for (const arquivo of arquivosUsuario) {
-                catalogoExclusivo[arquivo.type].push(arquivo);
+            const arquivos =
+                await buscarArquivosRecursivamente(
+                    owner,
+                    repo,
+                    itensUsuario
+                );
+
+            for (const arquivo of arquivos) {
+                exclusivos[arquivo.type].push(arquivo);
             }
         } catch (_) {}
     }
 
     return {
         publicos,
-        pastas
+        exclusivos
     };
 }
 
-function limparCatalogoExclusivo() {
+function limparCatalogos() {
+    catalogoPublico = {
+        fotos: [],
+        audios: [],
+        videos: []
+    };
+
     catalogoExclusivo = {
         fotos: [],
         audios: [],
@@ -933,74 +1113,94 @@ function limparCatalogoExclusivo() {
     };
 }
 
-function carregarCatalogoPublico(dados) {
+function carregarVazios() {
+    limparCatalogos();
+    atualizarInterface();
+}
+
+function carregarCatalogos(publicos, exclusivos) {
     catalogoPublico = {
-        fotos: ordenarArquivos(dados.fotos || []),
-        audios: ordenarArquivos(dados.audios || []),
-        videos: ordenarArquivos(dados.videos || [])
+        fotos: ordenarArquivos(publicos.fotos || []),
+        audios: ordenarArquivos(publicos.audios || []),
+        videos: ordenarArquivos(publicos.videos || [])
+    };
+
+    catalogoExclusivo = {
+        fotos: ordenarArquivos(exclusivos.fotos || []),
+        audios: ordenarArquivos(exclusivos.audios || []),
+        videos: ordenarArquivos(exclusivos.videos || [])
     };
 }
 
 async function carregarCatalogo() {
-    limparCatalogoExclusivo();
+    limparCatalogos();
 
-    const repositorio = descobrirRepositorio();
+    const repositorio = await descobrirRepositorio();
+
+    repositorioAtual = {
+        owner: repositorio.owner,
+        repo: repositorio.repo
+    };
 
     REPOSITORIO.owner = repositorio.owner;
     REPOSITORIO.repo = repositorio.repo;
 
-    if (!REPOSITORIO.owner || !REPOSITORIO.repo) {
-        carregarVazios();
+    if (!repositorioAtual.owner || !repositorioAtual.repo) {
+        atualizarInterface();
         return;
     }
 
     try {
-        branchAtual = await obterBranch(REPOSITORIO.owner, REPOSITORIO.repo);
+        branchAtual = await obterBranch(
+            repositorioAtual.owner,
+            repositorioAtual.repo
+        );
+
+        const usuario = obterUsuarioAtual();
 
         const arvore = await obterArvore(
-            REPOSITORIO.owner,
-            REPOSITORIO.repo,
+            repositorioAtual.owner,
+            repositorioAtual.repo,
             branchAtual
         );
 
-        const resultado = processarArvore(arvore.tree || [], branchAtual);
-
-        carregarCatalogoPublico(resultado.publicos);
-
-        const usuario = obterUsuarioAtual();
-        const pastaUsuario = resultado.pastas.get(normalizarTexto(usuario));
-
-        if (pastaUsuario) {
-            for (const arquivo of pastaUsuario) {
-                catalogoExclusivo[arquivo.type].push(arquivo);
-            }
+        if (arvore.truncated) {
+            throw new Error("Árvore truncada");
         }
+
+        const resultado = processarArvore(
+            arvore.tree || [],
+            branchAtual,
+            usuario
+        );
+
+        carregarCatalogos(
+            resultado.publicos,
+            resultado.exclusivos
+        );
 
         atualizarInterface();
     } catch (_) {
         try {
-            const resultado = await obterCatalogoPorContents(
-                REPOSITORIO.owner,
-                REPOSITORIO.repo
+            const usuario = obterUsuarioAtual();
+
+            const resultado =
+                await obterCatalogoPorContents(
+                    repositorioAtual.owner,
+                    repositorioAtual.repo,
+                    usuario
+                );
+
+            carregarCatalogos(
+                resultado.publicos,
+                resultado.exclusivos
             );
 
-            carregarCatalogoPublico(resultado.publicos);
             atualizarInterface();
         } catch (_) {
             carregarVazios();
         }
     }
-}
-
-function carregarVazios() {
-    catalogoPublico = {
-        fotos: [],
-        audios: [],
-        videos: []
-    };
-
-    limparCatalogoExclusivo();
-    atualizarInterface();
 }
 
 function criarVazio(texto) {
@@ -1018,6 +1218,7 @@ function criarVazio(texto) {
 
 function renderizarFotos(containerId, arquivos, texto) {
     const container = document.getElementById(containerId);
+
     container.innerHTML = "";
 
     if (!arquivos.length) {
@@ -1030,14 +1231,17 @@ function renderizarFotos(containerId, arquivos, texto) {
 
     for (const arquivo of arquivos) {
         const card = document.createElement("button");
+
         card.type = "button";
         card.className = "photo-card";
         card.setAttribute("aria-label", arquivo.name);
 
         const imagem = document.createElement("img");
+
         imagem.src = arquivo.url;
         imagem.alt = arquivo.name;
         imagem.loading = "lazy";
+        imagem.decoding = "async";
 
         imagem.addEventListener("error", () => {
             card.remove();
@@ -1046,7 +1250,10 @@ function renderizarFotos(containerId, arquivos, texto) {
         card.appendChild(imagem);
 
         card.addEventListener("click", () => {
-            abrirLightbox(arquivo.url, arquivo.name);
+            abrirLightbox(
+                arquivo.url,
+                arquivo.name
+            );
         });
 
         grid.appendChild(card);
@@ -1057,6 +1264,7 @@ function renderizarFotos(containerId, arquivos, texto) {
 
 function renderizarAudios(containerId, arquivos, texto) {
     const container = document.getElementById(containerId);
+
     container.innerHTML = "";
 
     if (!arquivos.length) {
@@ -1076,12 +1284,14 @@ function renderizarAudios(containerId, arquivos, texto) {
         nome.textContent = arquivo.name;
 
         const audio = document.createElement("audio");
+
         audio.controls = true;
         audio.preload = "metadata";
         audio.src = arquivo.url;
 
         card.appendChild(nome);
         card.appendChild(audio);
+
         lista.appendChild(card);
     }
 
@@ -1090,6 +1300,7 @@ function renderizarAudios(containerId, arquivos, texto) {
 
 function renderizarVideos(containerId, arquivos, texto) {
     const container = document.getElementById(containerId);
+
     container.innerHTML = "";
 
     if (!arquivos.length) {
@@ -1109,6 +1320,7 @@ function renderizarVideos(containerId, arquivos, texto) {
         nome.textContent = arquivo.name;
 
         const video = document.createElement("video");
+
         video.controls = true;
         video.preload = "metadata";
         video.playsInline = true;
@@ -1116,6 +1328,7 @@ function renderizarVideos(containerId, arquivos, texto) {
 
         card.appendChild(nome);
         card.appendChild(video);
+
         lista.appendChild(card);
     }
 
@@ -1187,9 +1400,15 @@ function abrirLightbox(url, nome) {
     lightbox.classList.add("active");
     document.body.style.overflow = "hidden";
 
-    history.pushState({
-        lightbox: true
-    }, "");
+    if (!historicoLightbox) {
+        historicoLightbox = true;
+        history.pushState(
+            {
+                lightbox: true
+            },
+            ""
+        );
+    }
 }
 
 function fecharLightbox() {
@@ -1200,13 +1419,30 @@ function fecharLightbox() {
     }
 
     lightbox.classList.remove("active");
+
     document.getElementById("lightbox-image").src = "";
+
     document.body.style.overflow = "";
 
-    if (history.state && history.state.lightbox) {
+    if (historicoLightbox) {
+        historicoLightbox = false;
         history.back();
     }
 }
+
+document.getElementById("back-button").addEventListener(
+    "click",
+    () => {
+        window.location.href = "home.html";
+    }
+);
+
+document.getElementById("home-button").addEventListener(
+    "click",
+    () => {
+        window.location.href = "home.html";
+    }
+);
 
 document.querySelectorAll(".tab").forEach(tab => {
     tab.addEventListener("click", () => {
@@ -1221,7 +1457,14 @@ document.querySelectorAll(".tab").forEach(tab => {
         });
 
         tab.classList.add("active");
-        document.getElementById(`section-${alvo}`).classList.add("active");
+
+        const section = document.getElementById(
+            `section-${alvo}`
+        );
+
+        if (section) {
+            section.classList.add("active");
+        }
     });
 });
 
@@ -1238,17 +1481,30 @@ document.querySelectorAll(".exclusive-tab").forEach(tab => {
         });
 
         tab.classList.add("active");
-        document.getElementById(`exclusive-${alvo}`).classList.add("active");
+
+        const conteudo = document.getElementById(
+            `exclusive-${alvo}`
+        );
+
+        if (conteudo) {
+            conteudo.classList.add("active");
+        }
     });
 });
 
-document.getElementById("lightbox-close").addEventListener("click", fecharLightbox);
+document.getElementById("lightbox-close").addEventListener(
+    "click",
+    fecharLightbox
+);
 
-document.getElementById("lightbox").addEventListener("click", evento => {
-    if (evento.target.id === "lightbox") {
-        fecharLightbox();
+document.getElementById("lightbox").addEventListener(
+    "click",
+    evento => {
+        if (evento.target.id === "lightbox") {
+            fecharLightbox();
+        }
     }
-});
+);
 
 document.addEventListener("keydown", evento => {
     if (evento.key === "Escape") {
@@ -1257,17 +1513,22 @@ document.addEventListener("keydown", evento => {
 });
 
 window.addEventListener("popstate", () => {
-    const lightbox = document.getElementById("lightbox");
+    historicoLightbox = false;
 
-    if (!history.state || !history.state.lightbox) {
-        lightbox.classList.remove("active");
-        document.getElementById("lightbox-image").src = "";
-        document.body.style.overflow = "";
-    }
+    const lightbox =
+        document.getElementById("lightbox");
+
+    lightbox.classList.remove("active");
+
+    document.getElementById(
+        "lightbox-image"
+    ).src = "";
+
+    document.body.style.overflow = "";
 });
 
-document.addEventListener("DOMContentLoaded", carregarCatalogo);
+carregarCatalogo();
 </script>
 
 </body>
-</html>
+    </html>
