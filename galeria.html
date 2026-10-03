@@ -3,37 +3,53 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#F5F0FA">
+<meta name="theme-color" content="#f4f0ff">
 <meta name="color-scheme" content="light">
-<meta name="description" content="Nossos Momentos — pequenos pedacinhos de nós, guardados aqui.">
-<title>Looply — Nossos Momentos</title>
+<meta name="description" content="Nossos Momentos — fotos, áudios e vídeos reunidos em uma pequena galeria pessoal.">
+<title>Nossos Momentos - MoissWorld</title>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cabin+Sketch:wght@400;700&display=swap');
+/* ============================================================
+   IDENTIDADE VISUAL — derivada da interface do Luple final
+   ============================================================ */
+
+@font-face {
+    font-family: "Quillen";
+    src:
+        local("Quillen"),
+        url("Quillen.otf") format("opentype");
+    font-display: swap;
+    font-style: normal;
+    font-weight: 400;
+}
 
 :root {
-    --primary: #7010B0;
-    --primary-dark: #6010A0;
-    --secondary: #503090;
-    --deep-purple: #302050;
-    --white: #FFFFFF;
-    --surface: #F5F0FA;
-    --lilac: #F0E0F0;
-    --muted-surface: #E8E0EC;
-    --text: #403050;
-    --secondary-text: #8A8195;
-    --placeholder: #AAA2B0;
-    --border: #DED6E5;
-    --success: #35C878;
-    --error: #E63232;
-    --shadow: 0 8px 24px rgba(70,30,100,.10);
-    --shadow-md: 0 15px 38px rgba(70,30,100,.13);
-    --shadow-lg: 0 22px 60px rgba(70,30,100,.16);
-    --radius-sm: 12px;
-    --radius-md: 16px;
-    --radius-lg: 24px;
-    --radius-xl: 32px;
-    --radius-pill: 999px;
+    --bg: #f4f0ff;
+    --bg-2: #eee8ff;
+    --surface: rgba(255,255,255,.93);
+    --surface-solid: #ffffff;
+    --surface-soft: #f8f5ff;
+    --surface-lilac: #f1eaff;
+    --primary: #9b5de5;
+    --primary-strong: #8750cf;
+    --primary-soft: #eadcff;
+    --primary-pale: #f4edff;
+    --text: #29252f;
+    --muted: #817b89;
+    --muted-2: #aaa4b0;
+    --line: rgba(102,82,126,.12);
+    --line-strong: rgba(125,91,164,.20);
+    --danger: #9d5f71;
+    --paper: #f4ebdd;
+    --paper-2: #f8f1e7;
+    --paper-text: #342f2a;
+    --shadow-sm: 0 5px 18px rgba(80,56,115,.07);
+    --shadow-md: 0 16px 38px rgba(80,56,115,.11);
+    --shadow-lg: 0 28px 80px rgba(65,45,94,.18);
+    --radius-lg: 28px;
+    --radius-md: 20px;
+    --radius-sm: 16px;
+    --touch: 44px;
 }
 
 * {
@@ -51,17 +67,26 @@ body {
     min-height: 100vh;
     min-height: 100dvh;
     overflow-x: hidden;
-    padding:
-        max(18px,env(safe-area-inset-top))
-        max(14px,env(safe-area-inset-right))
-        max(30px,env(safe-area-inset-bottom))
-        max(14px,env(safe-area-inset-left));
-    background:
-        radial-gradient(circle at 10% -10%,rgba(112,16,176,.10),transparent 30%),
-        radial-gradient(circle at 95% 5%,rgba(80,48,144,.08),transparent 28%),
-        linear-gradient(145deg,#F8F4FB,var(--surface));
     color: var(--text);
-    font-family: Arial,Helvetica,sans-serif;
+    font-family:
+        Inter,
+        ui-sans-serif,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+    background:
+        radial-gradient(circle at 10% -8%, rgba(177,131,255,.22), transparent 31%),
+        radial-gradient(circle at 94% 8%, rgba(220,204,255,.48), transparent 28%),
+        linear-gradient(135deg, var(--bg), var(--bg-2));
+    padding:
+        max(18px, env(safe-area-inset-top))
+        max(14px, env(safe-area-inset-right))
+        max(30px, env(safe-area-inset-bottom))
+        max(14px, env(safe-area-inset-left));
 }
 
 body::before {
@@ -70,13 +95,13 @@ body::before {
     inset: 0;
     pointer-events: none;
     z-index: -1;
-    opacity: .28;
+    opacity: .34;
     background-image:
-        linear-gradient(rgba(112,16,176,.035) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(112,16,176,.035) 1px,transparent 1px);
-    background-size: 40px 40px;
-    mask-image: linear-gradient(to bottom,#000,transparent 80%);
-    -webkit-mask-image: linear-gradient(to bottom,#000,transparent 80%);
+        linear-gradient(rgba(255,255,255,.35) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.25) 1px, transparent 1px);
+    background-size: 38px 38px;
+    mask-image: linear-gradient(to bottom, black, transparent 76%);
+    -webkit-mask-image: linear-gradient(to bottom, black, transparent 76%);
 }
 
 button,
@@ -85,67 +110,71 @@ a {
     -webkit-tap-highlight-color: transparent;
 }
 
+button:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+    outline: 3px solid rgba(155,93,229,.30);
+    outline-offset: 3px;
+}
+
 button {
     border: 0;
 }
 
-button:focus-visible,
-a:focus-visible,
-[tabindex]:focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: 3px;
-}
-
 .app-shell {
-    width: min(100%,1180px);
+    width: min(100%, 1180px);
     margin: 0 auto;
-    animation: pageIn .5s ease both;
+    animation: pageIn .45s ease both;
 }
 
 @keyframes pageIn {
-    from {
-        opacity: 0;
-        transform: translateY(12px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
 }
+
+/* ============================================================
+   TOPO / VOLTAR
+   ============================================================ */
 
 .topbar {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 12px;
     margin-bottom: 14px;
 }
 
+.navigation-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7px;
+}
+
 .navigation-button {
     min-width: 46px;
     min-height: 46px;
-    padding: 8px 11px;
+    padding: 7px 10px;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 7px;
-    border: 1px solid var(--border);
-    border-radius: 15px;
-    background: rgba(255,255,255,.88);
-    color: var(--primary);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: rgba(255,255,255,.78);
+    color: var(--primary-strong);
     cursor: pointer;
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow-sm);
     transition:
         transform .18s ease,
-        background .18s ease,
         box-shadow .18s ease,
-        color .18s ease;
+        background .18s ease;
+    overflow: hidden;
 }
 
 .navigation-button:hover {
     transform: translateY(-2px);
-    background: var(--lilac);
-    color: var(--primary-dark);
+    background: #fff;
     box-shadow: var(--shadow-md);
 }
 
@@ -156,225 +185,221 @@ a:focus-visible,
 .navigation-button svg {
     width: 21px;
     height: 21px;
+    flex: 0 0 21px;
+}
+
+.navigation-label {
+    max-width: 0;
+    overflow: hidden;
+    opacity: 0;
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 800;
+    transition: max-width .20s ease, opacity .20s ease;
+}
+
+.navigation-button:hover .navigation-label,
+.navigation-button:focus-visible .navigation-label {
+    max-width: 90px;
+    opacity: 1;
 }
 
 .music-button {
-    width: 46px;
-    height: 46px;
-    flex: 0 0 46px;
+    min-width: 46px;
+    min-height: 46px;
+    padding: 7px 10px;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    border: 1px solid var(--border);
-    border-radius: 15px;
-    background: rgba(255,255,255,.88);
-    color: var(--primary);
+    justify-content: flex-start;
+    gap: 7px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: rgba(255,255,255,.78);
+    color: var(--primary-strong);
     cursor: pointer;
-    box-shadow: var(--shadow);
-    transition:
-        transform .18s ease,
-        background .18s ease,
-        box-shadow .18s ease,
-        color .18s ease;
+    box-shadow: var(--shadow-sm);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+    overflow: hidden;
 }
 
 .music-button:hover {
     transform: translateY(-2px);
-    background: var(--lilac);
-    color: var(--primary-dark);
+    background: #fff;
     box-shadow: var(--shadow-md);
 }
 
 .music-button:active {
-    transform: scale(.95);
-}
-
-.music-button.playing {
-    color: var(--white);
-    background: var(--primary);
-    border-color: var(--primary);
-    box-shadow: 0 7px 18px rgba(112,16,176,.22);
-}
-
-.music-button.playing:hover {
-    background: var(--primary-dark);
+    transform: scale(.96);
 }
 
 .music-button svg {
     width: 21px;
     height: 21px;
+    flex: 0 0 21px;
 }
 
-.music-button .icon-pause {
-    display: none;
+.music-label {
+    max-width: 0;
+    overflow: hidden;
+    opacity: 0;
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 800;
+    transition: max-width .20s ease, opacity .20s ease;
 }
 
-.music-button.playing .icon-play {
-    display: none;
+.music-button:hover .music-label,
+.music-button:focus-visible .music-label {
+    max-width: 90px;
+    opacity: 1;
 }
 
-.music-button.playing .icon-pause {
-    display: block;
+.music-button.playing {
+    background: rgba(245,239,255,.96);
 }
 
-.music-button.paused .icon-play {
-    display: block;
+.topbar-spacer {
+    width: 46px;
+    height: 46px;
+    flex: 0 0 46px;
 }
 
-.music-button.paused .icon-pause {
-    display: none;
-}
-
-.music-button.music-error {
-    color: var(--error);
-}
-
-.brand-mini {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-left: auto;
-}
-
-.logo-mark {
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: var(--surface);
-    box-shadow: var(--shadow);
-}
-
-.logo-ring {
-    width: 29px;
-    height: 29px;
-    display: block;
-    border: 3px solid var(--primary);
-    border-right-color: transparent;
-    border-radius: 50%;
-    animation: spin 3s linear infinite;
-}
+/* ============================================================
+   CONTAINER PRINCIPAL
+   ============================================================ */
 
 .container {
     width: 100%;
-    padding: clamp(20px,4vw,36px);
-    border: 1px solid rgba(222,214,229,.9);
-    border-radius: var(--radius-xl);
-    background: rgba(255,255,255,.94);
+    padding: clamp(20px,4vw,34px);
+    border: 1px solid rgba(120,92,155,.10);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
     box-shadow: var(--shadow-lg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
 }
 
 .hero {
     text-align: center;
-    margin-bottom: 27px;
+    margin-bottom: 25px;
 }
 
-.hero-logo {
-    width: 82px;
-    height: 82px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 13px;
-    border-radius: 50%;
-    background: var(--surface);
-    animation: logoAnimation 1.2s ease-out;
-}
-
-.hero-logo .logo-ring {
-    width: 62px;
-    height: 62px;
-    border-width: 5px;
-}
-
-@keyframes logoAnimation {
-    0% {
-        transform: scale(0);
-        opacity: 0;
-    }
-    50% {
-        transform: scale(1);
-        opacity: 1;
-    }
-    100% {
-        transform: scale(1.12);
-        opacity: 1;
-    }
-}
-
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+.eyebrow {
+    color: var(--primary-strong);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    margin-bottom: 7px;
 }
 
 .hero h1 {
-    color: var(--primary);
-    font-family: 'Cabin Sketch',cursive;
-    font-size: clamp(38px,8vw,58px);
-    font-weight: 700;
-    line-height: 1;
-    letter-spacing: .3px;
+    font-family: "Quillen", Georgia, "Times New Roman", serif;
+    font-size: clamp(38px,8vw,62px);
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: .01em;
     margin-bottom: 9px;
 }
 
 .subtitulo {
     max-width: 690px;
     margin: 0 auto;
-    color: var(--secondary-text);
-    font-family: 'Cabin Sketch',cursive;
+    color: #776f7e;
+    font-family: "Quillen", Georgia, "Times New Roman", serif;
     font-size: 17px;
-    line-height: 1.45;
+    line-height: 1.55;
 }
 
+.subtitulo::first-letter {
+    color: var(--primary-strong);
+}
+
+/* ============================================================
+   RESUMO
+   ============================================================ */
+
 .overview {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
+    display: grid;
+    grid-template-columns: minmax(0,1fr) auto;
+    gap: 12px;
+    align-items: stretch;
     margin-bottom: 15px;
 }
 
+.overview-card {
+    min-width: 0;
+    padding: 15px 17px;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(135deg,#fff,#faf7ff);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-sm);
+}
+
+.overview-label {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.lista-titulo {
+    font-size: clamp(22px,5vw,28px);
+    line-height: 1.05;
+    font-weight: 800;
+    letter-spacing: -.035em;
+}
+
+.collection-note {
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.45;
+}
+
 .contador {
-    min-width: 118px;
-    padding: 10px 14px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgba(112,16,176,.15);
-    border-radius: var(--radius-pill);
-    background: var(--lilac);
-    color: var(--primary);
+    min-width: 118px;
+    padding: 10px 13px;
+    border-radius: 15px;
+    background: var(--primary-pale);
+    border: 1px solid rgba(155,93,229,.14);
+    color: var(--primary-strong);
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 800;
     white-space: nowrap;
 }
+
+/* ============================================================
+   ABAS
+   ============================================================ */
 
 .media-tabs {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
-    margin-bottom: 19px;
+    margin-bottom: 17px;
 }
 
 .media-tab {
-    min-height: 45px;
+    min-height: 44px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     padding: 0 15px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-pill);
-    background: var(--surface);
-    color: var(--secondary-text);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: rgba(255,255,255,.84);
+    color: var(--muted);
     cursor: pointer;
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 800;
+    box-shadow: 0 3px 12px rgba(80,56,115,.04);
     transition:
         transform .18s ease,
         background .18s ease,
@@ -385,26 +410,29 @@ a:focus-visible,
 
 .media-tab:hover {
     transform: translateY(-1px);
-    color: var(--primary);
-    border-color: rgba(112,16,176,.25);
-    background: var(--lilac);
+    color: var(--primary-strong);
+    border-color: rgba(155,93,229,.20);
+}
+
+.media-tab:active {
+    transform: scale(.98);
 }
 
 .media-tab.active {
-    color: var(--white);
+    color: #fff;
     background: var(--primary);
     border-color: var(--primary);
-    box-shadow: 0 7px 18px rgba(112,16,176,.20);
-}
-
-.media-tab.exclusive {
-    border-color: rgba(112,16,176,.20);
+    box-shadow: 0 8px 20px rgba(155,93,229,.20);
 }
 
 .media-tab svg {
     width: 17px;
     height: 17px;
 }
+
+/* ============================================================
+   SEÇÕES
+   ============================================================ */
 
 .section {
     display: none;
@@ -416,14 +444,8 @@ a:focus-visible,
 }
 
 @keyframes sectionIn {
-    from {
-        opacity: .2;
-        transform: translateY(4px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: .2; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .section-head {
@@ -435,66 +457,19 @@ a:focus-visible,
 }
 
 .section-head h2 {
-    color: var(--text);
-    font-family: 'Cabin Sketch',cursive;
-    font-size: 25px;
-    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -.02em;
 }
 
 .section-head p {
-    color: var(--secondary-text);
+    color: var(--muted);
     font-size: 12px;
     text-align: right;
 }
 
-.exclusive-banner {
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 17px;
-    padding: 18px;
-    border: 1px solid rgba(112,16,176,.16);
-    border-radius: var(--radius-md);
-    background:
-        radial-gradient(circle at 100% 0,rgba(112,16,176,.10),transparent 45%),
-        linear-gradient(135deg,var(--surface),#fff);
-}
-
-.exclusive-banner::after {
-    content: "";
-    position: absolute;
-    width: 130px;
-    height: 130px;
-    right: -70px;
-    top: -70px;
-    border-radius: 50%;
-    border: 1px solid rgba(112,16,176,.10);
-}
-
-.exclusive-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 5px;
-    color: var(--primary);
-    font-weight: 700;
-    font-size: 14px;
-}
-
-.exclusive-title svg {
-    width: 18px;
-    height: 18px;
-}
-
-.exclusive-banner p {
-    color: var(--secondary-text);
-    font-size: 12px;
-    line-height: 1.55;
-}
-
-.exclusive-user {
-    color: var(--primary);
-    font-weight: 700;
-}
+/* ============================================================
+   MASONRY — LÓGICA VISUAL DO CÓDIGO 1
+   ============================================================ */
 
 .galeria {
     column-count: 5;
@@ -514,23 +489,17 @@ a:focus-visible,
 }
 
 @keyframes mediaIn {
-    from {
-        opacity: 0;
-        transform: translateY(8px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .photo-shell {
     position: relative;
     overflow: hidden;
     border-radius: 18px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
+    background: linear-gradient(135deg,#f1eaff,#fff);
+    border: 1px solid rgba(102,82,126,.10);
+    box-shadow: 0 7px 18px rgba(80,56,115,.08);
 }
 
 .photo-shell img {
@@ -540,7 +509,8 @@ a:focus-visible,
     object-fit: contain;
     transition:
         transform .30s ease,
-        opacity .30s ease;
+        opacity .30s ease,
+        filter .30s ease;
 }
 
 .media-card:hover .photo-shell img,
@@ -555,13 +525,11 @@ a:focus-visible,
     padding: 30px 11px 11px;
     opacity: 0;
     transform: translateY(5px);
-    background: linear-gradient(transparent,rgba(48,32,80,.70));
+    background: linear-gradient(transparent,rgba(35,26,46,.55));
     color: #fff;
     font-size: 11px;
     font-weight: 700;
-    transition:
-        opacity .22s ease,
-        transform .22s ease;
+    transition: opacity .22s ease, transform .22s ease;
     pointer-events: none;
 }
 
@@ -578,18 +546,22 @@ a:focus-visible,
     justify-content: center;
     text-align: center;
     padding: 24px;
-    color: var(--primary);
+    color: var(--primary-strong);
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 800;
     line-height: 1.5;
 }
 
 .photo-fallback small {
     display: block;
-    color: var(--secondary-text);
+    color: var(--muted);
     font-weight: 600;
     margin-top: 4px;
 }
+
+/* ============================================================
+   ÁUDIO / VÍDEO
+   ============================================================ */
 
 .media-grid {
     display: grid;
@@ -600,22 +572,21 @@ a:focus-visible,
 .media-panel {
     min-width: 0;
     padding: 16px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    background: linear-gradient(145deg,#fff,var(--surface));
-    box-shadow: var(--shadow);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: linear-gradient(135deg,#fff,#fbf9ff);
+    box-shadow: var(--shadow-sm);
 }
 
 .media-panel h3 {
-    color: var(--primary);
-    font-family: 'Cabin Sketch',cursive;
-    font-size: 24px;
-    font-weight: 700;
+    font-family: "Quillen",Georgia,serif;
+    font-size: 23px;
+    font-weight: 400;
     margin-bottom: 5px;
 }
 
 .media-panel p {
-    color: var(--secondary-text);
+    color: var(--muted);
     font-size: 11px;
     line-height: 1.45;
     margin-bottom: 12px;
@@ -623,9 +594,9 @@ a:focus-visible,
 
 .audio-item,
 .video-item {
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    background: rgba(245,240,250,.65);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--surface-soft);
     padding: 12px;
     margin-bottom: 9px;
 }
@@ -639,7 +610,7 @@ a:focus-visible,
     display: block;
     color: var(--text);
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 800;
     line-height: 1.4;
     overflow-wrap: anywhere;
     margin-bottom: 8px;
@@ -657,7 +628,7 @@ audio {
 }
 
 video {
-    background: #1c1328;
+    background: #151018;
     max-height: 460px;
     object-fit: contain;
 }
@@ -666,11 +637,15 @@ video {
     margin-top: 8px;
     padding: 9px 10px;
     border-radius: 11px;
-    background: rgba(230,50,50,.06);
-    color: var(--error);
+    background: #fff4f6;
+    color: var(--danger);
     font-size: 11px;
     line-height: 1.45;
 }
+
+/* ============================================================
+   ESTADOS
+   ============================================================ */
 
 .loading-state {
     min-height: 150px;
@@ -678,9 +653,8 @@ video {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    color: var(--secondary-text);
-    font-family: 'Cabin Sketch',cursive;
-    font-size: 15px;
+    color: var(--muted);
+    font-size: 13px;
 }
 
 .loader-dot {
@@ -688,29 +662,22 @@ video {
     height: 8px;
     border-radius: 50%;
     background: var(--primary);
-    box-shadow: 0 0 12px rgba(112,16,176,.45);
     animation: pulse 1s ease-in-out infinite;
 }
 
 @keyframes pulse {
-    0%,100% {
-        opacity: .35;
-        transform: scale(.85);
-    }
-    50% {
-        opacity: 1;
-        transform: scale(1);
-    }
+    0%,100% { opacity:.35; transform:scale(.85); }
+    50% { opacity:1; transform:scale(1); }
 }
 
 .empty-state {
     display: none;
     padding: 30px 16px;
     text-align: center;
-    color: var(--secondary-text);
-    border: 1px dashed var(--border);
-    border-radius: var(--radius-md);
-    background: var(--surface);
+    color: var(--muted);
+    border: 1px dashed rgba(117,101,132,.16);
+    border-radius: 18px;
+    background: rgba(255,255,255,.48);
     line-height: 1.6;
 }
 
@@ -721,11 +688,75 @@ video {
 .empty-state strong {
     display: block;
     color: var(--text);
-    font-family: 'Cabin Sketch',cursive;
-    font-size: 21px;
-    font-weight: 700;
+    font-family: "Quillen",Georgia,serif;
+    font-size: 20px;
+    font-weight: 400;
     margin-bottom: 5px;
 }
+
+.error-state {
+    margin-top: 14px;
+    padding: 15px;
+    border-radius: 16px;
+    background: #fff4f6;
+    border: 1px solid rgba(157,95,113,.18);
+    color: var(--danger);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.error-state strong {
+    color: #704353;
+}
+
+.error-state code {
+    font-family: ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-size: 11px;
+}
+
+/* ============================================================
+   AÇÕES
+   ============================================================ */
+
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.action-button {
+    min-height: 46px;
+    padding: 0 18px;
+    border: 1px solid rgba(117,101,132,.13);
+    border-radius: 16px;
+    background: #fff;
+    color: #6f6876;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 800;
+    transition:
+        transform .18s ease,
+        background .18s ease,
+        color .18s ease,
+        box-shadow .18s ease;
+}
+
+.action-button:hover {
+    transform: translateY(-1px);
+    color: var(--primary-strong);
+    background: var(--primary-pale);
+    box-shadow: var(--shadow-sm);
+}
+
+.action-button:active {
+    transform: scale(.98);
+}
+
+/* ============================================================
+   LIGHTBOX — COMPORTAMENTO DO CÓDIGO 1
+   ============================================================ */
 
 .lightbox {
     position: fixed;
@@ -739,15 +770,13 @@ video {
         max(12px,env(safe-area-inset-right))
         max(14px,env(safe-area-inset-bottom))
         max(12px,env(safe-area-inset-left));
-    background: rgba(48,32,80,.78);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    background: rgba(41,33,51,.80);
+    backdrop-filter: blur(13px);
+    -webkit-backdrop-filter: blur(13px);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition:
-        opacity .24s ease,
-        visibility .24s ease;
+    transition: opacity .24s ease,visibility .24s ease;
     cursor: zoom-out;
 }
 
@@ -770,14 +799,8 @@ video {
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: scale(.95);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+    from { opacity:0; transform:scale(.95); }
+    to { opacity:1; transform:scale(1); }
 }
 
 .lightbox-img {
@@ -788,7 +811,8 @@ video {
     height: auto;
     object-fit: contain;
     border-radius: 12px;
-    box-shadow: 0 28px 80px rgba(48,32,80,.35);
+    box-shadow: 0 28px 80px rgba(0,0,0,.40);
+    cursor: default;
 }
 
 .lightbox-close {
@@ -797,21 +821,24 @@ video {
     right: max(16px,env(safe-area-inset-right));
     width: 46px;
     height: 46px;
-    border: 1px solid rgba(112,16,176,.15);
+    border: 1px solid rgba(255,255,255,.30);
     border-radius: 50%;
-    background: #fff;
-    color: var(--primary);
+    background: rgba(255,255,255,.12);
+    color: #fff;
     display: grid;
     place-items: center;
     font-size: 25px;
     line-height: 1;
     cursor: pointer;
     z-index: 3;
-    box-shadow: var(--shadow);
+    transition:
+        transform .18s ease,
+        background .18s ease;
 }
 
 .lightbox-close:hover {
-    background: var(--lilac);
+    transform: rotate(3deg) scale(1.04);
+    background: rgba(255,255,255,.20);
 }
 
 .lightbox-caption {
@@ -821,39 +848,39 @@ video {
     transform: translateX(-50%);
     max-width: min(90vw,760px);
     padding: 9px 14px;
-    border-radius: var(--radius-pill);
-    background: rgba(255,255,255,.94);
-    border: 1px solid var(--border);
-    color: var(--text);
+    border-radius: 999px;
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.18);
+    color: #fff;
     font-size: 12px;
     font-weight: 700;
     text-align: center;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     overflow-wrap: anywhere;
-    box-shadow: var(--shadow);
 }
 
 .lightbox-fallback {
     max-width: 600px;
     padding: 28px;
-    border-radius: var(--radius-lg);
+    border-radius: 22px;
     background: #fff;
-    border: 1px solid var(--border);
     color: var(--text);
     text-align: center;
     box-shadow: var(--shadow-lg);
+    cursor: default;
 }
 
 .lightbox-fallback strong {
     display: block;
-    color: var(--primary);
-    font-family: 'Cabin Sketch',cursive;
-    font-size: 27px;
-    font-weight: 700;
+    font-family: "Quillen",Georgia,serif;
+    font-size: 26px;
+    font-weight: 400;
     margin-bottom: 8px;
 }
 
 .lightbox-fallback p {
-    color: var(--secondary-text);
+    color: var(--muted);
     font-size: 13px;
     line-height: 1.6;
     margin-bottom: 14px;
@@ -865,21 +892,83 @@ video {
     align-items: center;
     justify-content: center;
     padding: 0 15px;
-    border-radius: var(--radius-pill);
+    border-radius: 13px;
     background: var(--primary);
     color: #fff;
     text-decoration: none;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 800;
+    transition: transform .18s ease,background .18s ease;
 }
 
-@media (max-width:1180px) {
+.raw-link:hover {
+    transform: translateY(-1px);
+    background: var(--primary-strong);
+}
+
+/* ============================================================
+   CONTEÚDO EXCLUSIVO
+   ============================================================ */
+
+.exclusive-grid {
+    display: grid;
+    gap: 13px;
+}
+
+.exclusive-section + .exclusive-section {
+    margin-top: 14px;
+}
+
+.exclusive-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.exclusive-title h3 {
+    font-family: "Quillen", Georgia, serif;
+    font-size: 23px;
+    font-weight: 400;
+}
+
+.exclusive-title span {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.exclusive-empty {
+    padding: 30px 16px;
+    text-align: center;
+    border: 1px dashed rgba(117,101,132,.16);
+    border-radius: 18px;
+    background: rgba(255,255,255,.48);
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.exclusive-empty strong {
+    display: block;
+    color: var(--text);
+    font-family: "Quillen", Georgia, serif;
+    font-size: 22px;
+    font-weight: 400;
+    margin-bottom: 5px;
+}
+
+/* ============================================================
+   RESPONSIVIDADE
+   ============================================================ */
+
+@media (max-width: 1180px) {
     .galeria {
         column-count: 4;
     }
 }
 
-@media (max-width:900px) {
+@media (max-width: 900px) {
     .galeria {
         column-count: 3;
     }
@@ -889,33 +978,18 @@ video {
     }
 }
 
-@media (max-width:680px) {
+@media (max-width: 680px) {
     body {
         padding-top: max(12px,env(safe-area-inset-top));
     }
 
     .container {
         padding: 19px 13px 16px;
-        border-radius: 26px;
-    }
-
-    .brand-mini {
-        display: none;
+        border-radius: 24px;
     }
 
     .hero {
         margin-bottom: 21px;
-    }
-
-    .hero-logo {
-        width: 70px;
-        height: 70px;
-    }
-
-    .hero-logo .logo-ring {
-        width: 54px;
-        height: 54px;
-        border-width: 4px;
     }
 
     .topbar {
@@ -923,12 +997,19 @@ video {
     }
 
     .navigation-button,
-    .music-button {
+    .music-button,
+    .topbar-spacer {
         min-width: 43px;
         width: 43px;
         min-height: 43px;
         height: 43px;
+        flex-basis: 43px;
         border-radius: 14px;
+    }
+
+    .navigation-label,
+    .music-label {
+        display: none;
     }
 
     .galeria {
@@ -946,7 +1027,11 @@ video {
     }
 
     .overview {
-        justify-content: flex-start;
+        grid-template-columns: 1fr;
+    }
+
+    .contador {
+        justify-self: start;
     }
 
     .section-head {
@@ -961,9 +1046,13 @@ video {
     .media-tab {
         flex: 1 1 calc(50% - 8px);
     }
+
+    .lightbox-caption {
+        bottom: max(12px,env(safe-area-inset-bottom));
+    }
 }
 
-@media (max-width:390px) {
+@media (max-width: 390px) {
     .galeria {
         column-count: 1;
     }
@@ -979,9 +1068,18 @@ video {
     .subtitulo {
         font-size: 15px;
     }
+
+    .lightbox-close {
+        width: 44px;
+        height: 44px;
+    }
 }
 
-@media (prefers-reduced-motion:reduce) {
+/* ============================================================
+   REDUÇÃO DE MOVIMENTO
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
     html {
         scroll-behavior: auto;
     }
@@ -994,89 +1092,90 @@ video {
         transition-duration: .001ms !important;
     }
 }
+
+/* ============================================================
+   IMPRESSÃO
+   ============================================================ */
+
+@media print {
+    body {
+        background: #fff;
+        padding: 0;
+    }
+
+    body::before,
+    .topbar,
+    .media-tabs,
+    .actions,
+    .lightbox {
+        display: none !important;
+    }
+
+    .container {
+        border: 0;
+        box-shadow: none;
+        background: #fff;
+    }
+}
 </style>
 </head>
 
 <body>
-
-<audio
-    id="musicaTema"
-    src="midia/tema.mp3"
-    preload="auto"
-    loop
-    playsinline
-></audio>
-
 <main class="app-shell">
 
     <div class="topbar">
+        <nav class="navigation-stack" aria-label="Navegação">
+            <button
+                class="navigation-button"
+                type="button"
+                id="btnVoltar"
+                aria-label="Voltar para home.html"
+                title="Voltar"
+            >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M19 12H5"></path>
+                    <path d="m12 19-7-7 7-7"></path>
+                </svg>
+                <span class="navigation-label">Voltar</span>
+            </button>
+        </nav>
 
         <button
-            class="navigation-button"
+            class="music-button"
             type="button"
-            id="btnVoltar"
-            aria-label="Voltar"
-            title="Voltar"
+            id="musicButton"
+            aria-label="Continuar música"
+            title="Continuar música"
         >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M19 12H5"></path>
-                <path d="m12 19-7-7 7-7"></path>
+            <svg id="musicIconPlay" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M8 5.5a1 1 0 0 1 1.53-.85l9.1 6.5a1 1 0 0 1 0 1.7l-9.1 6.5A1 1 0 0 1 8 18.5z"></path>
             </svg>
+            <svg id="musicIconPause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="display:none">
+                <path d="M7 5h3v14H7zM14 5h3v14h-3z"></path>
+            </svg>
+            <span class="music-label" id="musicLabel">Continuar</span>
         </button>
-
-        <div class="brand-mini">
-
-            <div class="logo-mark">
-                <span class="logo-ring"></span>
-            </div>
-
-            <button
-                class="music-button paused"
-                type="button"
-                id="btnMusica"
-                aria-label="Continuar música"
-                title="Continuar música"
-            >
-                <svg
-                    class="icon-play"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    aria-hidden="true"
-                >
-                    <path d="M8 5.14v13.72a1 1 0 0 0 1.52.85l10.2-6.86a1 1 0 0 0 0-1.66L9.52 4.29A1 1 0 0 0 8 5.14Z"></path>
-                </svg>
-
-                <svg
-                    class="icon-pause"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    aria-hidden="true"
-                >
-                    <rect x="6" y="4" width="4" height="16" rx="1"></rect>
-                    <rect x="14" y="4" width="4" height="16" rx="1"></rect>
-                </svg>
-            </button>
-
-        </div>
     </div>
 
     <section class="container" aria-label="Nossos Momentos">
 
         <header class="hero">
-
-            <div class="hero-logo" aria-hidden="true">
-                <span class="logo-ring"></span>
-            </div>
-
-            <h1>Nossos Momentos</h1>
-
+            <div class="eyebrow">MoissWorld</div>
+            <h1>Momentos</h1>
             <p class="subtitulo">
-                Pequenos pedacinhos de nós, quero deixar guardados aqui ♡
+                fotos, vozes e pequenos pedaços de nós ♡
             </p>
-
         </header>
 
         <div class="overview">
+            <div class="overview-card">
+                <div class="overview-label">Coleção</div>
+                <div class="lista-titulo">🫂</div>
+                <div class="collection-note" id="collectionNote">
+                    Procurando mídias...
+                </div>
+            </div>
+
             <div
                 class="contador"
                 id="contador"
@@ -1093,7 +1192,6 @@ video {
             role="tablist"
             aria-label="Tipos de mídia"
         >
-
             <button
                 class="media-tab active"
                 type="button"
@@ -1103,7 +1201,7 @@ video {
                 id="tab-fotos"
                 data-section="fotos"
             >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <rect x="3" y="4" width="18" height="16" rx="3"></rect>
                     <circle cx="8.5" cy="9" r="1.5"></circle>
                     <path d="m5.5 17 4.5-4.5 3.5-3.5 6 6"></path>
@@ -1120,7 +1218,7 @@ video {
                 id="tab-audios"
                 data-section="audios"
             >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M9 18V5l11-2v13"></path>
                     <circle cx="6" cy="18" r="3"></circle>
                     <circle cx="17" cy="16" r="3"></circle>
@@ -1137,7 +1235,7 @@ video {
                 id="tab-videos"
                 data-section="videos"
             >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <rect x="3" y="5" width="13" height="14" rx="2"></rect>
                     <path d="m16 10 5-3v10l-5-3z"></path>
                 </svg>
@@ -1145,7 +1243,7 @@ video {
             </button>
 
             <button
-                class="media-tab exclusive"
+                class="media-tab"
                 type="button"
                 role="tab"
                 aria-selected="false"
@@ -1153,13 +1251,13 @@ video {
                 id="tab-exclusivo"
                 data-section="exclusivo"
             >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="4" y="10" width="16" height="11" rx="2"></rect>
-                    <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M6 10V8a6 6 0 0 1 12 0v2"></path>
+                    <rect x="4" y="10" width="16" height="11" rx="3"></rect>
+                    <path d="M12 14v3"></path>
                 </svg>
                 Exclusivo
             </button>
-
         </div>
 
         <section
@@ -1181,13 +1279,13 @@ video {
             ></div>
 
             <div class="loading-state" id="fotoLoading">
-                <span class="loader-dot"></span>
+                <span class="loader-dot" aria-hidden="true"></span>
                 descobrindo nossas fotos...
             </div>
 
             <div class="empty-state" id="fotoEmpty">
                 <strong>Nenhuma foto encontrada</strong>
-                Ainda não existem fotos disponíveis nesta galeria.
+                
             </div>
         </section>
 
@@ -1206,13 +1304,13 @@ video {
             <div id="audios" class="media-grid"></div>
 
             <div class="loading-state" id="audioLoading">
-                <span class="loader-dot"></span>
+                <span class="loader-dot" aria-hidden="true"></span>
                 procurando nossas gravações...
             </div>
 
             <div class="empty-state" id="audioEmpty">
                 <strong>Nenhum áudio encontrado</strong>
-                Ainda não existem gravações disponíveis.
+                
             </div>
         </section>
 
@@ -1231,13 +1329,13 @@ video {
             <div id="videos" class="media-grid"></div>
 
             <div class="loading-state" id="videoLoading">
-                <span class="loader-dot"></span>
+                <span class="loader-dot" aria-hidden="true"></span>
                 procurando nossos vídeos...
             </div>
 
             <div class="empty-state" id="videoEmpty">
                 <strong>Nenhum vídeo encontrado</strong>
-                Ainda não existem vídeos disponíveis.
+                
             </div>
         </section>
 
@@ -1248,49 +1346,39 @@ video {
             aria-labelledby="tab-exclusivo"
             hidden
         >
-            <div class="exclusive-banner">
-
-                <div class="exclusive-title">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="4" y="10" width="16" height="11" rx="2"></rect>
-                        <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
-                    </svg>
-                    Conteúdo exclusivo
-                </div>
-
-                <p>
-                    Este espaço reúne conteúdos preparados especialmente para
-                    <span class="exclusive-user" id="exclusiveUser">você</span>.
-                </p>
-
-            </div>
-
             <div class="section-head">
-                <h2>Somente para você</h2>
+                <h2>Conteúdo exclusivo</h2>
                 <p id="exclusiveStatus">Carregando...</p>
             </div>
 
-            <div
-                class="galeria"
-                id="exclusiveFotos"
-                aria-live="polite"
-            ></div>
-
-            <div id="exclusiveMedia" class="media-grid"></div>
+            <div id="exclusiveContent" class="exclusive-grid"></div>
 
             <div class="loading-state" id="exclusiveLoading">
-                <span class="loader-dot"></span>
-                procurando seu conteúdo...
+                <span class="loader-dot" aria-hidden="true"></span>
+                procurando seu conteúdo exclusivo...
             </div>
 
-            <div class="empty-state" id="exclusiveEmpty">
+            <div class="exclusive-empty" id="exclusiveEmpty" hidden>
                 <strong>Nenhum conteúdo exclusivo</strong>
-                Ainda não há fotos, áudios ou vídeos destinados a este usuário.
+                Não há arquivos disponíveis para este usuário em <b>midia/&lt;usuário&gt;/</b>.
             </div>
         </section>
 
+        <div id="globalError"></div>
+
+        <div class="actions">
+            <button
+                class="action-button"
+                type="button"
+                id="btnVoltarInferior"
+            >
+                ← Voltar para home.html
+            </button>
+        </div>
     </section>
 </main>
+
+<audio id="temaMusical" preload="auto" playsinline></audio>
 
 <div
     class="lightbox"
@@ -1305,6 +1393,7 @@ video {
         type="button"
         id="lightboxClose"
         aria-label="Fechar visualização"
+        title="Fechar"
     >
         ×
     </button>
@@ -1324,6 +1413,36 @@ video {
 <script>
 "use strict";
 
+/* ============================================================
+   CONFIGURAÇÃO DO GITHUB
+   ============================================================
+
+   Não existe lista manual de arquivos.
+
+   owner, repo e branch podem permanecer vazios.
+
+   Quando a página estiver em:
+       https://USUARIO.github.io/REPOSITORIO/galeria.html
+
+   o sistema tenta descobrir:
+       owner = USUARIO
+       repo  = REPOSITORIO
+
+   Quando estiver em:
+       https://USUARIO.github.io/galeria.html
+
+   ele tenta usar:
+       repo = USUARIO.github.io
+
+   O branch também pode ficar vazio. Nesse caso o GitHub informa
+   qual é o branch padrão do repositório.
+
+   Em domínio personalizado, se a URL não permitir descobrir o
+   repositório, basta preencher owner e repo abaixo.
+
+   Nunca coloque nomes individuais de fotos, áudios ou vídeos aqui.
+   ============================================================ */
+
 const REPOSITORIO = {
     owner: "",
     repo: "",
@@ -1331,237 +1450,133 @@ const REPOSITORIO = {
     pastaMidia: "midia"
 };
 
+const PASTAS = {
+    fotos: "Fotos",
+    audios: "Áudios",
+    videos: "Vídeos"
+};
+
 const EXTENSOES = {
     fotos: new Set([
-        "jpg","jpeg","png","webp","gif","avif",
-        "bmp","svg","heic","heif","jfif","tif","tiff"
+        "jpg",
+        "jpeg",
+        "png",
+        "webp",
+        "gif",
+        "avif",
+        "bmp",
+        "svg",
+        "heic",
+        "heif",
+        "jfif",
+        "tif",
+        "tiff"
     ]),
+
     audios: new Set([
-        "mp3","m4a","wav","ogg","oga","aac","flac","opus"
+        "mp3",
+        "m4a",
+        "wav",
+        "ogg",
+        "oga",
+        "aac",
+        "flac",
+        "opus",
+        "webm"
     ]),
+
     videos: new Set([
-        "mp4","webm","mov","m4v","ogv","avi","mkv"
+        "mp4",
+        "webm",
+        "mov",
+        "m4v",
+        "ogv",
+        "avi",
+        "mkv"
     ])
 };
 
 const MIME_POR_EXTENSAO = {
-    jpg:"image/jpeg",
-    jpeg:"image/jpeg",
-    png:"image/png",
-    webp:"image/webp",
-    gif:"image/gif",
-    avif:"image/avif",
-    bmp:"image/bmp",
-    svg:"image/svg+xml",
-    heic:"image/heic",
-    heif:"image/heif",
-    jfif:"image/jpeg",
-    tif:"image/tiff",
-    tiff:"image/tiff",
-    mp3:"audio/mpeg",
-    m4a:"audio/mp4",
-    wav:"audio/wav",
-    ogg:"audio/ogg",
-    oga:"audio/ogg",
-    aac:"audio/aac",
-    flac:"audio/flac",
-    opus:"audio/opus",
-    mp4:"video/mp4",
-    webm:"video/webm",
-    mov:"video/quicktime",
-    m4v:"video/mp4",
-    ogv:"video/ogg",
-    avi:"video/x-msvideo",
-    mkv:"video/x-matroska"
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    webp: "image/webp",
+    gif: "image/gif",
+    avif: "image/avif",
+    bmp: "image/bmp",
+    svg: "image/svg+xml",
+    heic: "image/heic",
+    heif: "image/heif",
+    jfif: "image/jpeg",
+    tif: "image/tiff",
+    tiff: "image/tiff",
+
+    mp3: "audio/mpeg",
+    m4a: "audio/mp4",
+    wav: "audio/wav",
+    ogg: "audio/ogg",
+    oga: "audio/ogg",
+    aac: "audio/aac",
+    flac: "audio/flac",
+    opus: "audio/opus",
+
+    mp4: "video/mp4",
+    webm: "video/webm",
+    mov: "video/quicktime",
+    m4v: "video/mp4",
+    ogv: "video/ogg",
+    avi: "video/x-msvideo",
+    mkv: "video/x-matroska"
 };
 
 const API_VERSION = "2026-03-10";
 
 const estado = {
-    usuario: "",
     arquivos: {
         fotos: [],
         audios: [],
-        videos: []
+        videos: [],
+        exclusivo: {
+            fotos: [],
+            audios: [],
+            videos: []
+        }
     },
-    exclusivos: {
-        fotos: [],
-        audios: [],
-        videos: []
-    },
+
     configuracao: null,
+
     lightboxAberto: false,
     lightboxUsouHistorico: false,
     ultimaFocada: null,
+
     indiceFotoAtual: -1,
-    carregando: true
+
+    carregando: true,
+
+    musicaConfigurada: false,
+    musicaPausadaPeloUsuario: false
 };
 
-const musicaTema =
-    document.getElementById(
-        "musicaTema"
+/* ============================================================
+   FUNÇÕES BÁSICAS
+   ============================================================ */
+
+function escaparHTML(valor) {
+    return String(valor).replace(
+        /[&<>'"]/g,
+        caractere => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            "'": "&#39;",
+            "\"": "&quot;"
+        }[caractere])
     );
-
-const btnMusica =
-    document.getElementById(
-        "btnMusica"
-    );
-
-let musicaAtiva = false;
-
-function atualizarBotaoMusica(
-    tocando
-) {
-    musicaAtiva =
-        Boolean(tocando);
-
-    btnMusica.classList.toggle(
-        "playing",
-        musicaAtiva
-    );
-
-    btnMusica.classList.toggle(
-        "paused",
-        !musicaAtiva
-    );
-
-    btnMusica.classList.remove(
-        "music-error"
-    );
-
-    btnMusica.setAttribute(
-        "aria-label",
-        musicaAtiva
-            ? "Pausar música"
-            : "Continuar música"
-    );
-
-    btnMusica.setAttribute(
-        "title",
-        musicaAtiva
-            ? "Pausar música"
-            : "Continuar música"
-    );
-}
-
-async function iniciarMusica() {
-    if (!musicaTema) {
-        return;
-    }
-
-    musicaTema.loop = true;
-
-    try {
-        await musicaTema.play();
-        atualizarBotaoMusica(true);
-    } catch (_) {
-        atualizarBotaoMusica(false);
-    }
-}
-
-async function alternarMusica() {
-    if (!musicaTema) {
-        return;
-    }
-
-    if (
-        musicaTema.paused ||
-        musicaTema.ended
-    ) {
-        try {
-            await musicaTema.play();
-            atualizarBotaoMusica(true);
-        } catch (_) {
-            atualizarBotaoMusica(false);
-            btnMusica.classList.add(
-                "music-error"
-            );
-        }
-    } else {
-        musicaTema.pause();
-        atualizarBotaoMusica(false);
-    }
-}
-
-btnMusica.addEventListener(
-    "click",
-    alternarMusica
-);
-
-musicaTema.addEventListener(
-    "play",
-    () => atualizarBotaoMusica(true)
-);
-
-musicaTema.addEventListener(
-    "pause",
-    () => atualizarBotaoMusica(false)
-);
-
-musicaTema.addEventListener(
-    "ended",
-    () => {
-        musicaTema.currentTime = 0;
-
-        musicaTema
-            .play()
-            .then(
-                () =>
-                    atualizarBotaoMusica(
-                        true
-                    )
-            )
-            .catch(
-                () =>
-                    atualizarBotaoMusica(
-                        false
-                    )
-            );
-    }
-);
-
-musicaTema.addEventListener(
-    "error",
-    () => {
-        atualizarBotaoMusica(false);
-
-        btnMusica.classList.add(
-            "music-error"
-        );
-
-        btnMusica.setAttribute(
-            "aria-label",
-            "Música indisponível"
-        );
-
-        btnMusica.setAttribute(
-            "title",
-            "Não foi possível carregar tema.mp3"
-        );
-    }
-);
-
-function obterUsuarioAtual() {
-    const usuario =
-        localStorage.getItem(
-            "username"
-        );
-
-    if (!usuario) {
-        return "";
-    }
-
-    return String(usuario).trim();
 }
 
 function obterExtensao(nome) {
-    const base =
-        String(nome || "")
-            .split("/")
-            .pop();
-
-    const posicao =
-        base.lastIndexOf(".");
+    const base = String(nome || "").split("/").pop();
+    const posicao = base.lastIndexOf(".");
 
     if (posicao === -1) {
         return "";
@@ -1573,116 +1588,70 @@ function obterExtensao(nome) {
 }
 
 function obterNomeSemExtensao(nome) {
-    const base =
-        String(nome || "")
-            .split("/")
-            .pop();
-
-    const posicao =
-        base.lastIndexOf(".");
+    const base = String(nome || "").split("/").pop();
+    const posicao = base.lastIndexOf(".");
 
     if (posicao <= 0) {
         return base;
     }
 
-    return base.slice(
-        0,
-        posicao
-    );
+    return base.slice(0,posicao);
 }
 
-function classificarArquivo(
-    nome,
-    mime = ""
-) {
-    const extensao =
-        obterExtensao(nome);
+function classificarArquivo(nome,mime = "") {
+    const extensao = obterExtensao(nome);
+    const tipoMime = String(mime || "").toLowerCase();
 
-    const tipoMime =
-        String(
-            mime || ""
-        ).toLowerCase();
-
-    if (
-        tipoMime.startsWith(
-            "image/"
-        )
-    ) {
+    if (tipoMime.startsWith("image/")) {
         return "fotos";
     }
 
-    if (
-        tipoMime.startsWith(
-            "audio/"
-        )
-    ) {
+    if (tipoMime.startsWith("audio/")) {
         return "audios";
     }
 
-    if (
-        tipoMime.startsWith(
-            "video/"
-        )
-    ) {
+    if (tipoMime.startsWith("video/")) {
         return "videos";
     }
 
-    if (
-        EXTENSOES.fotos.has(
-            extensao
-        )
-    ) {
+    if (EXTENSOES.fotos.has(extensao)) {
         return "fotos";
     }
 
-    if (
-        EXTENSOES.audios.has(
-            extensao
-        )
-    ) {
+    if (EXTENSOES.audios.has(extensao)) {
         return "audios";
     }
 
-    if (
-        EXTENSOES.videos.has(
-            extensao
-        )
-    ) {
+    if (EXTENSOES.videos.has(extensao)) {
         return "videos";
     }
 
     return null;
 }
 
-function tipoMimePorArquivo(
-    arquivo
-) {
+function tipoMimePorArquivo(arquivo) {
     if (arquivo.mime) {
         return arquivo.mime;
     }
 
-    return (
-        MIME_POR_EXTENSAO[
-            obterExtensao(
-                arquivo.nome
-            )
-        ] || ""
-    );
+    return MIME_POR_EXTENSAO[
+        obterExtensao(arquivo.nome)
+    ] || "";
 }
 
-function shuffleArray(
-    array
-) {
+/* ============================================================
+   EMBARALHAMENTO — FISHER-YATES DO CÓDIGO 1
+   ============================================================ */
+
+function shuffleArray(array) {
     for (
         let i = array.length - 1;
         i > 0;
         i--
     ) {
-        const j =
-            Math.floor(
-                Math.random() *
-                (i + 1)
-            );
+        const j = Math.floor(
+            Math.random() * (i + 1)
+        );
 
         [
             array[i],
@@ -1696,42 +1665,28 @@ function shuffleArray(
     return array;
 }
 
-function compararNomes(
-    a,
-    b
-) {
-    return String(
-        a.nome
-    ).localeCompare(
-        String(
-            b.nome
-        ),
-        "pt-BR",
-        {
-            numeric: true,
-            sensitivity: "base"
-        }
-    );
+/* Mantém também o nome em português caso alguma parte futura
+   do projeto utilize essa função. */
+function embaralhar(array) {
+    return shuffleArray(array);
 }
 
+/* ============================================================
+   DETECÇÃO DO REPOSITÓRIO
+   ============================================================ */
+
 function detectarRepositorioAutomaticamente() {
-    const host =
-        window.location.hostname;
+    const host = window.location.hostname;
+    const caminho = window.location.pathname
+        .split("/")
+        .filter(Boolean);
 
-    const caminho =
-        window.location.pathname
-            .split("/")
-            .filter(Boolean);
-
-    const configuracao =
-        {
-            ...REPOSITORIO
-        };
+    const configuracao = {
+        ...REPOSITORIO
+    };
 
     const ehGithubPages =
-        host.endsWith(
-            ".github.io"
-        );
+        host.endsWith(".github.io");
 
     if (
         !configuracao.owner &&
@@ -1747,8 +1702,7 @@ function detectarRepositorioAutomaticamente() {
         caminho.length > 0 &&
         !caminho[0].includes(".")
     ) {
-        configuracao.repo =
-            caminho[0];
+        configuracao.repo = caminho[0];
     }
 
     if (
@@ -1763,54 +1717,56 @@ function detectarRepositorioAutomaticamente() {
     return configuracao;
 }
 
-function validarConfiguracaoMinima(
-    configuracao
-) {
+function validarConfiguracaoMinima(configuracao) {
     if (
         !configuracao.owner ||
         !configuracao.repo
     ) {
         throw new Error(
-            "Não foi possível descobrir automaticamente o proprietário e o repositório."
+            "Não foi possível descobrir. "
         );
     }
 }
 
-function construirRawUrl(
-    caminho,
-    configuracao
-) {
-    const partes =
-        String(caminho)
-            .split("/")
-            .map(
-                encodeURIComponent
-            );
+/* ============================================================
+   URL RAW
+   ============================================================ */
+
+function construirRawUrl(caminho,configuracao) {
+    const partes = String(caminho)
+        .split("/")
+        .map(encodeURIComponent);
 
     const branch =
-        configuracao.branch ||
-        "main";
+        configuracao.branch || "main";
 
-    return `https://raw.githubusercontent.com/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/${encodeURIComponent(branch)}/${partes.join("/")}`;
+    return (
+        "https://raw.githubusercontent.com/" +
+        encodeURIComponent(configuracao.owner) +
+        "/" +
+        encodeURIComponent(configuracao.repo) +
+        "/" +
+        encodeURIComponent(branch) +
+        "/" +
+        partes.join("/")
+    );
 }
 
-async function githubFetch(
-    url
-) {
-    const resposta =
-        await fetch(
-            url,
-            {
-                method: "GET",
-                headers: {
-                    "Accept":
-                        "application/vnd.github+json",
-                    "X-GitHub-Api-Version":
-                        API_VERSION
-                },
-                cache: "no-store"
-            }
-        );
+/* ============================================================
+   CONSULTA À API DO GITHUB
+   ============================================================ */
+
+async function githubFetch(url) {
+    const resposta = await fetch(url,{
+        method: "GET",
+        headers: {
+            "Accept":
+                "application/vnd.github+json",
+            "X-GitHub-Api-Version":
+                API_VERSION
+        },
+        cache: "no-store"
+    });
 
     if (!resposta.ok) {
         let detalhe = "";
@@ -1819,14 +1775,13 @@ async function githubFetch(
             const json =
                 await resposta.json();
 
-            if (
-                json &&
-                json.message
-            ) {
+            if (json && json.message) {
                 detalhe =
                     ` — ${json.message}`;
             }
-        } catch (_) {}
+        } catch (_) {
+            /* A resposta pode não ser JSON. */
+        }
 
         throw new Error(
             `GitHub respondeu HTTP ${resposta.status}${detalhe}`
@@ -1846,12 +1801,17 @@ async function obterConfiguracaoEfetiva() {
 
     if (!configuracao.branch) {
         const url =
-            `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}`;
+            "https://api.github.com/repos/" +
+            encodeURIComponent(
+                configuracao.owner
+            ) +
+            "/" +
+            encodeURIComponent(
+                configuracao.repo
+            );
 
         const metadados =
-            await githubFetch(
-                url
-            );
+            await githubFetch(url);
 
         configuracao.branch =
             metadados.default_branch ||
@@ -1861,49 +1821,231 @@ async function obterConfiguracaoEfetiva() {
     return configuracao;
 }
 
-function criarCatalogoVazio() {
+/* ============================================================
+   NORMALIZAÇÃO DE ITENS
+   ============================================================ */
+
+function transformarItemGithub(
+    item,
+    tipoEsperado,
+    configuracao
+) {
+    if (!item || item.type !== "file") {
+        return null;
+    }
+
+    const extensao = obterExtensao(item.name);
+    const tipoMime = String(item.mime_type || "").toLowerCase();
+    const tipo = classificarArquivo(item.name, item.mime_type || "");
+    const extensaoAceitaNaPasta = EXTENSOES[tipoEsperado]?.has(extensao);
+    const mimeAceitoNaPasta =
+        (tipoEsperado === "fotos" && tipoMime.startsWith("image/")) ||
+        (tipoEsperado === "audios" && tipoMime.startsWith("audio/")) ||
+        (tipoEsperado === "videos" && tipoMime.startsWith("video/"));
+
+    if (tipo !== tipoEsperado && !extensaoAceitaNaPasta && !mimeAceitoNaPasta) {
+        return null;
+    }
+
     return {
-        fotos: [],
-        audios: [],
-        videos: []
+        nome: item.name,
+        caminho: item.path,
+        url:
+            item.download_url ||
+            construirRawUrl(
+                item.path,
+                configuracao
+            ),
+        apiUrl: item.url || "",
+        sha: item.sha || "",
+        tamanho: Number(item.size || 0),
+        mime:
+            item.mime_type ||
+            MIME_POR_EXTENSAO[
+                obterExtensao(item.name)
+            ] ||
+            "",
+        tipo
     };
 }
+
+/* ============================================================
+   CONTENTS API — UMA PASTA
+   ============================================================ */
+
+async function listarPastaViaContents(
+    nomePasta,
+    configuracao
+) {
+    const caminho =
+        `${configuracao.pastaMidia}/${nomePasta}`;
+
+    const resultados = [];
+    const vistos = new Set();
+
+    const limitePagina = 100;
+
+    for (
+        let pagina = 1;
+        pagina <= 100;
+        pagina++
+    ) {
+        const url =
+            "https://api.github.com/repos/" +
+            encodeURIComponent(
+                configuracao.owner
+            ) +
+            "/" +
+            encodeURIComponent(
+                configuracao.repo
+            ) +
+            "/contents/" +
+            caminho
+                .split("/")
+                .map(encodeURIComponent)
+                .join("/") +
+            "?ref=" +
+            encodeURIComponent(
+                configuracao.branch
+            ) +
+            "&per_page=" +
+            limitePagina +
+            "&page=" +
+            pagina;
+
+        const dados =
+            await githubFetch(url);
+
+        if (!Array.isArray(dados)) {
+            break;
+        }
+
+        let novos = 0;
+
+        for (const item of dados) {
+            if (!item || !item.path) {
+                continue;
+            }
+
+            if (vistos.has(item.path)) {
+                continue;
+            }
+
+            vistos.add(item.path);
+
+            const transformado =
+                transformarItemGithub(
+                    item,
+                    classificarPasta(
+                        nomePasta
+                    ),
+                    configuracao
+                );
+
+            if (transformado) {
+                resultados.push(
+                    transformado
+                );
+                novos++;
+            }
+        }
+
+        if (
+            dados.length < limitePagina ||
+            novos === 0
+        ) {
+            break;
+        }
+    }
+
+    return resultados;
+}
+
+/* ============================================================
+   CLASSIFICAÇÃO DE PASTAS
+   ============================================================ */
+
+function classificarPasta(nomePasta) {
+    if (
+        nomePasta === PASTAS.fotos
+    ) {
+        return "fotos";
+    }
+
+    if (
+        nomePasta === PASTAS.audios
+    ) {
+        return "audios";
+    }
+
+    if (
+        nomePasta === PASTAS.videos
+    ) {
+        return "videos";
+    }
+
+    return null;
+}
+
+/* ============================================================
+   GIT TREE API — CAMINHO PRINCIPAL
+   ============================================================ */
 
 async function listarCatalogoViaTree(
     configuracao
 ) {
     const url =
-        `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/git/trees/${encodeURIComponent(configuracao.branch)}?recursive=1`;
+        "https://api.github.com/repos/" +
+        encodeURIComponent(
+            configuracao.owner
+        ) +
+        "/" +
+        encodeURIComponent(
+            configuracao.repo
+        ) +
+        "/git/trees/" +
+        encodeURIComponent(
+            configuracao.branch
+        ) +
+        "?recursive=1";
 
     const dados =
-        await githubFetch(
-            url
-        );
+        await githubFetch(url);
 
     if (
         !dados ||
-        !Array.isArray(
-            dados.tree
-        )
+        !Array.isArray(dados.tree)
     ) {
         throw new Error(
-            "A API do GitHub não retornou a árvore do repositório."
+            "."
         );
     }
 
     if (dados.truncated) {
+        estado._treeCompleta = null;
         return null;
     }
 
-    const prefixo =
-        `${configuracao.pastaMidia}/`;
+    estado._treeCompleta = dados;
 
-    const resultado =
-        criarCatalogoVazio();
+    const prefixos = {
+        fotos:
+            `${configuracao.pastaMidia}/${PASTAS.fotos}/`,
 
-    for (
-        const item of dados.tree
-    ) {
+        audios:
+            `${configuracao.pastaMidia}/${PASTAS.audios}/`,
+
+        videos:
+            `${configuracao.pastaMidia}/${PASTAS.videos}/`
+    };
+
+    const resultado = {
+        fotos: [],
+        audios: [],
+        videos: []
+    };
+
+    for (const item of dados.tree) {
         if (
             !item ||
             item.type !== "blob" ||
@@ -1912,66 +2054,64 @@ async function listarCatalogoViaTree(
             continue;
         }
 
-        if (
-            !item.path.startsWith(
-                prefixo
-            )
-        ) {
-            continue;
-        }
-
-        const caminhoRelativo =
-            item.path.slice(
-                prefixo.length
-            );
+        let tipo = null;
 
         if (
-            caminhoRelativo.includes(
-                "/"
+            item.path.startsWith(
+                prefixos.fotos
             )
         ) {
-            continue;
+            tipo = "fotos";
+        } else if (
+            item.path.startsWith(
+                prefixos.audios
+            )
+        ) {
+            tipo = "audios";
+        } else if (
+            item.path.startsWith(
+                prefixos.videos
+            )
+        ) {
+            tipo = "videos";
         }
-
-        const nome =
-            item.path.slice(
-                item.path.lastIndexOf(
-                    "/"
-                ) + 1
-            );
-
-        const tipo =
-            classificarArquivo(
-                nome,
-                ""
-            );
 
         if (!tipo) {
             continue;
         }
 
-        resultado[
-            tipo
-        ].push({
+        const nome =
+            item.path.slice(
+                item.path.lastIndexOf("/") + 1
+            );
+
+        const extensao = obterExtensao(nome);
+        const classificado = classificarArquivo(nome, "");
+
+        /* A pasta é a fonte contextual quando uma extensão é ambígua.
+           Isso permite WEBM em Áudios/ e também WEBM em Vídeos/. */
+        if (
+            classificado !== tipo &&
+            !EXTENSOES[tipo]?.has(extensao)
+        ) {
+            continue;
+        }
+
+        resultado[tipo].push({
             nome,
             caminho: item.path,
-            url: construirRawUrl(
-                item.path,
-                configuracao
-            ),
-            apiUrl:
-                item.url || "",
-            sha:
-                item.sha || "",
-            tamanho:
-                Number(
-                    item.size || 0
+            url:
+                construirRawUrl(
+                    item.path,
+                    configuracao
                 ),
+            apiUrl: item.url || "",
+            sha: item.sha || "",
+            tamanho:
+                Number(item.size || 0),
             mime:
                 MIME_POR_EXTENSAO[
-                    obterExtensao(
-                        nome
-                    )
+                    obterExtensao(nome)
                 ] || "",
             tipo
         });
@@ -1980,172 +2120,105 @@ async function listarCatalogoViaTree(
     return resultado;
 }
 
-async function listarPastaViaContentsRecursivo(
-    caminho,
-    configuracao
-) {
-    const url =
-        `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/contents/${caminho.split("/").map(encodeURIComponent).join("/")}?ref=${encodeURIComponent(configuracao.branch)}`;
+/* ============================================================
+   CONTEÚDO EXCLUSIVO POR USUÁRIO
+   ============================================================ */
 
-    const dados =
-        await githubFetch(
-            url
-        );
+function obterUsuarioAtual() {
+    return String(localStorage.getItem("username") || "").trim();
+}
 
-    let resultados = [];
+function normalizarNomeUsuario(valor) {
+    return String(valor || "")
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9_-]/g, "");
+}
 
-    if (
-        !Array.isArray(
-            dados
-        )
-    ) {
-        return resultados;
-    }
+function criarItemDeArquivo(item, configuracao) {
+    const nome = String(item.name || item.path || "").split("/").pop();
+    const tipo = classificarArquivo(nome, item.mime_type || "");
+    if (!tipo) return null;
 
-    for (
-        const item of dados
-    ) {
-        if (!item) {
-            continue;
-        }
+    return {
+        nome,
+        caminho: item.path,
+        url: item.download_url || construirRawUrl(item.path, configuracao),
+        apiUrl: item.url || "",
+        sha: item.sha || "",
+        tamanho: Number(item.size || 0),
+        mime: item.mime_type || MIME_POR_EXTENSAO[obterExtensao(nome)] || "",
+        tipo
+    };
+}
 
-        if (
-            item.type === "dir"
-        ) {
-            const subResultados =
-                await listarPastaViaContentsRecursivo(
-                    item.path,
-                    configuracao
-                );
+async function listarExclusivoViaContents(configuracao, nomeUsuario) {
+    const pastaBase = `${configuracao.pastaMidia}/${normalizarNomeUsuario(nomeUsuario)}`;
+    if (!nomeUsuario) return { fotos: [], audios: [], videos: [] };
 
-            resultados =
-                resultados.concat(
-                    subResultados
-                );
+    const resultado = { fotos: [], audios: [], videos: [] };
+    const fila = [pastaBase];
+    const vistos = new Set();
 
-            continue;
-        }
+    while (fila.length) {
+        const caminho = fila.shift();
+        const url =
+            "https://api.github.com/repos/" +
+            encodeURIComponent(configuracao.owner) + "/" +
+            encodeURIComponent(configuracao.repo) + "/contents/" +
+            caminho.split("/").map(encodeURIComponent).join("/") +
+            "?ref=" + encodeURIComponent(configuracao.branch);
 
-        if (
-            item.type === "file"
-        ) {
-            const tipo =
-                classificarArquivo(
-                    item.name,
-                    item.mime_type ||
-                        ""
-                );
+        const dados = await githubFetch(url);
+        if (!Array.isArray(dados)) continue;
 
-            if (!tipo) {
+        for (const item of dados) {
+            if (!item || !item.path || vistos.has(item.path)) continue;
+            vistos.add(item.path);
+
+            if (item.type === "dir") {
+                fila.push(item.path);
                 continue;
             }
 
-            resultados.push({
-                nome: item.name,
-                caminho: item.path,
-                url:
-                    item.download_url ||
-                    construirRawUrl(
-                        item.path,
-                        configuracao
-                    ),
-                apiUrl:
-                    item.url || "",
-                sha:
-                    item.sha || "",
-                tamanho:
-                    Number(
-                        item.size || 0
-                    ),
-                mime:
-                    item.mime_type ||
-                    MIME_POR_EXTENSAO[
-                        obterExtensao(
-                            item.name
-                        )
-                    ] ||
-                    "",
-                tipo
-            });
+            if (item.type !== "file") continue;
+            if (item.path.toLowerCase() === `${configuracao.pastaMidia}/tema.mp3`.toLowerCase()) continue;
+
+            const arquivo = criarItemDeArquivo(item, configuracao);
+            if (arquivo && resultado[arquivo.tipo]) {
+                resultado[arquivo.tipo].push(arquivo);
+            }
         }
     }
 
-    return resultados;
+    return resultado;
 }
 
-async function listarMidiaPublicaViaContents(
-    configuracao
-) {
-    const caminho =
-        configuracao.pastaMidia;
+async function listarExclusivoViaTree(dadosTree, configuracao, nomeUsuario) {
+    const resultado = { fotos: [], audios: [], videos: [] };
+    const usuario = normalizarNomeUsuario(nomeUsuario);
+    if (!usuario) return resultado;
 
-    const url =
-        `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/contents/${caminho.split("/").map(encodeURIComponent).join("/")}?ref=${encodeURIComponent(configuracao.branch)}`;
+    const prefixo = `${configuracao.pastaMidia}/${usuario}/`.toLowerCase();
 
-    const dados =
-        await githubFetch(
-            url
-        );
+    for (const item of dadosTree.tree) {
+        if (!item || item.type !== "blob" || !item.path) continue;
+        const caminho = String(item.path);
+        if (!caminho.toLowerCase().startsWith(prefixo)) continue;
+        if (caminho.toLowerCase() === `${configuracao.pastaMidia}/tema.mp3`.toLowerCase()) continue;
 
-    const resultado =
-        criarCatalogoVazio();
+        const nome = caminho.slice(caminho.lastIndexOf("/") + 1);
+        const tipo = classificarArquivo(nome, "");
+        if (!tipo) continue;
 
-    if (
-        !Array.isArray(
-            dados
-        )
-    ) {
-        return resultado;
-    }
-
-    for (
-        const item of dados
-    ) {
-        if (
-            !item ||
-            item.type !== "file"
-        ) {
-            continue;
-        }
-
-        const tipo =
-            classificarArquivo(
-                item.name,
-                item.mime_type ||
-                    ""
-            );
-
-        if (!tipo) {
-            continue;
-        }
-
-        resultado[
-            tipo
-        ].push({
-            nome: item.name,
-            caminho: item.path,
-            url:
-                item.download_url ||
-                construirRawUrl(
-                    item.path,
-                    configuracao
-                ),
-            apiUrl:
-                item.url || "",
-            sha:
-                item.sha || "",
-            tamanho:
-                Number(
-                    item.size || 0
-                ),
-            mime:
-                item.mime_type ||
-                MIME_POR_EXTENSAO[
-                    obterExtensao(
-                        item.name
-                    )
-                ] ||
-                "",
+        resultado[tipo].push({
+            nome,
+            caminho,
+            url: construirRawUrl(caminho, configuracao),
+            apiUrl: item.url || "",
+            sha: item.sha || "",
+            tamanho: Number(item.size || 0),
+            mime: MIME_POR_EXTENSAO[obterExtensao(nome)] || "",
             tipo
         });
     }
@@ -2153,145 +2226,224 @@ async function listarMidiaPublicaViaContents(
     return resultado;
 }
 
-function obterPastaExclusiva() {
-    if (
-        !estado.usuario
-    ) {
-        return "";
-    }
-
-    return `${estado.configuracao.pastaMidia}/${estado.usuario}`;
+function ordenarCatalogo(catalogo) {
+    catalogo.audios.sort(compararNomes);
+    catalogo.videos.sort(compararNomes);
+    catalogo.fotos.sort((a, b) => String(a.nome).localeCompare(String(b.nome), "pt-BR", { numeric: true, sensitivity: "base" }));
+    return catalogo;
 }
 
-async function carregarConteudoExclusivo(
-    pastaExclusiva
-) {
-    const resultado =
-        criarCatalogoVazio();
+function renderizarExclusivo() {
+    const container = document.getElementById("exclusiveContent");
+    const loading = document.getElementById("exclusiveLoading");
+    const vazio = document.getElementById("exclusiveEmpty");
+    const status = document.getElementById("exclusiveStatus");
+    if (!container || !vazio || !status) return;
 
-    const prefixo =
-        `${pastaExclusiva}/`;
+    if (loading) loading.remove();
+    container.innerHTML = "";
 
-    let catalogoTree =
-        null;
+    const dados = estado.arquivos.exclusivo || { fotos: [], audios: [], videos: [] };
+    const total = dados.fotos.length + dados.audios.length + dados.videos.length;
+    status.textContent = `${total} ${total === 1 ? "mídia" : "mídias"}`;
+    vazio.hidden = total !== 0;
 
-    try {
-        const url =
-            `https://api.github.com/repos/${encodeURIComponent(estado.configuracao.owner)}/${encodeURIComponent(estado.configuracao.repo)}/git/trees/${encodeURIComponent(estado.configuracao.branch)}?recursive=1`;
+    if (!total) return;
 
-        const dados =
-            await githubFetch(
-                url
-            );
-
-        if (
-            dados &&
-            Array.isArray(
-                dados.tree
-            ) &&
-            !dados.truncated
-        ) {
-            catalogoTree =
-                dados.tree;
-        }
-    } catch (_) {
-        catalogoTree =
-            null;
+    if (dados.fotos.length) {
+        const bloco = document.createElement("div");
+        bloco.className = "exclusive-section";
+        const titulo = document.createElement("div");
+        titulo.className = "exclusive-title";
+        titulo.innerHTML = `<h3>Fotos</h3><span>${dados.fotos.length}</span>`;
+        const galeria = document.createElement("div");
+        galeria.className = "galeria";
+        dados.fotos.forEach((arquivo, index) => galeria.appendChild(criarCartaoFoto(arquivo, index)));
+        bloco.append(titulo, galeria);
+        container.appendChild(bloco);
     }
 
-    if (catalogoTree) {
-        for (
-            const item of catalogoTree
-        ) {
-            if (
-                !item ||
-                item.type !== "blob" ||
-                !item.path
-            ) {
-                continue;
-            }
-
-            if (
-                !item.path.startsWith(
-                    prefixo
-                )
-            ) {
-                continue;
-            }
-
-            const nome =
-                item.path.slice(
-                    item.path.lastIndexOf(
-                        "/"
-                    ) + 1
-                );
-
-            const tipo =
-                classificarArquivo(
-                    nome,
-                    ""
-                );
-
-            if (!tipo) {
-                continue;
-            }
-
-            resultado[
-                tipo
-            ].push({
-                nome,
-                caminho: item.path,
-                url: construirRawUrl(
-                    item.path,
-                    estado.configuracao
-                ),
-                apiUrl:
-                    item.url || "",
-                sha:
-                    item.sha || "",
-                tamanho:
-                    Number(
-                        item.size || 0
-                    ),
-                mime:
-                    MIME_POR_EXTENSAO[
-                        obterExtensao(
-                            nome
-                        )
-                    ] || "",
-                tipo
-            });
-        }
-
-        return resultado;
+    if (dados.audios.length) {
+        const bloco = document.createElement("div");
+        bloco.className = "exclusive-section";
+        const titulo = document.createElement("div");
+        titulo.className = "exclusive-title";
+        titulo.innerHTML = `<h3>Áudios</h3><span>${dados.audios.length}</span>`;
+        const panel = document.createElement("article");
+        panel.className = "media-panel";
+        dados.audios.forEach(arquivo => {
+            const item = document.createElement("div");
+            item.className = "audio-item";
+            const nome = document.createElement("span");
+            nome.className = "media-name";
+            nome.textContent = arquivo.nome;
+            const player = document.createElement("audio");
+            player.controls = true;
+            player.preload = "none";
+            player.playsInline = true;
+            player.src = arquivo.url;
+            player.addEventListener("error", () => adicionarErroMedia(item, "Este navegador não conseguiu reproduzir este áudio."), { once: true });
+            item.append(nome, player);
+            panel.appendChild(item);
+        });
+        bloco.append(titulo, panel);
+        container.appendChild(bloco);
     }
 
-    try {
-        const arquivos =
-            await listarPastaViaContentsRecursivo(
-                pastaExclusiva,
-                estado.configuracao
-            );
-
-        for (
-            const arquivo of arquivos
-        ) {
-            if (
-                resultado[
-                    arquivo.tipo
-                ]
-            ) {
-                resultado[
-                    arquivo.tipo
-                ].push(
-                    arquivo
-                );
-            }
-        }
-    } catch (_) {}
-
-    return resultado;
+    if (dados.videos.length) {
+        const bloco = document.createElement("div");
+        bloco.className = "exclusive-section";
+        const titulo = document.createElement("div");
+        titulo.className = "exclusive-title";
+        titulo.innerHTML = `<h3>Vídeos</h3><span>${dados.videos.length}</span>`;
+        const panel = document.createElement("article");
+        panel.className = "media-panel";
+        dados.videos.forEach(arquivo => {
+            const item = document.createElement("div");
+            item.className = "video-item";
+            const nome = document.createElement("span");
+            nome.className = "media-name";
+            nome.textContent = arquivo.nome;
+            const player = document.createElement("video");
+            player.controls = true;
+            player.preload = "metadata";
+            player.playsInline = true;
+            player.src = arquivo.url;
+            const tipo = tipoMimePorArquivo(arquivo);
+            if (tipo) player.setAttribute("type", tipo);
+            player.addEventListener("error", () => adicionarErroMedia(item, "Este navegador encontrou o arquivo, mas não consegue reproduzir esse formato diretamente."), { once: true });
+            item.append(nome, player);
+            panel.appendChild(item);
+        });
+        bloco.append(titulo, panel);
+        container.appendChild(bloco);
+    }
 }
+
+async function carregarConteudoExclusivo(configuracao, treeData = null) {
+    const usuario = obterUsuarioAtual();
+    if (!usuario) {
+        estado.arquivos.exclusivo = { fotos: [], audios: [], videos: [] };
+        renderizarExclusivo();
+        return;
+    }
+
+    let resultado = null;
+    if (treeData && !treeData.truncated) {
+        resultado = await listarExclusivoViaTree(treeData, configuracao, usuario);
+    } else {
+        try {
+            resultado = await listarExclusivoViaContents(configuracao, usuario);
+        } catch (erro) {
+            console.warn("Conteúdo exclusivo indisponível:", erro);
+            resultado = { fotos: [], audios: [], videos: [] };
+        }
+    }
+
+    estado.arquivos.exclusivo = ordenarCatalogo(resultado);
+    renderizarExclusivo();
+}
+
+/* ============================================================
+   CATÁLOGO COMPLETO
+   ============================================================ */
+
+function atualizarBotaoMusica() {
+    const botao = document.getElementById("musicButton");
+    const audio = document.getElementById("temaMusical");
+    const iconePlay = document.getElementById("musicIconPlay");
+    const iconePause = document.getElementById("musicIconPause");
+    const rotulo = document.getElementById("musicLabel");
+
+    if (!botao || !audio || !iconePlay || !iconePause || !rotulo) return;
+
+    const tocando = !audio.paused && !audio.ended;
+    iconePlay.style.display = tocando ? "none" : "block";
+    iconePause.style.display = tocando ? "block" : "none";
+    rotulo.textContent = tocando ? "Pausar" : "Continuar";
+    botao.setAttribute("aria-label", tocando ? "Pausar música" : "Continuar música");
+    botao.setAttribute("title", tocando ? "Pausar música" : "Continuar música");
+    botao.classList.toggle("playing", tocando);
+}
+
+async function tocarMusica() {
+    const audio = document.getElementById("temaMusical");
+    if (!audio || !estado.musicaConfigurada || estado.musicaPausadaPeloUsuario) {
+        atualizarBotaoMusica();
+        return;
+    }
+
+    try {
+        await audio.play();
+    } catch (erro) {
+        console.info("A reprodução automática foi bloqueada pelo navegador.");
+    }
+
+    atualizarBotaoMusica();
+}
+
+function pausarMusica() {
+    const audio = document.getElementById("temaMusical");
+    if (!audio) return;
+    audio.pause();
+    estado.musicaPausadaPeloUsuario = true;
+    atualizarBotaoMusica();
+}
+
+async function alternarMusica() {
+    const audio = document.getElementById("temaMusical");
+    if (!audio || !estado.musicaConfigurada) return;
+
+    if (!audio.paused && !audio.ended) {
+        pausarMusica();
+        return;
+    }
+
+    estado.musicaPausadaPeloUsuario = false;
+
+    try {
+        await audio.play();
+    } catch (erro) {
+        console.info("Não foi possível iniciar a música.");
+    }
+
+    atualizarBotaoMusica();
+}
+
+function configurarMusica(configuracao) {
+    const audio = document.getElementById("temaMusical");
+    if (!audio) return;
+
+    audio.src = construirRawUrl(
+        `${configuracao.pastaMidia}/tema.mp3`,
+        configuracao
+    );
+    audio.loop = true;
+    audio.preload = "auto";
+
+    estado.musicaConfigurada = true;
+    estado.musicaPausadaPeloUsuario = false;
+
+    audio.addEventListener("play", atualizarBotaoMusica);
+    audio.addEventListener("pause", atualizarBotaoMusica);
+    audio.addEventListener("ended", atualizarBotaoMusica);
+
+    atualizarBotaoMusica();
+    tocarMusica();
+}
+
+function prepararInteracaoMusica() {
+    if (!estado.musicaConfigurada || estado.musicaPausadaPeloUsuario) return;
+
+    const audio = document.getElementById("temaMusical");
+    if (!audio || !audio.paused) return;
+
+    tocarMusica();
+}
+
+document.getElementById("musicButton").addEventListener("click", alternarMusica);
+document.addEventListener("pointerdown", prepararInteracaoMusica, { passive: true });
+document.addEventListener("keydown", prepararInteracaoMusica);
 
 async function carregarCatalogo() {
     const configuracao =
@@ -2300,37 +2452,53 @@ async function carregarCatalogo() {
     estado.configuracao =
         configuracao;
 
+    configurarMusica(configuracao);
+
     let catalogo =
         await listarCatalogoViaTree(
             configuracao
         );
 
     if (!catalogo) {
-        catalogo =
-            await listarMidiaPublicaViaContents(
+        /* A Git Trees API pode retornar truncated=true
+           em repositórios muito grandes. Nesse caso cada
+           diretório é consultado separadamente. */
+        const [
+            fotos,
+            audios,
+            videos
+        ] = await Promise.all([
+            listarPastaViaContents(
+                PASTAS.fotos,
                 configuracao
-            );
+            ),
+            listarPastaViaContents(
+                PASTAS.audios,
+                configuracao
+            ),
+            listarPastaViaContents(
+                PASTAS.videos,
+                configuracao
+            )
+        ]);
+
+        catalogo = {
+            fotos,
+            audios,
+            videos
+        };
     }
 
-    estado.arquivos =
-        catalogo;
+    estado.arquivos.fotos = catalogo.fotos || [];
+    estado.arquivos.audios = catalogo.audios || [];
+    estado.arquivos.videos = catalogo.videos || [];
 
-    const pastaExclusiva =
-        obterPastaExclusiva();
+    await carregarConteudoExclusivo(
+        configuracao,
+        estado._treeCompleta
+    );
 
-    if (
-        pastaExclusiva
-    ) {
-        estado.exclusivos =
-            await carregarConteudoExclusivo(
-                pastaExclusiva
-            );
-    } else {
-        estado.exclusivos =
-            criarCatalogoVazio();
-    }
-
-    shuffleArray(
+    embaralhar(
         estado.arquivos.fotos
     );
 
@@ -2342,27 +2510,33 @@ async function carregarCatalogo() {
         compararNomes
     );
 
-    shuffleArray(
-        estado.exclusivos.fotos
-    );
-
-    estado.exclusivos.audios.sort(
-        compararNomes
-    );
-
-    estado.exclusivos.videos.sort(
-        compararNomes
-    );
-
     atualizarResumo();
+
     renderizarFotos();
     renderizarAudios();
     renderizarVideos();
-    renderizarExclusivos();
 
-    estado.carregando =
-        false;
+    estado.carregando = false;
 }
+
+/* ============================================================
+   ORDENAÇÃO DOS MEDIA NÃO-FOTOGRÁFICOS
+   ============================================================ */
+
+function compararNomes(a,b) {
+    return String(a.nome).localeCompare(
+        String(b.nome),
+        "pt-BR",
+        {
+            numeric: true,
+            sensitivity: "base"
+        }
+    );
+}
+
+/* ============================================================
+   RESUMO
+   ============================================================ */
 
 function atualizarResumo() {
     const fotos =
@@ -2374,21 +2548,26 @@ function atualizarResumo() {
     const videos =
         estado.arquivos.videos.length;
 
-    const exclusivas =
-        estado.exclusivos.fotos.length +
-        estado.exclusivos.audios.length +
-        estado.exclusivos.videos.length;
-
     const total =
         fotos +
         audios +
-        videos +
-        exclusivas;
+        videos;
 
     document.getElementById(
         "contador"
     ).textContent =
         `${total} ${total === 1 ? "mídia" : "mídias"}`;
+
+    const exclusivo = estado.arquivos.exclusivo || { fotos: [], audios: [], videos: [] };
+    const totalExclusivo = exclusivo.fotos.length + exclusivo.audios.length + exclusivo.videos.length;
+
+    document.getElementById(
+        "collectionNote"
+    ).textContent =
+        `${fotos} ${fotos === 1 ? "foto" : "fotos"} · ` +
+        `${audios} ${audios === 1 ? "áudio" : "áudios"} · ` +
+        `${videos} ${videos === 1 ? "vídeo" : "vídeos"}` +
+        (totalExclusivo ? ` · ${totalExclusivo} exclusivo${totalExclusivo === 1 ? "" : "s"}` : "");
 
     document.getElementById(
         "fotoStatus"
@@ -2404,25 +2583,36 @@ function atualizarResumo() {
         "videoStatus"
     ).textContent =
         `${videos} ${videos === 1 ? "vídeo" : "vídeos"}`;
-
-    document.getElementById(
-        "exclusiveStatus"
-    ).textContent =
-        `${exclusivas} ${exclusivas === 1 ? "item" : "itens"}`;
 }
 
-function esconderCarregamento(
-    id
-) {
+/* ============================================================
+   ESTADOS DE CARREGAMENTO
+   ============================================================ */
+
+function esconderCarregamento(id) {
     const elemento =
-        document.getElementById(
-            id
-        );
+        document.getElementById(id);
 
     if (elemento) {
         elemento.remove();
     }
 }
+
+function marcarSecaoComoPronta(id) {
+    const secao =
+        document.getElementById(id);
+
+    if (secao) {
+        secao.setAttribute(
+            "aria-busy",
+            "false"
+        );
+    }
+}
+
+/* ============================================================
+   FOTOS
+   ============================================================ */
 
 function renderizarFotos() {
     const container =
@@ -2430,8 +2620,7 @@ function renderizarFotos() {
             "galeria"
         );
 
-    container.innerHTML =
-        "";
+    container.innerHTML = "";
 
     container.setAttribute(
         "aria-busy",
@@ -2449,21 +2638,18 @@ function renderizarFotos() {
 
     vazio.classList.toggle(
         "visible",
-        estado.arquivos.fotos.length ===
-            0
+        estado.arquivos.fotos.length === 0
     );
 
     estado.arquivos.fotos.forEach(
-        (
-            arquivo,
-            index
-        ) => {
-            container.appendChild(
+        (arquivo,index) => {
+            const card =
                 criarCartaoFoto(
                     arquivo,
                     index
-                )
-            );
+                );
+
+            container.appendChild(card);
         }
     );
 }
@@ -2480,8 +2666,7 @@ function criarCartaoFoto(
     card.className =
         "media-card";
 
-    card.tabIndex =
-        0;
+    card.tabIndex = 0;
 
     card.setAttribute(
         "role",
@@ -2497,10 +2682,7 @@ function criarCartaoFoto(
         String(index);
 
     card.style.animationDelay =
-        `${Math.min(
-            index * .012,
-            .35
-        )}s`;
+        `${Math.min(index * .012,.35)}s`;
 
     const shell =
         document.createElement(
@@ -2515,12 +2697,8 @@ function criarCartaoFoto(
             "img"
         );
 
-    imagem.loading =
-        "lazy";
-
-    imagem.decoding =
-        "async";
-
+    imagem.loading = "lazy";
+    imagem.decoding = "async";
     imagem.alt =
         `Foto: ${arquivo.nome}`;
 
@@ -2529,11 +2707,12 @@ function criarCartaoFoto(
 
     imagem.addEventListener(
         "error",
-        () =>
+        () => {
             mostrarFallbackImagem(
                 shell,
                 arquivo
-            ),
+            );
+        },
         {
             once: true
         }
@@ -2552,8 +2731,11 @@ function criarCartaoFoto(
             arquivo.nome
         );
 
-    shell.append(
-        imagem,
+    shell.appendChild(
+        imagem
+    );
+
+    shell.appendChild(
         overlay
     );
 
@@ -2562,12 +2744,11 @@ function criarCartaoFoto(
     );
 
     const abrir =
-        () =>
-            abrirLightbox(
-                arquivo,
-                card,
-                index
-            );
+        () => abrirLightbox(
+            arquivo,
+            card,
+            index
+        );
 
     card.addEventListener(
         "click",
@@ -2578,10 +2759,8 @@ function criarCartaoFoto(
         "keydown",
         event => {
             if (
-                event.key ===
-                    "Enter" ||
-                event.key ===
-                    " "
+                event.key === "Enter" ||
+                event.key === " "
             ) {
                 event.preventDefault();
                 abrir();
@@ -2597,8 +2776,7 @@ function mostrarFallbackImagem(
     arquivo
 ) {
     if (
-        shell.dataset.fallback ===
-        "true"
+        shell.dataset.fallback === "true"
     ) {
         return;
     }
@@ -2606,8 +2784,7 @@ function mostrarFallbackImagem(
     shell.dataset.fallback =
         "true";
 
-    shell.innerHTML =
-        "";
+    shell.innerHTML = "";
 
     const box =
         document.createElement(
@@ -2641,7 +2818,9 @@ function mostrarFallbackImagem(
         );
 
     detalhe.innerHTML =
-        "Este navegador não conseguiu exibir esta imagem diretamente.<br>Toque para abrir o arquivo original.";
+        "Este navegador não conseguiu exibir esta imagem diretamente." +
+        "<br>" +
+        "Toque para abrir o arquivo original.";
 
     texto.append(
         titulo,
@@ -2664,17 +2843,9 @@ function mostrarFallbackImagem(
         event => {
             event.stopPropagation();
 
-            const janela =
-                window.open(
-                    arquivo.url,
-                    "_blank",
-                    "noopener,noreferrer"
-                );
-
-            if (janela) {
-                janela.opener =
-                    null;
-            }
+            abrirArquivoOriginal(
+                arquivo
+            );
         },
         {
             once: true
@@ -2682,14 +2853,32 @@ function mostrarFallbackImagem(
     );
 }
 
+function abrirArquivoOriginal(
+    arquivo
+) {
+    const janela =
+        window.open(
+            arquivo.url,
+            "_blank",
+            "noopener,noreferrer"
+        );
+
+    if (janela) {
+        janela.opener = null;
+    }
+}
+
+/* ============================================================
+   ÁUDIOS
+   ============================================================ */
+
 function renderizarAudios() {
     const container =
         document.getElementById(
             "audios"
         );
 
-    container.innerHTML =
-        "";
+    container.innerHTML = "";
 
     esconderCarregamento(
         "audioLoading"
@@ -2702,13 +2891,11 @@ function renderizarAudios() {
 
     vazio.classList.toggle(
         "visible",
-        estado.arquivos.audios.length ===
-            0
+        estado.arquivos.audios.length === 0
     );
 
     if (
-        estado.arquivos.audios.length ===
-        0
+        estado.arquivos.audios.length === 0
     ) {
         return;
     }
@@ -2735,7 +2922,7 @@ function renderizarAudios() {
         );
 
     descricao.textContent =
-        "Áudios encontrados.";
+        "As gravações são encontradas automaticamente em midia/Áudios/. Elas não começam sozinhas.";
 
     panel.append(
         titulo,
@@ -2768,25 +2955,21 @@ function renderizarAudios() {
                     "audio"
                 );
 
-            player.controls =
-                true;
-
-            player.preload =
-                "none";
-
-            player.playsInline =
-                true;
+            player.controls = true;
+            player.preload = "none";
+            player.playsInline = true;
 
             player.src =
                 arquivo.url;
 
             player.addEventListener(
                 "error",
-                () =>
+                () => {
                     adicionarErroMedia(
                         item,
                         "Este navegador não conseguiu reproduzir este áudio."
-                    ),
+                    );
+                },
                 {
                     once: true
                 }
@@ -2808,14 +2991,17 @@ function renderizarAudios() {
     );
 }
 
+/* ============================================================
+   VÍDEOS
+   ============================================================ */
+
 function renderizarVideos() {
     const container =
         document.getElementById(
             "videos"
         );
 
-    container.innerHTML =
-        "";
+    container.innerHTML = "";
 
     esconderCarregamento(
         "videoLoading"
@@ -2828,13 +3014,11 @@ function renderizarVideos() {
 
     vazio.classList.toggle(
         "visible",
-        estado.arquivos.videos.length ===
-            0
+        estado.arquivos.videos.length === 0
     );
 
     if (
-        estado.arquivos.videos.length ===
-        0
+        estado.arquivos.videos.length === 0
     ) {
         return;
     }
@@ -2894,15 +3078,9 @@ function renderizarVideos() {
                     "video"
                 );
 
-            player.controls =
-                true;
-
-            player.preload =
-                "metadata";
-
-            player.playsInline =
-                true;
-
+            player.controls = true;
+            player.preload = "metadata";
+            player.playsInline = true;
             player.src =
                 arquivo.url;
 
@@ -2920,11 +3098,12 @@ function renderizarVideos() {
 
             player.addEventListener(
                 "error",
-                () =>
+                () => {
                     adicionarErroMedia(
                         item,
                         "Este navegador encontrou o arquivo, mas não consegue reproduzir esse formato diretamente."
-                    ),
+                    );
+                },
                 {
                     once: true
                 }
@@ -2946,249 +3125,9 @@ function renderizarVideos() {
     );
 }
 
-function renderizarExclusivos() {
-    const fotos =
-        estado.exclusivos.fotos;
-
-    const audios =
-        estado.exclusivos.audios;
-
-    const videos =
-        estado.exclusivos.videos;
-
-    const total =
-        fotos.length +
-        audios.length +
-        videos.length;
-
-    esconderCarregamento(
-        "exclusiveLoading"
-    );
-
-    const vazio =
-        document.getElementById(
-            "exclusiveEmpty"
-        );
-
-    vazio.classList.toggle(
-        "visible",
-        total === 0
-    );
-
-    const galeria =
-        document.getElementById(
-            "exclusiveFotos"
-        );
-
-    galeria.innerHTML =
-        "";
-
-    fotos.forEach(
-        (
-            arquivo,
-            index
-        ) => {
-            galeria.appendChild(
-                criarCartaoFoto(
-                    arquivo,
-                    index
-                )
-            );
-        }
-    );
-
-    const media =
-        document.getElementById(
-            "exclusiveMedia"
-        );
-
-    media.innerHTML =
-        "";
-
-    if (
-        audios.length > 0
-    ) {
-        const panel =
-            document.createElement(
-                "article"
-            );
-
-        panel.className =
-            "media-panel";
-
-        const titulo =
-            document.createElement(
-                "h3"
-            );
-
-        titulo.textContent =
-            "Áudios exclusivos";
-
-        const descricao =
-            document.createElement(
-                "p"
-            );
-
-        descricao.textContent =
-            "Gravações preparadas especialmente para você.";
-
-        panel.append(
-            titulo,
-            descricao
-        );
-
-        audios.forEach(
-            arquivo => {
-                const item =
-                    document.createElement(
-                        "div"
-                    );
-
-                item.className =
-                    "audio-item";
-
-                const nome =
-                    document.createElement(
-                        "span"
-                    );
-
-                nome.className =
-                    "media-name";
-
-                nome.textContent =
-                    arquivo.nome;
-
-                const player =
-                    document.createElement(
-                        "audio"
-                    );
-
-                player.controls =
-                    true;
-
-                player.preload =
-                    "none";
-
-                player.playsInline =
-                    true;
-
-                player.src =
-                    arquivo.url;
-
-                item.append(
-                    nome,
-                    player
-                );
-
-                panel.appendChild(
-                    item
-                );
-            }
-        );
-
-        media.appendChild(
-            panel
-        );
-    }
-
-    if (
-        videos.length > 0
-    ) {
-        const panel =
-            document.createElement(
-                "article"
-            );
-
-        panel.className =
-            "media-panel";
-
-        const titulo =
-            document.createElement(
-                "h3"
-            );
-
-        titulo.textContent =
-            "Vídeos exclusivos";
-
-        const descricao =
-            document.createElement(
-                "p"
-            );
-
-        descricao.textContent =
-            "Vídeos disponíveis somente nesta área.";
-
-        panel.append(
-            titulo,
-            descricao
-        );
-
-        videos.forEach(
-            arquivo => {
-                const item =
-                    document.createElement(
-                        "div"
-                    );
-
-                item.className =
-                    "video-item";
-
-                const nome =
-                    document.createElement(
-                        "span"
-                    );
-
-                nome.className =
-                    "media-name";
-
-                nome.textContent =
-                    arquivo.nome;
-
-                const player =
-                    document.createElement(
-                        "video"
-                    );
-
-                player.controls =
-                    true;
-
-                player.preload =
-                    "metadata";
-
-                player.playsInline =
-                    true;
-
-                player.src =
-                    arquivo.url;
-
-                const tipo =
-                    tipoMimePorArquivo(
-                        arquivo
-                    );
-
-                if (tipo) {
-                    player.setAttribute(
-                        "type",
-                        tipo
-                    );
-                }
-
-                item.append(
-                    nome,
-                    player
-                );
-
-                panel.appendChild(
-                    item
-                );
-            }
-        );
-
-        media.appendChild(
-            panel
-        );
-    }
-}
+/* ============================================================
+   ERRO DE PLAYER
+   ============================================================ */
 
 function adicionarErroMedia(
     container,
@@ -3218,6 +3157,10 @@ function adicionarErroMedia(
     );
 }
 
+/* ============================================================
+   LIGHTBOX
+   ============================================================ */
+
 function abrirLightbox(
     arquivo,
     elementoOrigem,
@@ -3243,9 +3186,7 @@ function abrirLightbox(
         document.activeElement;
 
     estado.indiceFotoAtual =
-        Number.isInteger(
-            indice
-        )
+        Number.isInteger(indice)
             ? indice
             : -1;
 
@@ -3267,7 +3208,7 @@ function abrirLightbox(
         renderizarFallbackLightbox(
             arquivo,
             "Formato HEIC/HEIF",
-            "O arquivo foi encontrado, mas este navegador não consegue decodificar HEIC/HEIF diretamente."
+            "O arquivo foi encontrado corretamente, mas muitos navegadores não conseguem decodificar HEIC/HEIF diretamente. O arquivo original continua disponível abaixo."
         );
     } else {
         const imagem =
@@ -3286,12 +3227,13 @@ function abrirLightbox(
 
         imagem.addEventListener(
             "error",
-            () =>
+            () => {
                 renderizarFallbackLightbox(
                     arquivo,
                     "Não foi possível visualizar esta imagem",
                     "O arquivo existe no repositório, mas este navegador não conseguiu decodificá-lo."
-                ),
+                );
+            },
             {
                 once: true
             }
@@ -3324,8 +3266,7 @@ function abrirLightbox(
         history.pushState(
             {
                 ...(history.state || {}),
-                nossosMomentosLightbox:
-                    true
+                nossosMomentosLightbox: true
             },
             ""
         );
@@ -3338,12 +3279,13 @@ function abrirLightbox(
     }
 
     requestAnimationFrame(
-        () =>
+        () => {
             document
                 .getElementById(
                     "lightboxClose"
                 )
-                ?.focus()
+                ?.focus();
+        }
     );
 }
 
@@ -3449,13 +3391,11 @@ function fecharLightbox(
 
     document.getElementById(
         "lightboxContent"
-    ).innerHTML =
-        "";
+    ).innerHTML = "";
 
     document.getElementById(
         "lightboxCaption"
-    ).textContent =
-        "";
+    ).textContent = "";
 
     estado.indiceFotoAtual =
         -1;
@@ -3475,7 +3415,6 @@ function fecharLightbox(
             false;
 
         history.back();
-
         return;
     }
 
@@ -3484,51 +3423,49 @@ function fecharLightbox(
 
     if (
         foco &&
-        typeof foco.focus ===
-            "function"
+        typeof foco.focus === "function"
     ) {
         requestAnimationFrame(
-            () =>
-                foco.focus()
+            () => foco.focus()
         );
     }
 }
 
-const lightboxEl =
+/* ============================================================
+   EVENTOS DO LIGHTBOX
+   ============================================================ */
+
+const lightbox =
     document.getElementById(
         "lightbox"
     );
 
-lightboxEl.addEventListener(
+lightbox.addEventListener(
     "click",
     event => {
         if (
-            event.target ===
-            lightboxEl
+            event.target === lightbox
         ) {
             fecharLightbox();
         }
     }
 );
 
-document
-    .getElementById(
-        "lightboxClose"
-    )
-    .addEventListener(
-        "click",
-        event => {
-            event.stopPropagation();
-            fecharLightbox();
-        }
-    );
+document.getElementById(
+    "lightboxClose"
+).addEventListener(
+    "click",
+    event => {
+        event.stopPropagation();
+        fecharLightbox();
+    }
+);
 
 document.addEventListener(
     "keydown",
     event => {
         if (
-            event.key ===
-                "Escape" &&
+            event.key === "Escape" &&
             estado.lightboxAberto
         ) {
             event.preventDefault();
@@ -3543,189 +3480,287 @@ window.addEventListener(
         if (
             estado.lightboxAberto
         ) {
-            fecharLightbox(
-                true
-            );
+            fecharLightbox(true);
         }
     }
 );
 
-function trocarSecao(
-    nome
-) {
-    document
-        .querySelectorAll(
-            ".media-tab"
-        )
-        .forEach(
-            botao => {
-                const ativo =
-                    botao.dataset.section ===
-                    nome;
+/* ============================================================
+   ABAS DE MÍDIA
+   ============================================================ */
 
-                botao.classList.toggle(
-                    "active",
-                    ativo
-                );
+function trocarSecao(nome) {
+    document.querySelectorAll(
+        ".media-tab"
+    ).forEach(
+        botao => {
+            const ativo =
+                botao.dataset.section ===
+                nome;
 
-                botao.setAttribute(
-                    "aria-selected",
-                    String(ativo)
-                );
-            }
-        );
+            botao.classList.toggle(
+                "active",
+                ativo
+            );
 
-    document
-        .querySelectorAll(
-            ".section"
-        )
-        .forEach(
-            secao => {
-                const ativo =
-                    secao.id ===
-                    `section-${nome}`;
+            botao.setAttribute(
+                "aria-selected",
+                String(ativo)
+            );
+        }
+    );
 
-                secao.classList.toggle(
-                    "active",
-                    ativo
-                );
+    document.querySelectorAll(
+        ".section"
+    ).forEach(
+        secao => {
+            const ativo =
+                secao.id ===
+                `section-${nome}`;
 
-                secao.hidden =
-                    !ativo;
-            }
-        );
+            secao.classList.toggle(
+                "active",
+                ativo
+            );
+
+            secao.hidden =
+                !ativo;
+        }
+    );
 }
 
-document
-    .querySelectorAll(
-        ".media-tab"
-    )
-    .forEach(
-        botao => {
-            botao.addEventListener(
-                "click",
-                () =>
-                    trocarSecao(
-                        botao.dataset.section
-                    )
+document.querySelectorAll(
+    ".media-tab"
+).forEach(
+    botao => {
+        botao.addEventListener(
+            "click",
+            () => {
+                trocarSecao(
+                    botao.dataset.section
+                );
+            }
+        );
+    }
+);
+
+/* ============================================================
+   TECLADO DAS ABAS
+   ============================================================ */
+
+document.getElementById(
+    "mediaTabs"
+).addEventListener(
+    "keydown",
+    event => {
+        const botoes =
+            Array.from(
+                document.querySelectorAll(
+                    ".media-tab"
+                )
             );
+
+        const indice =
+            botoes.indexOf(
+                event.target
+            );
+
+        if (indice === -1) {
+            return;
         }
-    );
 
-document
-    .getElementById(
-        "mediaTabs"
-    )
-    .addEventListener(
-        "keydown",
-        event => {
-            const botoes =
-                Array.from(
-                    document.querySelectorAll(
-                        ".media-tab"
-                    )
-                );
+        let novoIndice =
+            indice;
 
-            const indice =
-                botoes.indexOf(
-                    event.target
-                );
+        if (
+            event.key === "ArrowRight"
+        ) {
+            novoIndice =
+                (indice + 1) %
+                botoes.length;
+        } else if (
+            event.key === "ArrowLeft"
+        ) {
+            novoIndice =
+                (indice - 1 +
+                    botoes.length) %
+                botoes.length;
+        } else if (
+            event.key === "Home"
+        ) {
+            novoIndice = 0;
+        } else if (
+            event.key === "End"
+        ) {
+            novoIndice =
+                botoes.length - 1;
+        } else {
+            return;
+        }
 
-            if (
-                indice === -1
-            ) {
-                return;
-            }
+        event.preventDefault();
 
-            let novoIndice =
-                indice;
+        botoes[
+            novoIndice
+        ].focus();
 
-            if (
-                event.key ===
-                "ArrowRight"
-            ) {
-                novoIndice =
-                    (indice + 1) %
-                    botoes.length;
-            } else if (
-                event.key ===
-                "ArrowLeft"
-            ) {
-                novoIndice =
-                    (
-                        indice -
-                        1 +
-                        botoes.length
-                    ) %
-                    botoes.length;
-            } else if (
-                event.key ===
-                "Home"
-            ) {
-                novoIndice = 0;
-            } else if (
-                event.key ===
-                "End"
-            ) {
-                novoIndice =
-                    botoes.length - 1;
-            } else {
-                return;
-            }
-
-            event.preventDefault();
-
+        trocarSecao(
             botoes[
                 novoIndice
-            ].focus();
+            ].dataset.section
+        );
+    }
+);
 
-            trocarSecao(
-                botoes[
-                    novoIndice
-                ].dataset.section
-            );
-        }
-    );
+/* ============================================================
+   NAVEGAÇÃO PARA HOME.HTML
+   ============================================================ */
 
 function voltarHome() {
     window.location.href =
         "home.html";
 }
 
-document
-    .getElementById(
-        "btnVoltar"
-    )
-    .addEventListener(
-        "click",
-        voltarHome
+document.getElementById(
+    "btnVoltar"
+).addEventListener(
+    "click",
+    voltarHome
+);
+
+document.getElementById(
+    "btnVoltarInferior"
+).addEventListener(
+    "click",
+    voltarHome
+);
+
+/* ============================================================
+   ERRO GLOBAL
+   ============================================================ */
+
+function mostrarErroGlobal(
+    erro
+) {
+    const box =
+        document.getElementById(
+            "globalError"
+        );
+
+    const detectado =
+        detectarRepositorioAutomaticamente();
+
+    const owner =
+        detectado.owner ||
+        "(vazio)";
+
+    const repo =
+        detectado.repo ||
+        "(vazio)";
+
+    const branch =
+        detectado.branch ||
+        "(será descoberto)";
+
+    box.innerHTML =
+        "";
+
+    const estadoErro =
+        document.createElement(
+            "div"
+        );
+
+    estadoErro.className =
+        "error-state";
+
+    const titulo =
+        document.createElement(
+            "strong"
+        );
+
+    titulo.textContent =
+        "Não consegui consultar as mídias do GitHub.";
+
+    const detalhe =
+        document.createElement(
+            "div"
+        );
+
+    detalhe.textContent =
+        erro?.message ||
+        "Ocorreu um erro inesperado.";
+
+    const orientacao =
+        document.createElement(
+            "div"
+        );
+
+    orientacao.style.marginTop =
+        "9px";
+
+    orientacao.textContent =
+        "Confira se o repositório é público, se as três pastas existem exatamente com os nomes midia/Fotos/, midia/Áudios/ e midia/Vídeos/, e se owner/repo estão corretos quando a página estiver em domínio personalizado.";
+
+    const configuracao =
+        document.createElement(
+            "div"
+        );
+
+    configuracao.style.marginTop =
+        "9px";
+
+    configuracao.innerHTML =
+        "<small>Configuração detectada: " +
+        "<code>" +
+        escaparHTML(
+            `${owner}/${repo} · ${branch}`
+        ) +
+        "</code></small>";
+
+    estadoErro.append(
+        titulo,
+        document.createElement(
+            "br"
+        ),
+        detalhe,
+        orientacao,
+        configuracao
     );
 
-function prepararUsuario() {
-    estado.usuario =
-        obterUsuarioAtual();
+    box.appendChild(
+        estadoErro
+    );
 
     document.getElementById(
-        "exclusiveUser"
+        "collectionNote"
     ).textContent =
-        estado.usuario ||
-        "você";
+        "Não foi possível carregar o catálogo de mídias.";
 }
 
+/* ============================================================
+   FALLBACK DE FALHA INDIVIDUAL
+   ============================================================ */
+
+window.addEventListener(
+    "unhandledrejection",
+    event => {
+        console.error(
+            "Promise rejeitada:",
+            event.reason
+        );
+    }
+);
+
+/* ============================================================
+   INICIALIZAÇÃO
+   ============================================================ */
+
 async function iniciar() {
-    prepararUsuario();
-
-    atualizarBotaoMusica(
-        false
-    );
-
-    iniciarMusica();
-
     try {
         await carregarCatalogo();
     } catch (erro) {
         console.error(
-            "Falha ao carregar galeria:",
+            "Falha ao iniciar Nossos Momentos:",
             erro
         );
 
@@ -3747,11 +3782,58 @@ async function iniciar() {
         esconderCarregamento(
             "exclusiveLoading"
         );
+
+        const exclusiveEmpty = document.getElementById("exclusiveEmpty");
+        if (exclusiveEmpty) {
+            exclusiveEmpty.hidden = false;
+            exclusiveEmpty.innerHTML =
+                "<strong>Não foi possível carregar o conteúdo exclusivo</strong>" +
+                "A consulta ao repositório não foi concluída.";
+        }
+
+        document.getElementById(
+            "fotoEmpty"
+        ).classList.add(
+            "visible"
+        );
+
+        document.getElementById(
+            "fotoEmpty"
+        ).innerHTML =
+            "<strong>Não foi possível carregar a galeria</strong>" +
+            "Confira a configuração do repositório e tente novamente.";
+
+        document.getElementById(
+            "audioEmpty"
+        ).classList.add(
+            "visible"
+        );
+
+        document.getElementById(
+            "audioEmpty"
+        ).innerHTML =
+            "<strong>Não foi possível carregar os áudios</strong>" +
+            "A consulta ao repositório não foi concluída.";
+
+        document.getElementById(
+            "videoEmpty"
+        ).classList.add(
+            "visible"
+        );
+
+        document.getElementById(
+            "videoEmpty"
+        ).innerHTML =
+            "<strong>Não foi possível carregar os vídeos</strong>" +
+            "A consulta ao repositório não foi concluída.";
+
+        mostrarErroGlobal(
+            erro
+        );
     }
 }
 
 iniciar();
 </script>
-
 </body>
     </html>
