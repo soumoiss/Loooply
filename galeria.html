@@ -852,10 +852,18 @@ const MIME_POR_EXTENSAO = {
     ogv:"video/ogg", avi:"video/x-msvideo", mkv:"video/x-matroska"
 };
 
+const REPOSITORIO = {
+    owner: "",
+    repo: "",
+    branch: "",
+    pastaMidia: "midia"
+};
+
 const estado = {
     arquivos: { fotos: [], audios: [], videos: [] },
     exclusivo: [],
     usuario: "",
+    configuracao: null,
     lightboxAberto: false,
     lightboxUsouHistorico: false,
     ultimaFocada: null,
@@ -868,7 +876,8 @@ const textoMusica = document.getElementById("textoMusica");
 const iconeMusica = document.getElementById("iconeMusica");
 
 function obterUsuario() {
-    return String(localStorage.getItem("username") || "").trim().toLowerCase();
+    const bruto = String(localStorage.getItem("username") || "").trim().toLowerCase();
+    return ["misol", "patati"].includes(bruto) ? bruto : "";
 }
 
 function obterExtensao(nome) {
@@ -909,61 +918,302 @@ function compararNomes(a, b) {
     });
 }
 
-async function carregarCatalogo() {
-    try {
-        const resposta = await fetch('./midias.json', { cache: 'no-cache' });
-        if (!resposta.ok) throw new Error("JSON não encontrado");
-        
-        const dados = await resposta.json();
-        const catalogo = { fotos: [], audios: [], videos: [] };
-        const exclusivo = [];
+function detectarRepositorioAutomaticamente() {
+    const host = window.location.hostname;
+    const caminho = window.location.pathname.split("/").filter(Boolean);
+    const configuracao = { ...REPOSITORIO };
+    const ehGithubPages = host.endsWith(".github.io");
 
-        for (const [categoria, lista] of Object.entries(dados)) {
-            if (!Array.isArray(lista)) continue;
+    if (!configuracao.owner && ehGithubPages) {
+        configuracao.owner = host.split(".")[0];
+    }
 
-            lista.forEach(itemRelativo => {
-                const nome = itemRelativo.split('/').pop();
-                const tipo = classificarArquivo(nome);
-                
-                if (!tipo) return;
+    if (!configuracao.repo && ehGithubPages && caminho.length > 0 && !caminho[0].includes(".")) {
+        configuracao.repo = caminho[0];
+    }
 
-                const objetoMedia = {
-                    nome: nome,
-                    caminho: `midia/${itemRelativo}`,
-                    url: `midia/${itemRelativo}`,
-                    mime: MIME_POR_EXTENSAO[obterExtensao(nome)] || "",
-                    tipo: tipo
-                };
+    if (!configuracao.repo && ehGithubPages && configuracao.owner) {
+        configuracao.repo = `${configuracao.owner}.github.io`;
+    }
 
-                const partes = itemRelativo.toLowerCase().split('/');
-                if (estado.usuario && partes.includes(estado.usuario)) {
-                    exclusivo.push(objetoMedia);
-                } else if (partes.length === 1 || partes[0] === categoria) {
-                    catalogo[tipo].push(objetoMedia);
-                }
-            });
+    return configuracao;
+}
+
+function validarRepositorio(configuracao) {
+    if (!configuracao.owner || !configuracao.repo) {
+        throw new Error("Não foi possível identificar o repositório do GitHub.");
+    }
+}
+
+function construirRawUrl(caminho, configuracao) {
+    const partes = String(caminho).split("/").map(encodeURIComponent);
+    const branch = configuracao.branch || "main";
+
+    return `https://raw.githubusercontent.com/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/${encodeURIComponent(branch)}/${partes.join("/")}`;
+}
+
+async function githubFetch(url) {
+    const resposta = await fetch(url, {
+        cache: "no-store",
+        headers: {
+            Accept: "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2026-03-10"
+        }
+    });
+
+    if (!resposta.ok) {
+        throw new Error(`GitHub API ${resposta.status}`);
+    }
+
+    return resposta.json();
+}
+
+async function obterConfiguracaoEfetiva() {
+    const configuracao = detectarRepositorioAutomaticamente();
+
+    validarRepositorio(configuracao);
+
+    if (!configuracao.branch) {
+        const url = `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}`;
+        const dados = await githubFetch(url);
+        configuracao.branch = dados.default_branch || "main";
+    }
+
+    return configuracao;
+}
+
+function criarObjetoMedia(item, configuracao) {
+    const nome = String(item.path || "").split("/").pop();
+    const tipo = classificarArquivo(nome);
+
+    if (!tipo) return null;
+
+    return {
+        nome,
+        caminho: item.path,
+        url: construirRawUrl(item.path, configuracao),
+        apiUrl: item.url || "",
+        sha: item.sha || "",
+        tamanho: Number(item.size || 0),
+        mime: item.mime_type || MIME_POR_EXTENSAO[obterExtensao(nome)] || "",
+        tipo
+    };
+}
+
+async function listarCatalogoViaTree(configuracao, usuario) {
+    const url = `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/git/trees/${encodeURIComponent(configuracao.branch)}?recursive=1`;
+    const dados = await githubFetch(url);
+
+    if (!dados || !Array.isArray(dados.tree)) {
+        throw new Error("A API do GitHub não retornou a árvore do repositório.");
+    }
+
+    if (dados.truncated) return null;
+
+    const prefixo = `${configuracao.pastaMidia}/`;
+    const pastaExclusiva = usuario ? `${prefixo}${usuario}/` : "";
+
+    const resultado = {
+        compartilhado: {
+            fotos: [],
+            audios: [],
+            videos: []
+        },
+        exclusivo: []
+    };
+
+    for (const item of dados.tree) {
+        if (!item || item.type !== "blob" || !item.path || !item.path.startsWith(prefixo)) {
+            continue;
         }
 
-        estado.arquivos = catalogo;
-        estado.exclusivo = exclusivo;
+        const relativo = item.path.slice(prefixo.length);
+        const caminhoMinusculo = item.path.toLowerCase();
+        const tema = `${prefixo}tema.mp3`.toLowerCase();
 
-        shuffleArray(estado.arquivos.fotos);
-        estado.arquivos.audios.sort(compararNomes);
-        estado.arquivos.videos.sort(compararNomes);
-        estado.exclusivo.sort(compararNomes);
+        if (!relativo.includes("/")) {
+            if (caminhoMinusculo === tema) {
+                continue;
+            }
 
-    } catch (erro) {
-        console.warn("Falha ao carregar midias.json:", erro);
-        estado.arquivos = { fotos: [], audios: [], videos: [] };
-        estado.exclusivo = [];
+            const arquivo = criarObjetoMedia(item, configuracao);
+
+            if (arquivo) {
+                resultado.compartilhado[arquivo.tipo].push(arquivo);
+            }
+
+            continue;
+        }
+
+        if (
+            usuario &&
+            item.path.toLowerCase().startsWith(pastaExclusiva.toLowerCase())
+        ) {
+            const arquivo = criarObjetoMedia(item, configuracao);
+
+            if (arquivo) {
+                resultado.exclusivo.push(arquivo);
+            }
+        }
     }
+
+    return resultado;
+}
+
+async function listarPastaDireta(caminho, configuracao) {
+    const url = `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/contents/${caminho.split("/").map(encodeURIComponent).join("/")}?ref=${encodeURIComponent(configuracao.branch)}`;
+    const dados = await githubFetch(url);
+
+    const resultado = {
+        fotos: [],
+        audios: [],
+        videos: []
+    };
+
+    const tema = `${configuracao.pastaMidia}/tema.mp3`.toLowerCase();
+
+    if (!Array.isArray(dados)) {
+        return resultado;
+    }
+
+    for (const item of dados) {
+        if (!item || item.type !== "file" || !item.path) {
+            continue;
+        }
+
+        if (item.path.toLowerCase() === tema) {
+            continue;
+        }
+
+        const tipo = classificarArquivo(item.name, item.mime_type || "");
+
+        if (!tipo) {
+            continue;
+        }
+
+        resultado[tipo].push({
+            nome: item.name,
+            caminho: item.path,
+            url: item.download_url || construirRawUrl(item.path, configuracao),
+            apiUrl: item.url || "",
+            sha: item.sha || "",
+            tamanho: Number(item.size || 0),
+            mime: item.mime_type || MIME_POR_EXTENSAO[obterExtensao(item.name)] || "",
+            tipo
+        });
+    }
+
+    return resultado;
+}
+
+async function listarPastaRecursiva(caminho, configuracao) {
+    const url = `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/contents/${caminho.split("/").map(encodeURIComponent).join("/")}?ref=${encodeURIComponent(configuracao.branch)}`;
+    const dados = await githubFetch(url);
+
+    let resultados = [];
+
+    if (!Array.isArray(dados)) {
+        return resultados;
+    }
+
+    for (const item of dados) {
+        if (!item) {
+            continue;
+        }
+
+        if (item.type === "dir") {
+            const subResultados = await listarPastaRecursiva(item.path, configuracao);
+            resultados = resultados.concat(subResultados);
+            continue;
+        }
+
+        if (item.type !== "file" || !item.path) {
+            continue;
+        }
+
+        const tipo = classificarArquivo(item.name, item.mime_type || "");
+
+        if (!tipo) {
+            continue;
+        }
+
+        resultados.push({
+            nome: item.name,
+            caminho: item.path,
+            url: item.download_url || construirRawUrl(item.path, configuracao),
+            apiUrl: item.url || "",
+            sha: item.sha || "",
+            tamanho: Number(item.size || 0),
+            mime: item.mime_type || MIME_POR_EXTENSAO[obterExtensao(item.name)] || "",
+            tipo
+        });
+    }
+
+    return resultados;
+}
+
+async function carregarCatalogo() {
+    let catalogo = {
+        fotos: [],
+        audios: [],
+        videos: []
+    };
+
+    let exclusivo = [];
+
+    try {
+        const configuracao = await obterConfiguracaoEfetiva();
+
+        estado.configuracao = configuracao;
+
+        const resultadoTree = await listarCatalogoViaTree(
+            configuracao,
+            estado.usuario
+        );
+
+        if (resultadoTree) {
+            catalogo = resultadoTree.compartilhado;
+            exclusivo = resultadoTree.exclusivo;
+        } else {
+            catalogo = await listarPastaDireta(
+                configuracao.pastaMidia,
+                configuracao
+            );
+
+            if (estado.usuario) {
+                try {
+                    exclusivo = await listarPastaRecursiva(
+                        `${configuracao.pastaMidia}/${estado.usuario}`,
+                        configuracao
+                    );
+                } catch (_) {
+                    exclusivo = [];
+                }
+            }
+        }
+    } catch (erro) {
+        console.warn("Falha ao carregar a galeria pelo GitHub:", erro);
+    }
+
+    estado.arquivos = catalogo;
+    estado.exclusivo = exclusivo;
+
+    shuffleArray(estado.arquivos.fotos);
+    estado.arquivos.audios.sort(compararNomes);
+    estado.arquivos.videos.sort(compararNomes);
+    estado.exclusivo.sort(compararNomes);
 
     atualizarResumo();
     renderizarFotos();
     renderizarAudios();
     renderizarVideos();
     renderizarExclusivo();
-    configurarMusica();
+
+    if (estado.configuracao) {
+        configurarMusica(estado.configuracao);
+    } else {
+        atualizarBotaoMusica(false);
+    }
 }
 
 function atualizarResumo() {
@@ -976,24 +1226,16 @@ function atualizarResumo() {
         `${total} ${total === 1 ? "mídia" : "mídias"}`;
 
     document.getElementById("fotoStatus").textContent =
-        `${estado.arquivos.fotos.length} ${
-            estado.arquivos.fotos.length === 1 ? "foto" : "fotos"
-        }`;
+        `${estado.arquivos.fotos.length} ${estado.arquivos.fotos.length === 1 ? "foto" : "fotos"}`;
 
     document.getElementById("audioStatus").textContent =
-        `${estado.arquivos.audios.length} ${
-            estado.arquivos.audios.length === 1 ? "áudio" : "áudios"
-        }`;
+        `${estado.arquivos.audios.length} ${estado.arquivos.audios.length === 1 ? "áudio" : "áudios"}`;
 
     document.getElementById("videoStatus").textContent =
-        `${estado.arquivos.videos.length} ${
-            estado.arquivos.videos.length === 1 ? "vídeo" : "vídeos"
-        }`;
+        `${estado.arquivos.videos.length} ${estado.arquivos.videos.length === 1 ? "vídeo" : "vídeos"}`;
 
     document.getElementById("exclusiveStatus").textContent =
-        `${estado.exclusivo.length} ${
-            estado.exclusivo.length === 1 ? "arquivo" : "arquivos"
-        }`;
+        `${estado.exclusivo.length} ${estado.exclusivo.length === 1 ? "arquivo" : "arquivos"}`;
 }
 
 function removerLoading(id) {
@@ -1004,15 +1246,21 @@ function renderizarFotos() {
     const container = document.getElementById("galeria");
 
     container.innerHTML = "";
+
     removerLoading("fotoLoading");
 
-    document
-        .getElementById("fotoEmpty")
-        .classList.toggle("visible", estado.arquivos.fotos.length === 0);
+    document.getElementById("fotoEmpty").classList.toggle(
+        "visible",
+        estado.arquivos.fotos.length === 0
+    );
 
     estado.arquivos.fotos.forEach((arquivo, index) => {
         container.appendChild(
-            criarCartaoFoto(arquivo, estado.arquivos.fotos, index)
+            criarCartaoFoto(
+                arquivo,
+                estado.arquivos.fotos,
+                index
+            )
         );
     });
 }
@@ -1044,7 +1292,12 @@ function criarCartaoFoto(arquivo, lista, index) {
     card.appendChild(shell);
 
     const abrir = () => {
-        abrirLightbox(arquivo, lista, index, card);
+        abrirLightbox(
+            arquivo,
+            lista,
+            index,
+            card
+        );
     };
 
     card.addEventListener("click", abrir);
@@ -1063,13 +1316,17 @@ function renderizarAudios() {
     const container = document.getElementById("audios");
 
     container.innerHTML = "";
+
     removerLoading("audioLoading");
 
-    document
-        .getElementById("audioEmpty")
-        .classList.toggle("visible", estado.arquivos.audios.length === 0);
+    document.getElementById("audioEmpty").classList.toggle(
+        "visible",
+        estado.arquivos.audios.length === 0
+    );
 
-    if (!estado.arquivos.audios.length) return;
+    if (!estado.arquivos.audios.length) {
+        return;
+    }
 
     const panel = document.createElement("article");
     panel.className = "media-panel";
@@ -1088,6 +1345,7 @@ function renderizarAudios() {
         nome.textContent = arquivo.nome;
 
         const player = document.createElement("audio");
+
         player.controls = true;
         player.preload = "none";
         player.playsInline = true;
@@ -1104,13 +1362,17 @@ function renderizarVideos() {
     const container = document.getElementById("videos");
 
     container.innerHTML = "";
+
     removerLoading("videoLoading");
 
-    document
-        .getElementById("videoEmpty")
-        .classList.toggle("visible", estado.arquivos.videos.length === 0);
+    document.getElementById("videoEmpty").classList.toggle(
+        "visible",
+        estado.arquivos.videos.length === 0
+    );
 
-    if (!estado.arquivos.videos.length) return;
+    if (!estado.arquivos.videos.length) {
+        return;
+    }
 
     const panel = document.createElement("article");
     panel.className = "media-panel";
@@ -1136,6 +1398,7 @@ function renderizarVideos() {
         player.src = arquivo.url;
 
         const mime = tipoMimePorArquivo(arquivo);
+
         if (mime) {
             player.setAttribute("type", mime);
         }
@@ -1151,17 +1414,21 @@ function renderizarExclusivo() {
     const container = document.getElementById("exclusivo");
 
     container.innerHTML = "";
+
     removerLoading("exclusiveLoading");
 
-    document
-        .getElementById("exclusiveEmpty")
-        .classList.toggle("visible", estado.exclusivo.length === 0);
+    document.getElementById("exclusiveEmpty").classList.toggle(
+        "visible",
+        estado.exclusivo.length === 0
+    );
 
     estado.exclusivo.forEach(arquivo => {
         const item = document.createElement("article");
+
         item.className = "exclusive-item";
 
         const nome = document.createElement("span");
+
         nome.className = "media-name";
         nome.textContent = arquivo.nome;
 
@@ -1169,29 +1436,35 @@ function renderizarExclusivo() {
 
         if (arquivo.tipo === "fotos") {
             const imagem = document.createElement("img");
+
             imagem.loading = "lazy";
             imagem.decoding = "async";
             imagem.src = arquivo.url;
             imagem.alt = arquivo.nome;
+
             item.appendChild(imagem);
         }
 
         if (arquivo.tipo === "audios") {
             const audio = document.createElement("audio");
+
             audio.controls = true;
             audio.preload = "none";
             audio.src = arquivo.url;
+
             item.appendChild(audio);
         }
 
         if (arquivo.tipo === "videos") {
             const video = document.createElement("video");
+
             video.controls = true;
             video.preload = "metadata";
             video.playsInline = true;
             video.src = arquivo.url;
 
             const mime = tipoMimePorArquivo(arquivo);
+
             if (mime) {
                 video.setAttribute("type", mime);
             }
@@ -1204,8 +1477,9 @@ function renderizarExclusivo() {
 }
 
 function atualizarBotaoMusica(tocando) {
+    textoMusica.textContent = "Música";
+
     if (tocando) {
-        textoMusica.textContent = "Música";
         btnMusica.title = "Pausar música";
         btnMusica.setAttribute("aria-label", "Pausar música");
 
@@ -1214,7 +1488,6 @@ function atualizarBotaoMusica(tocando) {
             <rect x="14" y="5" width="4" height="14" rx="1"></rect>
         `;
     } else {
-        textoMusica.textContent = "Música";
         btnMusica.title = "Continuar música";
         btnMusica.setAttribute("aria-label", "Continuar música");
 
@@ -1224,55 +1497,132 @@ function atualizarBotaoMusica(tocando) {
     }
 }
 
-function configurarMusica() {
-    audioTema.src = "midia/tema.mp3";
+function configurarMusica(configuracao) {
+    audioTema.src = construirRawUrl(
+        `${configuracao.pastaMidia}/tema.mp3`,
+        configuracao
+    );
+
     audioTema.loop = true;
     audioTema.currentTime = 0;
+    audioTema.load();
+
     estado.musicaPausadaManualmente = false;
 
-    audioTema.play()
-        .then(() => atualizarBotaoMusica(true))
-        .catch(() => atualizarBotaoMusica(false));
+    tentarAutoplay();
 }
 
-async function alternarMusica() {
-    if (audioTema.paused) {
-        try {
-            estado.musicaPausadaManualmente = false;
-            await audioTema.play();
-            atualizarBotaoMusica(true);
-        } catch (_) {
-            atualizarBotaoMusica(false);
-        }
-    } else {
-        estado.musicaPausadaManualmente = true;
-        audioTema.pause();
+async function tentarAutoplay() {
+    if (
+        !audioTema.src ||
+        (audioTema.paused && estado.musicaPausadaManualmente)
+    ) {
+        return;
+    }
+
+    try {
+        await audioTema.play();
+
+        atualizarBotaoMusica(true);
+        removerListenersDeAutoplay();
+    } catch (_) {
         atualizarBotaoMusica(false);
     }
 }
 
-btnMusica.addEventListener("click", alternarMusica);
+function removerListenersDeAutoplay() {
+    document.removeEventListener(
+        "pointerdown",
+        lidarInteracaoAutoplay
+    );
 
-function tentarAutoplay() {
-    if (audioTema.src && audioTema.paused && !estado.musicaPausadaManualmente) {
-        audioTema.play()
-            .then(() => atualizarBotaoMusica(true))
-            .catch(() => {});
-    }
+    document.removeEventListener(
+        "touchstart",
+        lidarInteracaoAutoplay
+    );
+
+    document.removeEventListener(
+        "keydown",
+        lidarInteracaoAutoplay
+    );
 }
 
-document.addEventListener("pointerdown", tentarAutoplay, { once: true });
-document.addEventListener("touchstart", tentarAutoplay, { once: true });
-document.addEventListener("keydown", tentarAutoplay, { once: true });
+function lidarInteracaoAutoplay(event) {
+    if (
+        event.target instanceof Element &&
+        event.target.closest("#btnMusica")
+    ) {
+        return;
+    }
 
-audioTema.addEventListener("play", () => atualizarBotaoMusica(true));
-audioTema.addEventListener("pause", () => atualizarBotaoMusica(false));
-audioTema.addEventListener("error", () => atualizarBotaoMusica(false));
+    tentarAutoplay();
+}
 
-function abrirLightbox(arquivo, lista, index, origem) {
-    const lightbox = document.getElementById("lightbox");
-    const content = document.getElementById("lightboxContent");
-    const caption = document.getElementById("lightboxCaption");
+async function alternarMusica() {
+    if (audioTema.paused) {
+        estado.musicaPausadaManualmente = false;
+
+        await tentarAutoplay();
+
+        return;
+    }
+
+    estado.musicaPausadaManualmente = true;
+
+    audioTema.pause();
+
+    atualizarBotaoMusica(false);
+}
+
+btnMusica.addEventListener(
+    "click",
+    alternarMusica
+);
+
+document.addEventListener(
+    "pointerdown",
+    lidarInteracaoAutoplay
+);
+
+document.addEventListener(
+    "touchstart",
+    lidarInteracaoAutoplay
+);
+
+document.addEventListener(
+    "keydown",
+    lidarInteracaoAutoplay
+);
+
+audioTema.addEventListener(
+    "play",
+    () => atualizarBotaoMusica(true)
+);
+
+audioTema.addEventListener(
+    "pause",
+    () => atualizarBotaoMusica(false)
+);
+
+audioTema.addEventListener(
+    "error",
+    () => atualizarBotaoMusica(false)
+);
+
+function abrirLightbox(
+    arquivo,
+    lista,
+    index,
+    origem
+) {
+    const lightbox =
+        document.getElementById("lightbox");
+
+    const content =
+        document.getElementById("lightboxContent");
+
+    const caption =
+        document.getElementById("lightboxCaption");
 
     estado.ultimaFocada = origem;
     estado.lightboxAberto = true;
@@ -1280,94 +1630,193 @@ function abrirLightbox(arquivo, lista, index, origem) {
     content.innerHTML = "";
 
     const imagem = document.createElement("img");
+
     imagem.className = "lightbox-img";
     imagem.src = arquivo.url;
     imagem.alt = arquivo.nome;
 
     content.appendChild(imagem);
+
     caption.textContent = arquivo.nome;
 
     lightbox.classList.add("aberto");
-    lightbox.setAttribute("aria-hidden", "false");
+
+    lightbox.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
     document.body.style.overflow = "hidden";
 
     if (!history.state?.momentosLightbox) {
         history.pushState(
-            { ...(history.state || {}), momentosLightbox: true },
+            {
+                ...(history.state || {}),
+                momentosLightbox: true
+            },
             ""
         );
+
         estado.lightboxUsouHistorico = true;
     }
 }
 
-function fecharLightbox(viaHistorico = false) {
-    const lightbox = document.getElementById("lightbox");
-    if (!estado.lightboxAberto) return;
+function fecharLightbox(
+    viaHistorico = false
+) {
+    const lightbox =
+        document.getElementById("lightbox");
+
+    if (!estado.lightboxAberto) {
+        return;
+    }
 
     estado.lightboxAberto = false;
+
     lightbox.classList.remove("aberto");
-    lightbox.setAttribute("aria-hidden", "true");
+
+    lightbox.setAttribute(
+        "aria-hidden",
+        "true"
+    );
 
     document.body.style.overflow = "";
 
-    document.getElementById("lightboxContent").innerHTML = "";
-    document.getElementById("lightboxCaption").textContent = "";
+    document.getElementById(
+        "lightboxContent"
+    ).innerHTML = "";
+
+    document.getElementById(
+        "lightboxCaption"
+    ).textContent = "";
 
     const foco = estado.ultimaFocada;
+
     estado.ultimaFocada = null;
 
-    if (!viaHistorico && estado.lightboxUsouHistorico && history.state?.momentosLightbox) {
+    if (
+        !viaHistorico &&
+        estado.lightboxUsouHistorico &&
+        history.state?.momentosLightbox
+    ) {
         estado.lightboxUsouHistorico = false;
+
         history.back();
+
         return;
     }
 
     estado.lightboxUsouHistorico = false;
 
-    if (foco && typeof foco.focus === "function") {
-        requestAnimationFrame(() => foco.focus());
+    if (
+        foco &&
+        typeof foco.focus === "function"
+    ) {
+        requestAnimationFrame(
+            () => foco.focus()
+        );
     }
 }
 
-document.getElementById("lightboxClose").addEventListener("click", () => fecharLightbox());
-document.getElementById("lightbox").addEventListener("click", event => {
-    if (event.target.id === "lightbox") fecharLightbox();
-});
+document.getElementById(
+    "lightboxClose"
+).addEventListener(
+    "click",
+    () => fecharLightbox()
+);
 
-document.addEventListener("keydown", event => {
-    if (event.key === "Escape" && estado.lightboxAberto) fecharLightbox();
-});
+document.getElementById(
+    "lightbox"
+).addEventListener(
+    "click",
+    event => {
+        if (
+            event.target.id === "lightbox"
+        ) {
+            fecharLightbox();
+        }
+    }
+);
 
-window.addEventListener("popstate", () => {
-    if (estado.lightboxAberto) fecharLightbox(true);
-});
+document.addEventListener(
+    "keydown",
+    event => {
+        if (
+            event.key === "Escape" &&
+            estado.lightboxAberto
+        ) {
+            fecharLightbox();
+        }
+    }
+);
+
+window.addEventListener(
+    "popstate",
+    () => {
+        if (estado.lightboxAberto) {
+            fecharLightbox(true);
+        }
+    }
+);
 
 function trocarSecao(nome) {
-    document.querySelectorAll(".media-tab").forEach(botao => {
-        const ativo = botao.dataset.section === nome;
-        botao.classList.toggle("active", ativo);
-        botao.setAttribute("aria-selected", String(ativo));
+    document.querySelectorAll(
+        ".media-tab"
+    ).forEach(botao => {
+        const ativo =
+            botao.dataset.section === nome;
+
+        botao.classList.toggle(
+            "active",
+            ativo
+        );
+
+        botao.setAttribute(
+            "aria-selected",
+            String(ativo)
+        );
     });
 
-    document.querySelectorAll(".section").forEach(secao => {
-        const ativo = secao.id === `section-${nome}`;
-        secao.classList.toggle("active", ativo);
+    document.querySelectorAll(
+        ".section"
+    ).forEach(secao => {
+        const ativo =
+            secao.id === `section-${nome}`;
+
+        secao.classList.toggle(
+            "active",
+            ativo
+        );
+
         secao.hidden = !ativo;
     });
 }
 
-document.querySelectorAll(".media-tab").forEach(botao => {
-    botao.addEventListener("click", () => {
-        trocarSecao(botao.dataset.section);
-    });
+document.querySelectorAll(
+    ".media-tab"
+).forEach(botao => {
+    botao.addEventListener(
+        "click",
+        () => {
+            trocarSecao(
+                botao.dataset.section
+            );
+        }
+    );
 });
 
-document.getElementById("btnVoltar").addEventListener("click", () => {
-    window.location.href = "home.html";
-});
+document.getElementById(
+    "btnVoltar"
+).addEventListener(
+    "click",
+    () => {
+        window.location.href = "home.html";
+    }
+);
 
 async function iniciar() {
     estado.usuario = obterUsuario();
+
     await carregarCatalogo();
 }
 
@@ -1375,4 +1824,4 @@ iniciar();
 </script>
 
 </body>
-</html>
+    </html>
