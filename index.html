@@ -921,7 +921,13 @@ window.addEventListener("load", () => {
 
   if (isLoggedIn) {
 
-    window.location.replace("home.html");
+    playStartupSound();
+
+    setTimeout(() => {
+
+      window.location.replace("home.html");
+
+    }, 7000);
 
     return;
 
@@ -947,6 +953,7 @@ window.addEventListener("load", () => {
 
 
   playStartupSound();
+
 
 });
 
