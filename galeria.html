@@ -5,19 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#f4f0ff">
 <meta name="color-scheme" content="light">
-<meta name="description" content="Nossos Momentos — fotos, áudios e vídeos reunidos em uma pequena galeria pessoal.">
-<title>Nossos Momentos - MoissWorld</title>
+<title>Momentos</title>
 
 <style>
-/* ============================================================
-   IDENTIDADE VISUAL — derivada da interface do Luple final
-   ============================================================ */
-
 @font-face {
     font-family: "Quillen";
-    src:
-        local("Quillen"),
-        url("Quillen.otf") format("opentype");
+    src: local("Quillen"), url("Quillen.otf") format("opentype");
     font-display: swap;
     font-style: normal;
     font-weight: 400;
@@ -27,29 +20,16 @@
     --bg: #f4f0ff;
     --bg-2: #eee8ff;
     --surface: rgba(255,255,255,.93);
-    --surface-solid: #ffffff;
     --surface-soft: #f8f5ff;
-    --surface-lilac: #f1eaff;
     --primary: #9b5de5;
     --primary-strong: #8750cf;
-    --primary-soft: #eadcff;
     --primary-pale: #f4edff;
     --text: #29252f;
     --muted: #817b89;
-    --muted-2: #aaa4b0;
     --line: rgba(102,82,126,.12);
-    --line-strong: rgba(125,91,164,.20);
-    --danger: #9d5f71;
-    --paper: #f4ebdd;
-    --paper-2: #f8f1e7;
-    --paper-text: #342f2a;
     --shadow-sm: 0 5px 18px rgba(80,56,115,.07);
     --shadow-md: 0 16px 38px rgba(80,56,115,.11);
     --shadow-lg: 0 28px 80px rgba(65,45,94,.18);
-    --radius-lg: 28px;
-    --radius-md: 20px;
-    --radius-sm: 16px;
-    --touch: 44px;
 }
 
 * {
@@ -68,16 +48,7 @@ body {
     min-height: 100dvh;
     overflow-x: hidden;
     color: var(--text);
-    font-family:
-        Inter,
-        ui-sans-serif,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Helvetica,
-        Arial,
-        sans-serif;
+    font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background:
         radial-gradient(circle at 10% -8%, rgba(177,131,255,.22), transparent 31%),
         radial-gradient(circle at 94% 8%, rgba(220,204,255,.48), transparent 28%),
@@ -128,13 +99,15 @@ button {
 }
 
 @keyframes pageIn {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
-
-/* ============================================================
-   TOPO / VOLTAR
-   ============================================================ */
 
 .topbar {
     display: flex;
@@ -144,41 +117,37 @@ button {
     margin-bottom: 14px;
 }
 
-.navigation-stack {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 7px;
+.navigation-button,
+.music-button {
+    min-height: 46px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: rgba(255,255,255,.82);
+    color: var(--primary-strong);
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
 }
 
 .navigation-button {
     min-width: 46px;
-    min-height: 46px;
     padding: 7px 10px;
     display: inline-flex;
     align-items: center;
     justify-content: flex-start;
     gap: 7px;
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    background: rgba(255,255,255,.78);
-    color: var(--primary-strong);
-    cursor: pointer;
-    box-shadow: var(--shadow-sm);
-    transition:
-        transform .18s ease,
-        box-shadow .18s ease,
-        background .18s ease;
     overflow: hidden;
 }
 
-.navigation-button:hover {
+.navigation-button:hover,
+.music-button:hover {
     transform: translateY(-2px);
     background: #fff;
     box-shadow: var(--shadow-md);
 }
 
-.navigation-button:active {
+.navigation-button:active,
+.music-button:active {
     transform: scale(.96);
 }
 
@@ -204,21 +173,27 @@ button {
     opacity: 1;
 }
 
-.topbar-spacer {
-    width: 46px;
-    height: 46px;
-    flex: 0 0 46px;
+.music-button {
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    font-size: 12px;
+    font-weight: 800;
 }
 
-/* ============================================================
-   CONTAINER PRINCIPAL
-   ============================================================ */
+.music-button svg {
+    width: 19px;
+    height: 19px;
+    flex: 0 0 19px;
+}
 
 .container {
     width: 100%;
     padding: clamp(20px,4vw,34px);
     border: 1px solid rgba(120,92,155,.10);
-    border-radius: var(--radius-lg);
+    border-radius: 28px;
     background: var(--surface);
     box-shadow: var(--shadow-lg);
     backdrop-filter: blur(16px);
@@ -230,79 +205,19 @@ button {
     margin-bottom: 25px;
 }
 
-.eyebrow {
-    color: var(--primary-strong);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: .18em;
-    text-transform: uppercase;
-    margin-bottom: 7px;
-}
-
 .hero h1 {
     font-family: "Quillen", Georgia, "Times New Roman", serif;
     font-size: clamp(38px,8vw,62px);
     font-weight: 400;
     line-height: 1.05;
     letter-spacing: .01em;
-    margin-bottom: 9px;
 }
-
-.subtitulo {
-    max-width: 690px;
-    margin: 0 auto;
-    color: #776f7e;
-    font-family: "Quillen", Georgia, "Times New Roman", serif;
-    font-size: 17px;
-    line-height: 1.55;
-}
-
-.subtitulo::first-letter {
-    color: var(--primary-strong);
-}
-
-/* ============================================================
-   RESUMO
-   ============================================================ */
 
 .overview {
-    display: grid;
-    grid-template-columns: minmax(0,1fr) auto;
-    gap: 12px;
-    align-items: stretch;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
     margin-bottom: 15px;
-}
-
-.overview-card {
-    min-width: 0;
-    padding: 15px 17px;
-    border-radius: var(--radius-sm);
-    background: linear-gradient(135deg,#fff,#faf7ff);
-    border: 1px solid var(--line);
-    box-shadow: var(--shadow-sm);
-}
-
-.overview-label {
-    color: var(--muted);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-}
-
-.lista-titulo {
-    font-size: clamp(22px,5vw,28px);
-    line-height: 1.05;
-    font-weight: 800;
-    letter-spacing: -.035em;
-}
-
-.collection-note {
-    margin-top: 5px;
-    color: var(--muted);
-    font-size: 11px;
-    line-height: 1.45;
 }
 
 .contador {
@@ -317,12 +232,7 @@ button {
     color: var(--primary-strong);
     font-size: 13px;
     font-weight: 800;
-    white-space: nowrap;
 }
-
-/* ============================================================
-   ABAS
-   ============================================================ */
 
 .media-tabs {
     display: flex;
@@ -346,22 +256,13 @@ button {
     font-size: 13px;
     font-weight: 800;
     box-shadow: 0 3px 12px rgba(80,56,115,.04);
-    transition:
-        transform .18s ease,
-        background .18s ease,
-        color .18s ease,
-        border-color .18s ease,
-        box-shadow .18s ease;
+    transition: transform .18s ease, background .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease;
 }
 
 .media-tab:hover {
     transform: translateY(-1px);
     color: var(--primary-strong);
     border-color: rgba(155,93,229,.20);
-}
-
-.media-tab:active {
-    transform: scale(.98);
 }
 
 .media-tab.active {
@@ -376,10 +277,6 @@ button {
     height: 17px;
 }
 
-/* ============================================================
-   SEÇÕES
-   ============================================================ */
-
 .section {
     display: none;
 }
@@ -390,13 +287,19 @@ button {
 }
 
 @keyframes sectionIn {
-    from { opacity: .2; transform: translateY(4px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: .2;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .section-head {
     display: flex;
-    align-items: end;
+    align-items: center;
     justify-content: space-between;
     gap: 12px;
     margin: 3px 1px 13px;
@@ -410,12 +313,7 @@ button {
 .section-head p {
     color: var(--muted);
     font-size: 12px;
-    text-align: right;
 }
-
-/* ============================================================
-   MASONRY — LÓGICA VISUAL DO CÓDIGO 1
-   ============================================================ */
 
 .galeria {
     column-count: 5;
@@ -435,8 +333,14 @@ button {
 }
 
 @keyframes mediaIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .photo-shell {
@@ -453,10 +357,7 @@ button {
     height: auto;
     display: block;
     object-fit: contain;
-    transition:
-        transform .30s ease,
-        opacity .30s ease,
-        filter .30s ease;
+    transition: transform .30s ease, opacity .30s ease;
 }
 
 .media-card:hover .photo-shell img,
@@ -485,30 +386,6 @@ button {
     transform: translateY(0);
 }
 
-.photo-fallback {
-    min-height: 170px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 24px;
-    color: var(--primary-strong);
-    font-size: 13px;
-    font-weight: 800;
-    line-height: 1.5;
-}
-
-.photo-fallback small {
-    display: block;
-    color: var(--muted);
-    font-weight: 600;
-    margin-top: 4px;
-}
-
-/* ============================================================
-   ÁUDIO / VÍDEO
-   ============================================================ */
-
 .media-grid {
     display: grid;
     grid-template-columns: repeat(2,minmax(0,1fr));
@@ -528,18 +405,12 @@ button {
     font-family: "Quillen",Georgia,serif;
     font-size: 23px;
     font-weight: 400;
-    margin-bottom: 5px;
-}
-
-.media-panel p {
-    color: var(--muted);
-    font-size: 11px;
-    line-height: 1.45;
     margin-bottom: 12px;
 }
 
 .audio-item,
-.video-item {
+.video-item,
+.exclusive-item {
     border: 1px solid var(--line);
     border-radius: 16px;
     background: var(--surface-soft);
@@ -548,7 +419,8 @@ button {
 }
 
 .audio-item:last-child,
-.video-item:last-child {
+.video-item:last-child,
+.exclusive-item:last-child {
     margin-bottom: 0;
 }
 
@@ -579,28 +451,28 @@ video {
     object-fit: contain;
 }
 
-.media-error {
-    margin-top: 8px;
-    padding: 9px 10px;
-    border-radius: 11px;
-    background: #fff4f6;
-    color: var(--danger);
-    font-size: 11px;
-    line-height: 1.45;
+.exclusive-content {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 13px;
 }
 
-/* ============================================================
-   ESTADOS
-   ============================================================ */
+.exclusive-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px;
+}
+
+.exclusive-item video {
+    max-height: 500px;
+}
 
 .loading-state {
     min-height: 150px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    color: var(--muted);
-    font-size: 13px;
 }
 
 .loader-dot {
@@ -612,8 +484,14 @@ video {
 }
 
 @keyframes pulse {
-    0%,100% { opacity:.35; transform:scale(.85); }
-    50% { opacity:1; transform:scale(1); }
+    0%,100% {
+        opacity: .35;
+        transform: scale(.85);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .empty-state {
@@ -624,7 +502,6 @@ video {
     border: 1px dashed rgba(117,101,132,.16);
     border-radius: 18px;
     background: rgba(255,255,255,.48);
-    line-height: 1.6;
 }
 
 .empty-state.visible {
@@ -637,72 +514,7 @@ video {
     font-family: "Quillen",Georgia,serif;
     font-size: 20px;
     font-weight: 400;
-    margin-bottom: 5px;
 }
-
-.error-state {
-    margin-top: 14px;
-    padding: 15px;
-    border-radius: 16px;
-    background: #fff4f6;
-    border: 1px solid rgba(157,95,113,.18);
-    color: var(--danger);
-    font-size: 13px;
-    line-height: 1.6;
-}
-
-.error-state strong {
-    color: #704353;
-}
-
-.error-state code {
-    font-family: ui-monospace,SFMono-Regular,Menlo,monospace;
-    font-size: 11px;
-}
-
-/* ============================================================
-   AÇÕES
-   ============================================================ */
-
-.actions {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 20px;
-}
-
-.action-button {
-    min-height: 46px;
-    padding: 0 18px;
-    border: 1px solid rgba(117,101,132,.13);
-    border-radius: 16px;
-    background: #fff;
-    color: #6f6876;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 800;
-    transition:
-        transform .18s ease,
-        background .18s ease,
-        color .18s ease,
-        box-shadow .18s ease;
-}
-
-.action-button:hover {
-    transform: translateY(-1px);
-    color: var(--primary-strong);
-    background: var(--primary-pale);
-    box-shadow: var(--shadow-sm);
-}
-
-.action-button:active {
-    transform: scale(.98);
-}
-
-/* ============================================================
-   LIGHTBOX — COMPORTAMENTO DO CÓDIGO 1
-   ============================================================ */
 
 .lightbox {
     position: fixed;
@@ -711,11 +523,7 @@ video {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding:
-        max(14px,env(safe-area-inset-top))
-        max(12px,env(safe-area-inset-right))
-        max(14px,env(safe-area-inset-bottom))
-        max(12px,env(safe-area-inset-left));
+    padding: 14px;
     background: rgba(41,33,51,.80);
     backdrop-filter: blur(13px);
     -webkit-backdrop-filter: blur(13px);
@@ -723,7 +531,6 @@ video {
     visibility: hidden;
     pointer-events: none;
     transition: opacity .24s ease,visibility .24s ease;
-    cursor: zoom-out;
 }
 
 .lightbox.aberto {
@@ -740,13 +547,6 @@ video {
     display: flex;
     align-items: center;
     justify-content: center;
-    animation: fadeIn .28s ease both;
-    cursor: default;
-}
-
-@keyframes fadeIn {
-    from { opacity:0; transform:scale(.95); }
-    to { opacity:1; transform:scale(1); }
 }
 
 .lightbox-img {
@@ -758,7 +558,6 @@ video {
     object-fit: contain;
     border-radius: 12px;
     box-shadow: 0 28px 80px rgba(0,0,0,.40);
-    cursor: default;
 }
 
 .lightbox-close {
@@ -777,14 +576,6 @@ video {
     line-height: 1;
     cursor: pointer;
     z-index: 3;
-    transition:
-        transform .18s ease,
-        background .18s ease;
-}
-
-.lightbox-close:hover {
-    transform: rotate(3deg) scale(1.04);
-    background: rgba(255,255,255,.20);
 }
 
 .lightbox-caption {
@@ -801,78 +592,27 @@ video {
     font-size: 12px;
     font-weight: 700;
     text-align: center;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
     overflow-wrap: anywhere;
 }
 
-.lightbox-fallback {
-    max-width: 600px;
-    padding: 28px;
-    border-radius: 22px;
-    background: #fff;
-    color: var(--text);
-    text-align: center;
-    box-shadow: var(--shadow-lg);
-    cursor: default;
-}
-
-.lightbox-fallback strong {
-    display: block;
-    font-family: "Quillen",Georgia,serif;
-    font-size: 26px;
-    font-weight: 400;
-    margin-bottom: 8px;
-}
-
-.lightbox-fallback p {
-    color: var(--muted);
-    font-size: 13px;
-    line-height: 1.6;
-    margin-bottom: 14px;
-}
-
-.raw-link {
-    display: inline-flex;
-    min-height: 42px;
-    align-items: center;
-    justify-content: center;
-    padding: 0 15px;
-    border-radius: 13px;
-    background: var(--primary);
-    color: #fff;
-    text-decoration: none;
-    font-size: 12px;
-    font-weight: 800;
-    transition: transform .18s ease,background .18s ease;
-}
-
-.raw-link:hover {
-    transform: translateY(-1px);
-    background: var(--primary-strong);
-}
-
-/* ============================================================
-   RESPONSIVIDADE
-   ============================================================ */
-
-@media (max-width: 1180px) {
+@media (max-width:1180px) {
     .galeria {
         column-count: 4;
     }
 }
 
-@media (max-width: 900px) {
+@media (max-width:900px) {
     .galeria {
         column-count: 3;
     }
 
-    .media-grid {
+    .media-grid,
+    .exclusive-content {
         grid-template-columns: 1fr;
     }
 }
 
-@media (max-width: 680px) {
+@media (max-width:680px) {
     body {
         padding-top: max(12px,env(safe-area-inset-top));
     }
@@ -882,25 +622,28 @@ video {
         border-radius: 24px;
     }
 
-    .hero {
-        margin-bottom: 21px;
-    }
-
     .topbar {
         margin-bottom: 9px;
     }
 
     .navigation-button,
-    .topbar-spacer {
+    .music-button {
         min-width: 43px;
         width: 43px;
         min-height: 43px;
         height: 43px;
-        flex-basis: 43px;
         border-radius: 14px;
     }
 
     .navigation-label {
+        display: none;
+    }
+
+    .music-button {
+        padding: 0;
+    }
+
+    .music-button span {
         display: none;
     }
 
@@ -919,32 +662,15 @@ video {
     }
 
     .overview {
-        grid-template-columns: 1fr;
-    }
-
-    .contador {
-        justify-self: start;
-    }
-
-    .section-head {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .section-head p {
-        text-align: left;
+        justify-content: flex-start;
     }
 
     .media-tab {
         flex: 1 1 calc(50% - 8px);
     }
-
-    .lightbox-caption {
-        bottom: max(12px,env(safe-area-inset-bottom));
-    }
 }
 
-@media (max-width: 390px) {
+@media (max-width:390px) {
     .galeria {
         column-count: 1;
     }
@@ -956,130 +682,45 @@ video {
     .hero h1 {
         font-size: 39px;
     }
-
-    .subtitulo {
-        font-size: 15px;
-    }
-
-    .lightbox-close {
-        width: 44px;
-        height: 44px;
-    }
-}
-
-/* ============================================================
-   REDUÇÃO DE MOVIMENTO
-   ============================================================ */
-
-@media (prefers-reduced-motion: reduce) {
-    html {
-        scroll-behavior: auto;
-    }
-
-    *,
-    *::before,
-    *::after {
-        animation-duration: .001ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: .001ms !important;
-    }
-}
-
-/* ============================================================
-   IMPRESSÃO
-   ============================================================ */
-
-@media print {
-    body {
-        background: #fff;
-        padding: 0;
-    }
-
-    body::before,
-    .topbar,
-    .media-tabs,
-    .actions,
-    .lightbox {
-        display: none !important;
-    }
-
-    .container {
-        border: 0;
-        box-shadow: none;
-        background: #fff;
-    }
 }
 </style>
 </head>
 
 <body>
+
 <main class="app-shell">
 
     <div class="topbar">
-        <nav class="navigation-stack" aria-label="Navegação">
-            <button
-                class="navigation-button"
-                type="button"
-                id="btnVoltar"
-                aria-label="Voltar para home.html"
-                title="Voltar para home.html"
-            >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M19 12H5"></path>
-                    <path d="m12 19-7-7 7-7"></path>
-                </svg>
-                <span class="navigation-label">Voltar</span>
-            </button>
-        </nav>
+        <button class="navigation-button" type="button" id="btnVoltar" aria-label="Voltar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5"></path>
+                <path d="m12 19-7-7 7-7"></path>
+            </svg>
+            <span class="navigation-label">Voltar</span>
+        </button>
 
-        <div class="topbar-spacer" aria-hidden="true"></div>
+        <button class="music-button" type="button" id="btnMusica" aria-label="Continuar música" title="Continuar música">
+            <svg id="iconeMusica" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m7 4 12 8-12 8z"></path>
+            </svg>
+            <span id="textoMusica">Música</span>
+        </button>
     </div>
 
-    <section class="container" aria-label="Nossos Momentos">
+    <section class="container">
 
         <header class="hero">
-            <div class="eyebrow">MoissWorld</div>
-            <h1>Nossos Momentos</h1>
-            <p class="subtitulo">
-                fotos e pequenos pedacinhos de nós,quero guardar aqui ♡
-            </p>
+            <h1>Momentos</h1>
         </header>
 
         <div class="overview">
-            <div class="overview-card">
-                <div class="overview-label">.</div>
-                <div class="lista-titulo">Nossos Momentos</div>
-                <div class="collection-note" id="collectionNote">
-                    Procurando as mídias do repositório...
-                </div>
-            </div>
-
-            <div
-                class="contador"
-                id="contador"
-                aria-live="polite"
-                aria-atomic="true"
-            >
-                0 mídias
-            </div>
+            <div class="contador" id="contador">0 mídias</div>
         </div>
 
-        <div
-            class="media-tabs"
-            id="mediaTabs"
-            role="tablist"
-            aria-label="Tipos de mídia"
-        >
-            <button
-                class="media-tab active"
-                type="button"
-                role="tab"
-                aria-selected="true"
-                aria-controls="section-fotos"
-                id="tab-fotos"
-                data-section="fotos"
-            >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <div class="media-tabs" id="mediaTabs" role="tablist">
+
+            <button class="media-tab active" type="button" role="tab" aria-selected="true" data-section="fotos">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="3" y="4" width="18" height="16" rx="3"></rect>
                     <circle cx="8.5" cy="9" r="1.5"></circle>
                     <path d="m5.5 17 4.5-4.5 3.5-3.5 6 6"></path>
@@ -1087,16 +728,8 @@ video {
                 Fotos
             </button>
 
-            <button
-                class="media-tab"
-                type="button"
-                role="tab"
-                aria-selected="false"
-                aria-controls="section-audios"
-                id="tab-audios"
-                data-section="audios"
-            >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <button class="media-tab" type="button" role="tab" aria-selected="false" data-section="audios">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M9 18V5l11-2v13"></path>
                     <circle cx="6" cy="18" r="3"></circle>
                     <circle cx="17" cy="16" r="3"></circle>
@@ -1104,2213 +737,642 @@ video {
                 Áudios
             </button>
 
-            <button
-                class="media-tab"
-                type="button"
-                role="tab"
-                aria-selected="false"
-                aria-controls="section-videos"
-                id="tab-videos"
-                data-section="videos"
-            >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <button class="media-tab" type="button" role="tab" aria-selected="false" data-section="videos">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="3" y="5" width="13" height="14" rx="2"></rect>
                     <path d="m16 10 5-3v10l-5-3z"></path>
                 </svg>
                 Vídeos
             </button>
+
+            <button class="media-tab" type="button" role="tab" aria-selected="false" data-section="exclusivo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="10" width="16" height="10" rx="2"></rect>
+                    <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+                </svg>
+                Exclusivo
+            </button>
+
         </div>
 
-        <section
-            class="section active"
-            id="section-fotos"
-            role="tabpanel"
-            aria-labelledby="tab-fotos"
-        >
+        <section class="section active" id="section-fotos" role="tabpanel">
             <div class="section-head">
-                <h2>Momentos</h2>
-                <p id="fotoStatus">Carregando...</p>
+                <h2>Fotos</h2>
+                <p id="fotoStatus"></p>
             </div>
 
-            <div
-                class="galeria"
-                id="galeria"
-                aria-live="polite"
-                aria-busy="true"
-            ></div>
+            <div class="galeria" id="galeria"></div>
 
             <div class="loading-state" id="fotoLoading">
-                <span class="loader-dot" aria-hidden="true"></span>
-                descobrindo nossas fotos...
+                <span class="loader-dot"></span>
             </div>
 
             <div class="empty-state" id="fotoEmpty">
-                <strong>Nenhuma foto encontrada</strong>
-                Coloque imagens dentro de <b>midia/Fotos/</b> e faça um novo commit.
+                <strong>Não há foto</strong>
             </div>
         </section>
 
-        <section
-            class="section"
-            id="section-audios"
-            role="tabpanel"
-            aria-labelledby="tab-audios"
-            hidden
-        >
+        <section class="section" id="section-audios" role="tabpanel" hidden>
             <div class="section-head">
-                <h2>Vozes</h2>
-                <p id="audioStatus">Carregando...</p>
+                <h2>Áudios</h2>
+                <p id="audioStatus"></p>
             </div>
 
             <div id="audios" class="media-grid"></div>
 
             <div class="loading-state" id="audioLoading">
-                <span class="loader-dot" aria-hidden="true"></span>
-                procurando nossas gravações...
+                <span class="loader-dot"></span>
             </div>
 
             <div class="empty-state" id="audioEmpty">
-                <strong>Nenhum áudio encontrado</strong>
-                Coloque arquivos dentro de <b>midia/Áudios/</b> e faça um novo commit.
+                <strong>Não há áudio</strong>
             </div>
         </section>
 
-        <section
-            class="section"
-            id="section-videos"
-            role="tabpanel"
-            aria-labelledby="tab-videos"
-            hidden
-        >
+        <section class="section" id="section-videos" role="tabpanel" hidden>
             <div class="section-head">
                 <h2>Vídeos</h2>
-                <p id="videoStatus">Carregando...</p>
+                <p id="videoStatus"></p>
             </div>
 
             <div id="videos" class="media-grid"></div>
 
             <div class="loading-state" id="videoLoading">
-                <span class="loader-dot" aria-hidden="true"></span>
-                procurando nossos vídeos...
+                <span class="loader-dot"></span>
             </div>
 
             <div class="empty-state" id="videoEmpty">
-                <strong>Nenhum vídeo encontrado</strong>
-                Coloque arquivos dentro <b>midia/Vídeos/</b> e faça um novo commit.
+                <strong>Não há vídeo</strong>
             </div>
         </section>
 
-        <div id="globalError"></div>
+        <section class="section" id="section-exclusivo" role="tabpanel" hidden>
+            <div class="section-head">
+                <h2>Exclusivo</h2>
+                <p id="exclusiveStatus"></p>
+            </div>
 
-        <div class="actions">
-            <button
-                class="action-button"
-                type="button"
-                id="btnVoltarInferior"
-            >
-                ← Voltar para home.html
-            </button>
-        </div>
+            <div id="exclusivo" class="exclusive-content"></div>
+
+            <div class="loading-state" id="exclusiveLoading">
+                <span class="loader-dot"></span>
+            </div>
+
+            <div class="empty-state" id="exclusiveEmpty">
+                <strong>Não há conteúdo exclusivo</strong>
+            </div>
+        </section>
+
     </section>
 </main>
 
-<div
-    class="lightbox"
-    id="lightbox"
-    aria-hidden="true"
-    role="dialog"
-    aria-modal="true"
-    aria-label="Visualização ampliada da foto"
->
-    <button
-        class="lightbox-close"
-        type="button"
-        id="lightboxClose"
-        aria-label="Fechar visualização"
-        title="Fechar"
-    >
-        ×
-    </button>
+<audio id="temaMusical" preload="auto" loop playsinline></audio>
 
-    <div
-        class="lightbox-content"
-        id="lightboxContent"
-    ></div>
-
-    <div
-        class="lightbox-caption"
-        id="lightboxCaption"
-        aria-live="polite"
-    ></div>
+<div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-modal="true">
+    <button class="lightbox-close" type="button" id="lightboxClose" aria-label="Fechar">×</button>
+    <div class="lightbox-content" id="lightboxContent"></div>
+    <div class="lightbox-caption" id="lightboxCaption"></div>
 </div>
 
 <script>
 "use strict";
 
-/* ============================================================
-   CONFIGURAÇÃO DO GITHUB
-   ============================================================
-
-   Não existe lista manual de arquivos.
-
-   owner, repo e branch podem permanecer vazios.
-
-   Quando a página estiver em:
-       https://USUARIO.github.io/REPOSITORIO/galeria.html
-
-   o sistema tenta descobrir:
-       owner = USUARIO
-       repo  = REPOSITORIO
-
-   Quando estiver em:
-       https://USUARIO.github.io/galeria.html
-
-   ele tenta usar:
-       repo = USUARIO.github.io
-
-   O branch também pode ficar vazio. Nesse caso o GitHub informa
-   qual é o branch padrão do repositório.
-
-   Em domínio personalizado, se a URL não permitir descobrir o
-   repositório, basta preencher owner e repo abaixo.
-
-   Nunca coloque nomes individuais de fotos, áudios ou vídeos aqui.
-   ============================================================ */
-
-const REPOSITORIO = {
-    owner: "",
-    repo: "",
-    branch: "",
-    pastaMidia: "midia"
-};
-
-const PASTAS = {
-    fotos: "Fotos",
-    audios: "Áudios",
-    videos: "Vídeos"
-};
-
 const EXTENSOES = {
-    fotos: new Set([
-        "jpg",
-        "jpeg",
-        "png",
-        "webp",
-        "gif",
-        "avif",
-        "bmp",
-        "svg",
-        "heic",
-        "heif",
-        "jfif",
-        "tif",
-        "tiff"
-    ]),
-
-    audios: new Set([
-        "mp3",
-        "m4a",
-        "wav",
-        "ogg",
-        "oga",
-        "aac",
-        "flac",
-        "opus",
-        "webm"
-    ]),
-
-    videos: new Set([
-        "mp4",
-        "webm",
-        "mov",
-        "m4v",
-        "ogv",
-        "avi",
-        "mkv"
-    ])
+    fotos: new Set(["jpg","jpeg","png","webp","gif","avif","bmp","svg","heic","heif","jfif","tif","tiff"]),
+    audios: new Set(["mp3","m4a","wav","ogg","oga","aac","flac","opus"]),
+    videos: new Set(["mp4","webm","mov","m4v","ogv","avi","mkv"])
 };
 
 const MIME_POR_EXTENSAO = {
-    jpg: "image/jpeg",
-    jpeg: "image/jpeg",
-    png: "image/png",
-    webp: "image/webp",
-    gif: "image/gif",
-    avif: "image/avif",
-    bmp: "image/bmp",
-    svg: "image/svg+xml",
-    heic: "image/heic",
-    heif: "image/heif",
-    jfif: "image/jpeg",
-    tif: "image/tiff",
-    tiff: "image/tiff",
-
-    mp3: "audio/mpeg",
-    m4a: "audio/mp4",
-    wav: "audio/wav",
-    ogg: "audio/ogg",
-    oga: "audio/ogg",
-    aac: "audio/aac",
-    flac: "audio/flac",
-    opus: "audio/opus",
-
-    mp4: "video/mp4",
-    webm: "video/webm",
-    mov: "video/quicktime",
-    m4v: "video/mp4",
-    ogv: "video/ogg",
-    avi: "video/x-msvideo",
-    mkv: "video/x-matroska"
+    jpg:"image/jpeg", jpeg:"image/jpeg", png:"image/png", webp:"image/webp", gif:"image/gif",
+    avif:"image/avif", bmp:"image/bmp", svg:"image/svg+xml", heic:"image/heic", heif:"image/heif",
+    jfif:"image/jpeg", tif:"image/tiff", tiff:"image/tiff", mp3:"audio/mpeg", m4a:"audio/mp4",
+    wav:"audio/wav", ogg:"audio/ogg", oga:"audio/ogg", aac:"audio/aac", flac:"audio/flac",
+    opus:"audio/opus", mp4:"video/mp4", webm:"video/webm", mov:"video/quicktime", m4v:"video/mp4",
+    ogv:"video/ogg", avi:"video/x-msvideo", mkv:"video/x-matroska"
 };
 
-const API_VERSION = "2026-03-10";
-
 const estado = {
-    arquivos: {
-        fotos: [],
-        audios: [],
-        videos: []
-    },
-
-    configuracao: null,
-
+    arquivos: { fotos: [], audios: [], videos: [] },
+    exclusivo: [],
+    usuario: "",
     lightboxAberto: false,
     lightboxUsouHistorico: false,
     ultimaFocada: null,
-
-    indiceFotoAtual: -1,
-
-    carregando: true
+    musicaPausadaManualmente: false
 };
 
-/* ============================================================
-   FUNÇÕES BÁSICAS
-   ============================================================ */
+const audioTema = document.getElementById("temaMusical");
+const btnMusica = document.getElementById("btnMusica");
+const textoMusica = document.getElementById("textoMusica");
+const iconeMusica = document.getElementById("iconeMusica");
 
-function escaparHTML(valor) {
-    return String(valor).replace(
-        /[&<>'"]/g,
-        caractere => ({
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            "'": "&#39;",
-            "\"": "&quot;"
-        }[caractere])
-    );
+function obterUsuario() {
+    return String(localStorage.getItem("username") || "").trim().toLowerCase();
 }
 
 function obterExtensao(nome) {
     const base = String(nome || "").split("/").pop();
     const posicao = base.lastIndexOf(".");
-
-    if (posicao === -1) {
-        return "";
-    }
-
-    return base
-        .slice(posicao + 1)
-        .toLowerCase();
+    return posicao === -1 ? "" : base.slice(posicao + 1).toLowerCase();
 }
 
 function obterNomeSemExtensao(nome) {
     const base = String(nome || "").split("/").pop();
     const posicao = base.lastIndexOf(".");
-
-    if (posicao <= 0) {
-        return base;
-    }
-
-    return base.slice(0,posicao);
+    return posicao <= 0 ? base : base.slice(0, posicao);
 }
 
-function classificarArquivo(nome,mime = "") {
+function classificarArquivo(nome) {
     const extensao = obterExtensao(nome);
-    const tipoMime = String(mime || "").toLowerCase();
-
-    if (tipoMime.startsWith("image/")) {
-        return "fotos";
-    }
-
-    if (tipoMime.startsWith("audio/")) {
-        return "audios";
-    }
-
-    if (tipoMime.startsWith("video/")) {
-        return "videos";
-    }
-
-    if (EXTENSOES.fotos.has(extensao)) {
-        return "fotos";
-    }
-
-    if (EXTENSOES.audios.has(extensao)) {
-        return "audios";
-    }
-
-    if (EXTENSOES.videos.has(extensao)) {
-        return "videos";
-    }
-
+    if (EXTENSOES.fotos.has(extensao)) return "fotos";
+    if (EXTENSOES.audios.has(extensao)) return "audios";
+    if (EXTENSOES.videos.has(extensao)) return "videos";
     return null;
 }
 
 function tipoMimePorArquivo(arquivo) {
-    if (arquivo.mime) {
-        return arquivo.mime;
-    }
-
-    return MIME_POR_EXTENSAO[
-        obterExtensao(arquivo.nome)
-    ] || "";
+    return arquivo.mime || MIME_POR_EXTENSAO[obterExtensao(arquivo.nome)] || "";
 }
-
-/* ============================================================
-   EMBARALHAMENTO — FISHER-YATES DO CÓDIGO 1
-   ============================================================ */
 
 function shuffleArray(array) {
-    for (
-        let i = array.length - 1;
-        i > 0;
-        i--
-    ) {
-        const j = Math.floor(
-            Math.random() * (i + 1)
-        );
-
-        [
-            array[i],
-            array[j]
-        ] = [
-            array[j],
-            array[i]
-        ];
-    }
-
-    return array;
-}
-
-/* Mantém também o nome em português caso alguma parte futura
-   do projeto utilize essa função. */
-function embaralhar(array) {
-    return shuffleArray(array);
-}
-
-/* ============================================================
-   DETECÇÃO DO REPOSITÓRIO
-   ============================================================ */
-
-function detectarRepositorioAutomaticamente() {
-    const host = window.location.hostname;
-    const caminho = window.location.pathname
-        .split("/")
-        .filter(Boolean);
-
-    const configuracao = {
-        ...REPOSITORIO
-    };
-
-    const ehGithubPages =
-        host.endsWith(".github.io");
-
-    if (
-        !configuracao.owner &&
-        ehGithubPages
-    ) {
-        configuracao.owner =
-            host.split(".")[0];
-    }
-
-    if (
-        !configuracao.repo &&
-        ehGithubPages &&
-        caminho.length > 0 &&
-        !caminho[0].includes(".")
-    ) {
-        configuracao.repo = caminho[0];
-    }
-
-    if (
-        !configuracao.repo &&
-        ehGithubPages &&
-        configuracao.owner
-    ) {
-        configuracao.repo =
-            `${configuracao.owner}.github.io`;
-    }
-
-    return configuracao;
-}
-
-function validarConfiguracaoMinima(configuracao) {
-    if (
-        !configuracao.owner ||
-        !configuracao.repo
-    ) {
-        throw new Error(
-            "Não foi possível descobrir automaticamente o proprietário e o repositório do GitHub. Preencha REPOSITORIO.owner e REPOSITORIO.repo no início do JavaScript."
-        );
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
     }
 }
 
-/* ============================================================
-   URL RAW
-   ============================================================ */
-
-function construirRawUrl(caminho,configuracao) {
-    const partes = String(caminho)
-        .split("/")
-        .map(encodeURIComponent);
-
-    const branch =
-        configuracao.branch || "main";
-
-    return (
-        "https://raw.githubusercontent.com/" +
-        encodeURIComponent(configuracao.owner) +
-        "/" +
-        encodeURIComponent(configuracao.repo) +
-        "/" +
-        encodeURIComponent(branch) +
-        "/" +
-        partes.join("/")
-    );
-}
-
-/* ============================================================
-   CONSULTA À API DO GITHUB
-   ============================================================ */
-
-async function githubFetch(url) {
-    const resposta = await fetch(url,{
-        method: "GET",
-        headers: {
-            "Accept":
-                "application/vnd.github+json",
-            "X-GitHub-Api-Version":
-                API_VERSION
-        },
-        cache: "no-store"
+function compararNomes(a, b) {
+    return String(a.nome).localeCompare(String(b.nome), "pt-BR", {
+        numeric: true,
+        sensitivity: "base"
     });
-
-    if (!resposta.ok) {
-        let detalhe = "";
-
-        try {
-            const json =
-                await resposta.json();
-
-            if (json && json.message) {
-                detalhe =
-                    ` — ${json.message}`;
-            }
-        } catch (_) {
-            /* A resposta pode não ser JSON. */
-        }
-
-        throw new Error(
-            `GitHub respondeu HTTP ${resposta.status}${detalhe}`
-        );
-    }
-
-    return resposta.json();
 }
-
-async function obterConfiguracaoEfetiva() {
-    const configuracao =
-        detectarRepositorioAutomaticamente();
-
-    validarConfiguracaoMinima(
-        configuracao
-    );
-
-    if (!configuracao.branch) {
-        const url =
-            "https://api.github.com/repos/" +
-            encodeURIComponent(
-                configuracao.owner
-            ) +
-            "/" +
-            encodeURIComponent(
-                configuracao.repo
-            );
-
-        const metadados =
-            await githubFetch(url);
-
-        configuracao.branch =
-            metadados.default_branch ||
-            "main";
-    }
-
-    return configuracao;
-}
-
-/* ============================================================
-   NORMALIZAÇÃO DE ITENS
-   ============================================================ */
-
-function transformarItemGithub(
-    item,
-    tipoEsperado,
-    configuracao
-) {
-    if (!item || item.type !== "file") {
-        return null;
-    }
-
-    const extensao = obterExtensao(item.name);
-    const tipoMime = String(item.mime_type || "").toLowerCase();
-    const tipo = classificarArquivo(item.name, item.mime_type || "");
-    const extensaoAceitaNaPasta = EXTENSOES[tipoEsperado]?.has(extensao);
-    const mimeAceitoNaPasta =
-        (tipoEsperado === "fotos" && tipoMime.startsWith("image/")) ||
-        (tipoEsperado === "audios" && tipoMime.startsWith("audio/")) ||
-        (tipoEsperado === "videos" && tipoMime.startsWith("video/"));
-
-    if (tipo !== tipoEsperado && !extensaoAceitaNaPasta && !mimeAceitoNaPasta) {
-        return null;
-    }
-
-    return {
-        nome: item.name,
-        caminho: item.path,
-        url:
-            item.download_url ||
-            construirRawUrl(
-                item.path,
-                configuracao
-            ),
-        apiUrl: item.url || "",
-        sha: item.sha || "",
-        tamanho: Number(item.size || 0),
-        mime:
-            item.mime_type ||
-            MIME_POR_EXTENSAO[
-                obterExtensao(item.name)
-            ] ||
-            "",
-        tipo
-    };
-}
-
-/* ============================================================
-   CONTENTS API — UMA PASTA
-   ============================================================ */
-
-async function listarPastaViaContents(
-    nomePasta,
-    configuracao
-) {
-    const caminho =
-        `${configuracao.pastaMidia}/${nomePasta}`;
-
-    const resultados = [];
-    const vistos = new Set();
-
-    const limitePagina = 100;
-
-    for (
-        let pagina = 1;
-        pagina <= 100;
-        pagina++
-    ) {
-        const url =
-            "https://api.github.com/repos/" +
-            encodeURIComponent(
-                configuracao.owner
-            ) +
-            "/" +
-            encodeURIComponent(
-                configuracao.repo
-            ) +
-            "/contents/" +
-            caminho
-                .split("/")
-                .map(encodeURIComponent)
-                .join("/") +
-            "?ref=" +
-            encodeURIComponent(
-                configuracao.branch
-            ) +
-            "&per_page=" +
-            limitePagina +
-            "&page=" +
-            pagina;
-
-        const dados =
-            await githubFetch(url);
-
-        if (!Array.isArray(dados)) {
-            break;
-        }
-
-        let novos = 0;
-
-        for (const item of dados) {
-            if (!item || !item.path) {
-                continue;
-            }
-
-            if (vistos.has(item.path)) {
-                continue;
-            }
-
-            vistos.add(item.path);
-
-            const transformado =
-                transformarItemGithub(
-                    item,
-                    classificarPasta(
-                        nomePasta
-                    ),
-                    configuracao
-                );
-
-            if (transformado) {
-                resultados.push(
-                    transformado
-                );
-                novos++;
-            }
-        }
-
-        if (
-            dados.length < limitePagina ||
-            novos === 0
-        ) {
-            break;
-        }
-    }
-
-    return resultados;
-}
-
-/* ============================================================
-   CLASSIFICAÇÃO DE PASTAS
-   ============================================================ */
-
-function classificarPasta(nomePasta) {
-    if (
-        nomePasta === PASTAS.fotos
-    ) {
-        return "fotos";
-    }
-
-    if (
-        nomePasta === PASTAS.audios
-    ) {
-        return "audios";
-    }
-
-    if (
-        nomePasta === PASTAS.videos
-    ) {
-        return "videos";
-    }
-
-    return null;
-}
-
-/* ============================================================
-   GIT TREE API — CAMINHO PRINCIPAL
-   ============================================================ */
-
-async function listarCatalogoViaTree(
-    configuracao
-) {
-    const url =
-        "https://api.github.com/repos/" +
-        encodeURIComponent(
-            configuracao.owner
-        ) +
-        "/" +
-        encodeURIComponent(
-            configuracao.repo
-        ) +
-        "/git/trees/" +
-        encodeURIComponent(
-            configuracao.branch
-        ) +
-        "?recursive=1";
-
-    const dados =
-        await githubFetch(url);
-
-    if (
-        !dados ||
-        !Array.isArray(dados.tree)
-    ) {
-        throw new Error(
-            "A API do GitHub não retornou a árvore do repositório."
-        );
-    }
-
-    if (dados.truncated) {
-        return null;
-    }
-
-    const prefixos = {
-        fotos:
-            `${configuracao.pastaMidia}/${PASTAS.fotos}/`,
-
-        audios:
-            `${configuracao.pastaMidia}/${PASTAS.audios}/`,
-
-        videos:
-            `${configuracao.pastaMidia}/${PASTAS.videos}/`
-    };
-
-    const resultado = {
-        fotos: [],
-        audios: [],
-        videos: []
-    };
-
-    for (const item of dados.tree) {
-        if (
-            !item ||
-            item.type !== "blob" ||
-            !item.path
-        ) {
-            continue;
-        }
-
-        let tipo = null;
-
-        if (
-            item.path.startsWith(
-                prefixos.fotos
-            )
-        ) {
-            tipo = "fotos";
-        } else if (
-            item.path.startsWith(
-                prefixos.audios
-            )
-        ) {
-            tipo = "audios";
-        } else if (
-            item.path.startsWith(
-                prefixos.videos
-            )
-        ) {
-            tipo = "videos";
-        }
-
-        if (!tipo) {
-            continue;
-        }
-
-        const nome =
-            item.path.slice(
-                item.path.lastIndexOf("/") + 1
-            );
-
-        const extensao = obterExtensao(nome);
-        const classificado = classificarArquivo(nome, "");
-
-        /* A pasta é a fonte contextual quando uma extensão é ambígua.
-           Isso permite WEBM em Áudios/ e também WEBM em Vídeos/. */
-        if (
-            classificado !== tipo &&
-            !EXTENSOES[tipo]?.has(extensao)
-        ) {
-            continue;
-        }
-
-        resultado[tipo].push({
-            nome,
-            caminho: item.path,
-            url:
-                construirRawUrl(
-                    item.path,
-                    configuracao
-                ),
-            apiUrl: item.url || "",
-            sha: item.sha || "",
-            tamanho:
-                Number(item.size || 0),
-            mime:
-                MIME_POR_EXTENSAO[
-                    obterExtensao(nome)
-                ] || "",
-            tipo
-        });
-    }
-
-    return resultado;
-}
-
-/* ============================================================
-   CATÁLOGO COMPLETO
-   ============================================================ */
 
 async function carregarCatalogo() {
-    const configuracao =
-        await obterConfiguracaoEfetiva();
+    try {
+        const resposta = await fetch('./midias.json', { cache: 'no-cache' });
+        if (!resposta.ok) throw new Error("JSON não encontrado");
+        
+        const dados = await resposta.json();
+        const catalogo = { fotos: [], audios: [], videos: [] };
+        const exclusivo = [];
 
-    estado.configuracao =
-        configuracao;
+        for (const [categoria, lista] of Object.entries(dados)) {
+            if (!Array.isArray(lista)) continue;
 
-    let catalogo =
-        await listarCatalogoViaTree(
-            configuracao
-        );
+            lista.forEach(itemRelativo => {
+                const nome = itemRelativo.split('/').pop();
+                const tipo = classificarArquivo(nome);
+                
+                if (!tipo) return;
 
-    if (!catalogo) {
-        /* A Git Trees API pode retornar truncated=true
-           em repositórios muito grandes. Nesse caso cada
-           diretório é consultado separadamente. */
-        const [
-            fotos,
-            audios,
-            videos
-        ] = await Promise.all([
-            listarPastaViaContents(
-                PASTAS.fotos,
-                configuracao
-            ),
-            listarPastaViaContents(
-                PASTAS.audios,
-                configuracao
-            ),
-            listarPastaViaContents(
-                PASTAS.videos,
-                configuracao
-            )
-        ]);
+                const objetoMedia = {
+                    nome: nome,
+                    caminho: `midia/${itemRelativo}`,
+                    url: `midia/${itemRelativo}`,
+                    mime: MIME_POR_EXTENSAO[obterExtensao(nome)] || "",
+                    tipo: tipo
+                };
 
-        catalogo = {
-            fotos,
-            audios,
-            videos
-        };
+                const partes = itemRelativo.toLowerCase().split('/');
+                if (estado.usuario && partes.includes(estado.usuario)) {
+                    exclusivo.push(objetoMedia);
+                } else if (partes.length === 1 || partes[0] === categoria) {
+                    catalogo[tipo].push(objetoMedia);
+                }
+            });
+        }
+
+        estado.arquivos = catalogo;
+        estado.exclusivo = exclusivo;
+
+        shuffleArray(estado.arquivos.fotos);
+        estado.arquivos.audios.sort(compararNomes);
+        estado.arquivos.videos.sort(compararNomes);
+        estado.exclusivo.sort(compararNomes);
+
+    } catch (erro) {
+        console.warn("Falha ao carregar midias.json:", erro);
+        estado.arquivos = { fotos: [], audios: [], videos: [] };
+        estado.exclusivo = [];
     }
 
-    estado.arquivos = catalogo;
-
-    embaralhar(
-        estado.arquivos.fotos
-    );
-
-    estado.arquivos.audios.sort(
-        compararNomes
-    );
-
-    estado.arquivos.videos.sort(
-        compararNomes
-    );
-
     atualizarResumo();
-
     renderizarFotos();
     renderizarAudios();
     renderizarVideos();
-
-    estado.carregando = false;
+    renderizarExclusivo();
+    configurarMusica();
 }
-
-/* ============================================================
-   ORDENAÇÃO DOS MEDIA NÃO-FOTOGRÁFICOS
-   ============================================================ */
-
-function compararNomes(a,b) {
-    return String(a.nome).localeCompare(
-        String(b.nome),
-        "pt-BR",
-        {
-            numeric: true,
-            sensitivity: "base"
-        }
-    );
-}
-
-/* ============================================================
-   RESUMO
-   ============================================================ */
 
 function atualizarResumo() {
-    const fotos =
-        estado.arquivos.fotos.length;
-
-    const audios =
-        estado.arquivos.audios.length;
-
-    const videos =
+    const total =
+        estado.arquivos.fotos.length +
+        estado.arquivos.audios.length +
         estado.arquivos.videos.length;
 
-    const total =
-        fotos +
-        audios +
-        videos;
-
-    document.getElementById(
-        "contador"
-    ).textContent =
+    document.getElementById("contador").textContent =
         `${total} ${total === 1 ? "mídia" : "mídias"}`;
 
-    document.getElementById(
-        "collectionNote"
-    ).textContent =
-        `${fotos} ${fotos === 1 ? "foto" : "fotos"} · ` +
-        `${audios} ${audios === 1 ? "áudio" : "áudios"} · ` +
-        `${videos} ${videos === 1 ? "vídeo" : "vídeos"}`;
+    document.getElementById("fotoStatus").textContent =
+        `${estado.arquivos.fotos.length} ${
+            estado.arquivos.fotos.length === 1 ? "foto" : "fotos"
+        }`;
 
-    document.getElementById(
-        "fotoStatus"
-    ).textContent =
-        `${fotos} ${fotos === 1 ? "foto" : "fotos"}`;
+    document.getElementById("audioStatus").textContent =
+        `${estado.arquivos.audios.length} ${
+            estado.arquivos.audios.length === 1 ? "áudio" : "áudios"
+        }`;
 
-    document.getElementById(
-        "audioStatus"
-    ).textContent =
-        `${audios} ${audios === 1 ? "áudio" : "áudios"}`;
+    document.getElementById("videoStatus").textContent =
+        `${estado.arquivos.videos.length} ${
+            estado.arquivos.videos.length === 1 ? "vídeo" : "vídeos"
+        }`;
 
-    document.getElementById(
-        "videoStatus"
-    ).textContent =
-        `${videos} ${videos === 1 ? "vídeo" : "vídeos"}`;
+    document.getElementById("exclusiveStatus").textContent =
+        `${estado.exclusivo.length} ${
+            estado.exclusivo.length === 1 ? "arquivo" : "arquivos"
+        }`;
 }
 
-/* ============================================================
-   ESTADOS DE CARREGAMENTO
-   ============================================================ */
-
-function esconderCarregamento(id) {
-    const elemento =
-        document.getElementById(id);
-
-    if (elemento) {
-        elemento.remove();
-    }
+function removerLoading(id) {
+    document.getElementById(id)?.remove();
 }
-
-function marcarSecaoComoPronta(id) {
-    const secao =
-        document.getElementById(id);
-
-    if (secao) {
-        secao.setAttribute(
-            "aria-busy",
-            "false"
-        );
-    }
-}
-
-/* ============================================================
-   FOTOS
-   ============================================================ */
 
 function renderizarFotos() {
-    const container =
-        document.getElementById(
-            "galeria"
-        );
+    const container = document.getElementById("galeria");
 
     container.innerHTML = "";
+    removerLoading("fotoLoading");
 
-    container.setAttribute(
-        "aria-busy",
-        "false"
-    );
+    document
+        .getElementById("fotoEmpty")
+        .classList.toggle("visible", estado.arquivos.fotos.length === 0);
 
-    esconderCarregamento(
-        "fotoLoading"
-    );
-
-    const vazio =
-        document.getElementById(
-            "fotoEmpty"
+    estado.arquivos.fotos.forEach((arquivo, index) => {
+        container.appendChild(
+            criarCartaoFoto(arquivo, estado.arquivos.fotos, index)
         );
-
-    vazio.classList.toggle(
-        "visible",
-        estado.arquivos.fotos.length === 0
-    );
-
-    estado.arquivos.fotos.forEach(
-        (arquivo,index) => {
-            const card =
-                criarCartaoFoto(
-                    arquivo,
-                    index
-                );
-
-            container.appendChild(card);
-        }
-    );
+    });
 }
 
-function criarCartaoFoto(
-    arquivo,
-    index
-) {
-    const card =
-        document.createElement(
-            "article"
-        );
+function criarCartaoFoto(arquivo, lista, index) {
+    const card = document.createElement("article");
 
-    card.className =
-        "media-card";
-
+    card.className = "media-card";
     card.tabIndex = 0;
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", `Abrir ${arquivo.nome}`);
 
-    card.setAttribute(
-        "role",
-        "button"
-    );
+    const shell = document.createElement("div");
+    shell.className = "photo-shell";
 
-    card.setAttribute(
-        "aria-label",
-        `Abrir ${arquivo.nome}`
-    );
-
-    card.dataset.indice =
-        String(index);
-
-    card.style.animationDelay =
-        `${Math.min(index * .012,.35)}s`;
-
-    const shell =
-        document.createElement(
-            "div"
-        );
-
-    shell.className =
-        "photo-shell";
-
-    const imagem =
-        document.createElement(
-            "img"
-        );
+    const imagem = document.createElement("img");
 
     imagem.loading = "lazy";
     imagem.decoding = "async";
-    imagem.alt =
-        `Foto: ${arquivo.nome}`;
+    imagem.alt = arquivo.nome;
+    imagem.src = arquivo.url;
 
-    imagem.src =
-        arquivo.url;
+    const overlay = document.createElement("div");
 
-    imagem.addEventListener(
-        "error",
-        () => {
-            mostrarFallbackImagem(
-                shell,
-                arquivo
-            );
-        },
-        {
-            once: true
+    overlay.className = "photo-overlay";
+    overlay.textContent = obterNomeSemExtensao(arquivo.nome);
+
+    shell.append(imagem, overlay);
+    card.appendChild(shell);
+
+    const abrir = () => {
+        abrirLightbox(arquivo, lista, index, card);
+    };
+
+    card.addEventListener("click", abrir);
+
+    card.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            abrir();
         }
-    );
-
-    const overlay =
-        document.createElement(
-            "div"
-        );
-
-    overlay.className =
-        "photo-overlay";
-
-    overlay.textContent =
-        obterNomeSemExtensao(
-            arquivo.nome
-        );
-
-    shell.appendChild(
-        imagem
-    );
-
-    shell.appendChild(
-        overlay
-    );
-
-    card.appendChild(
-        shell
-    );
-
-    const abrir =
-        () => abrirLightbox(
-            arquivo,
-            card,
-            index
-        );
-
-    card.addEventListener(
-        "click",
-        abrir
-    );
-
-    card.addEventListener(
-        "keydown",
-        event => {
-            if (
-                event.key === "Enter" ||
-                event.key === " "
-            ) {
-                event.preventDefault();
-                abrir();
-            }
-        }
-    );
+    });
 
     return card;
 }
 
-function mostrarFallbackImagem(
-    shell,
-    arquivo
-) {
-    if (
-        shell.dataset.fallback === "true"
-    ) {
-        return;
-    }
-
-    shell.dataset.fallback =
-        "true";
-
-    shell.innerHTML = "";
-
-    const box =
-        document.createElement(
-            "div"
-        );
-
-    box.className =
-        "photo-fallback";
-
-    const extensao =
-        obterExtensao(
-            arquivo.nome
-        ).toUpperCase();
-
-    const texto =
-        document.createElement(
-            "div"
-        );
-
-    const titulo =
-        document.createElement(
-            "strong"
-        );
-
-    titulo.textContent =
-        `♡ ${extensao || "IMAGEM"}`;
-
-    const detalhe =
-        document.createElement(
-            "small"
-        );
-
-    detalhe.innerHTML =
-        "Este navegador não conseguiu exibir esta imagem diretamente." +
-        "<br>" +
-        "Toque para abrir o arquivo original.";
-
-    texto.append(
-        titulo,
-        detalhe
-    );
-
-    box.appendChild(
-        texto
-    );
-
-    shell.appendChild(
-        box
-    );
-
-    shell.style.cursor =
-        "pointer";
-
-    shell.addEventListener(
-        "click",
-        event => {
-            event.stopPropagation();
-
-            abrirArquivoOriginal(
-                arquivo
-            );
-        },
-        {
-            once: true
-        }
-    );
-}
-
-function abrirArquivoOriginal(
-    arquivo
-) {
-    const janela =
-        window.open(
-            arquivo.url,
-            "_blank",
-            "noopener,noreferrer"
-        );
-
-    if (janela) {
-        janela.opener = null;
-    }
-}
-
-/* ============================================================
-   ÁUDIOS
-   ============================================================ */
-
 function renderizarAudios() {
-    const container =
-        document.getElementById(
-            "audios"
-        );
+    const container = document.getElementById("audios");
 
     container.innerHTML = "";
+    removerLoading("audioLoading");
 
-    esconderCarregamento(
-        "audioLoading"
-    );
+    document
+        .getElementById("audioEmpty")
+        .classList.toggle("visible", estado.arquivos.audios.length === 0);
 
-    const vazio =
-        document.getElementById(
-            "audioEmpty"
-        );
+    if (!estado.arquivos.audios.length) return;
 
-    vazio.classList.toggle(
-        "visible",
-        estado.arquivos.audios.length === 0
-    );
+    const panel = document.createElement("article");
+    panel.className = "media-panel";
 
-    if (
-        estado.arquivos.audios.length === 0
-    ) {
-        return;
-    }
+    const titulo = document.createElement("h3");
+    titulo.textContent = "Áudios";
 
-    const panel =
-        document.createElement(
-            "article"
-        );
+    panel.appendChild(titulo);
 
-    panel.className =
-        "media-panel";
+    estado.arquivos.audios.forEach(arquivo => {
+        const item = document.createElement("div");
+        item.className = "audio-item";
 
-    const titulo =
-        document.createElement(
-            "h3"
-        );
+        const nome = document.createElement("span");
+        nome.className = "media-name";
+        nome.textContent = arquivo.nome;
 
-    titulo.textContent =
-        "Nossas vozes";
+        const player = document.createElement("audio");
+        player.controls = true;
+        player.preload = "none";
+        player.playsInline = true;
+        player.src = arquivo.url;
 
-    const descricao =
-        document.createElement(
-            "p"
-        );
+        item.append(nome, player);
+        panel.appendChild(item);
+    });
 
-    descricao.textContent =
-        "As gravações são encontradas automaticamente em midia/Áudios/. Elas não começam sozinhas.";
-
-    panel.append(
-        titulo,
-        descricao
-    );
-
-    estado.arquivos.audios.forEach(
-        arquivo => {
-            const item =
-                document.createElement(
-                    "div"
-                );
-
-            item.className =
-                "audio-item";
-
-            const nome =
-                document.createElement(
-                    "span"
-                );
-
-            nome.className =
-                "media-name";
-
-            nome.textContent =
-                arquivo.nome;
-
-            const player =
-                document.createElement(
-                    "audio"
-                );
-
-            player.controls = true;
-            player.preload = "none";
-            player.playsInline = true;
-
-            player.src =
-                arquivo.url;
-
-            player.addEventListener(
-                "error",
-                () => {
-                    adicionarErroMedia(
-                        item,
-                        "Este navegador não conseguiu reproduzir este áudio."
-                    );
-                },
-                {
-                    once: true
-                }
-            );
-
-            item.append(
-                nome,
-                player
-            );
-
-            panel.appendChild(
-                item
-            );
-        }
-    );
-
-    container.appendChild(
-        panel
-    );
+    container.appendChild(panel);
 }
-
-/* ============================================================
-   VÍDEOS
-   ============================================================ */
 
 function renderizarVideos() {
-    const container =
-        document.getElementById(
-            "videos"
-        );
+    const container = document.getElementById("videos");
 
     container.innerHTML = "";
+    removerLoading("videoLoading");
 
-    esconderCarregamento(
-        "videoLoading"
-    );
+    document
+        .getElementById("videoEmpty")
+        .classList.toggle("visible", estado.arquivos.videos.length === 0);
 
-    const vazio =
-        document.getElementById(
-            "videoEmpty"
-        );
+    if (!estado.arquivos.videos.length) return;
 
-    vazio.classList.toggle(
-        "visible",
-        estado.arquivos.videos.length === 0
-    );
+    const panel = document.createElement("article");
+    panel.className = "media-panel";
 
-    if (
-        estado.arquivos.videos.length === 0
-    ) {
-        return;
-    }
+    const titulo = document.createElement("h3");
+    titulo.textContent = "Vídeos";
 
-    const panel =
-        document.createElement(
-            "article"
-        );
+    panel.appendChild(titulo);
 
-    panel.className =
-        "media-panel";
+    estado.arquivos.videos.forEach(arquivo => {
+        const item = document.createElement("div");
+        item.className = "video-item";
 
-    const titulo =
-        document.createElement(
-            "h3"
-        );
+        const nome = document.createElement("span");
+        nome.className = "media-name";
+        nome.textContent = arquivo.nome;
 
-    titulo.textContent =
-        "Nossos vídeos";
+        const player = document.createElement("video");
 
-    const descricao =
-        document.createElement(
-            "p"
-        );
+        player.controls = true;
+        player.preload = "metadata";
+        player.playsInline = true;
+        player.src = arquivo.url;
 
-    descricao.textContent =
-        "Os vídeos não iniciam automaticamente e só pedem dados ao navegador quando necessário.";
-
-    panel.append(
-        titulo,
-        descricao
-    );
-
-    estado.arquivos.videos.forEach(
-        arquivo => {
-            const item =
-                document.createElement(
-                    "div"
-                );
-
-            item.className =
-                "video-item";
-
-            const nome =
-                document.createElement(
-                    "span"
-                );
-
-            nome.className =
-                "media-name";
-
-            nome.textContent =
-                arquivo.nome;
-
-            const player =
-                document.createElement(
-                    "video"
-                );
-
-            player.controls = true;
-            player.preload = "metadata";
-            player.playsInline = true;
-            player.src =
-                arquivo.url;
-
-            const tipo =
-                tipoMimePorArquivo(
-                    arquivo
-                );
-
-            if (tipo) {
-                player.setAttribute(
-                    "type",
-                    tipo
-                );
-            }
-
-            player.addEventListener(
-                "error",
-                () => {
-                    adicionarErroMedia(
-                        item,
-                        "Este navegador encontrou o arquivo, mas não consegue reproduzir esse formato diretamente."
-                    );
-                },
-                {
-                    once: true
-                }
-            );
-
-            item.append(
-                nome,
-                player
-            );
-
-            panel.appendChild(
-                item
-            );
+        const mime = tipoMimePorArquivo(arquivo);
+        if (mime) {
+            player.setAttribute("type", mime);
         }
-    );
 
-    container.appendChild(
-        panel
-    );
+        item.append(nome, player);
+        panel.appendChild(item);
+    });
+
+    container.appendChild(panel);
 }
 
-/* ============================================================
-   ERRO DE PLAYER
-   ============================================================ */
+function renderizarExclusivo() {
+    const container = document.getElementById("exclusivo");
 
-function adicionarErroMedia(
-    container,
-    mensagem
-) {
-    if (
-        container.querySelector(
-            ".media-error"
-        )
-    ) {
-        return;
-    }
+    container.innerHTML = "";
+    removerLoading("exclusiveLoading");
 
-    const erro =
-        document.createElement(
-            "div"
-        );
+    document
+        .getElementById("exclusiveEmpty")
+        .classList.toggle("visible", estado.exclusivo.length === 0);
 
-    erro.className =
-        "media-error";
+    estado.exclusivo.forEach(arquivo => {
+        const item = document.createElement("article");
+        item.className = "exclusive-item";
 
-    erro.textContent =
-        mensagem;
+        const nome = document.createElement("span");
+        nome.className = "media-name";
+        nome.textContent = arquivo.nome;
 
-    container.appendChild(
-        erro
-    );
-}
+        item.appendChild(nome);
 
-/* ============================================================
-   LIGHTBOX
-   ============================================================ */
+        if (arquivo.tipo === "fotos") {
+            const imagem = document.createElement("img");
+            imagem.loading = "lazy";
+            imagem.decoding = "async";
+            imagem.src = arquivo.url;
+            imagem.alt = arquivo.nome;
+            item.appendChild(imagem);
+        }
 
-function abrirLightbox(
-    arquivo,
-    elementoOrigem,
-    indice
-) {
-    const lightbox =
-        document.getElementById(
-            "lightbox"
-        );
+        if (arquivo.tipo === "audios") {
+            const audio = document.createElement("audio");
+            audio.controls = true;
+            audio.preload = "none";
+            audio.src = arquivo.url;
+            item.appendChild(audio);
+        }
 
-    const content =
-        document.getElementById(
-            "lightboxContent"
-        );
+        if (arquivo.tipo === "videos") {
+            const video = document.createElement("video");
+            video.controls = true;
+            video.preload = "metadata";
+            video.playsInline = true;
+            video.src = arquivo.url;
 
-    const caption =
-        document.getElementById(
-            "lightboxCaption"
-        );
-
-    estado.ultimaFocada =
-        elementoOrigem ||
-        document.activeElement;
-
-    estado.indiceFotoAtual =
-        Number.isInteger(indice)
-            ? indice
-            : -1;
-
-    estado.lightboxAberto =
-        true;
-
-    content.innerHTML =
-        "";
-
-    const extensao =
-        obterExtensao(
-            arquivo.nome
-        );
-
-    if (
-        extensao === "heic" ||
-        extensao === "heif"
-    ) {
-        renderizarFallbackLightbox(
-            arquivo,
-            "Formato HEIC/HEIF",
-            "O arquivo foi encontrado corretamente, mas muitos navegadores não conseguem decodificar HEIC/HEIF diretamente. O arquivo original continua disponível abaixo."
-        );
-    } else {
-        const imagem =
-            document.createElement(
-                "img"
-            );
-
-        imagem.className =
-            "lightbox-img";
-
-        imagem.src =
-            arquivo.url;
-
-        imagem.alt =
-            `Visualização ampliada: ${arquivo.nome}`;
-
-        imagem.addEventListener(
-            "error",
-            () => {
-                renderizarFallbackLightbox(
-                    arquivo,
-                    "Não foi possível visualizar esta imagem",
-                    "O arquivo existe no repositório, mas este navegador não conseguiu decodificá-lo."
-                );
-            },
-            {
-                once: true
+            const mime = tipoMimePorArquivo(arquivo);
+            if (mime) {
+                video.setAttribute("type", mime);
             }
-        );
 
-        content.appendChild(
-            imagem
-        );
+            item.appendChild(video);
+        }
+
+        container.appendChild(item);
+    });
+}
+
+function atualizarBotaoMusica(tocando) {
+    if (tocando) {
+        textoMusica.textContent = "Música";
+        btnMusica.title = "Pausar música";
+        btnMusica.setAttribute("aria-label", "Pausar música");
+
+        iconeMusica.innerHTML = `
+            <rect x="6" y="5" width="4" height="14" rx="1"></rect>
+            <rect x="14" y="5" width="4" height="14" rx="1"></rect>
+        `;
+    } else {
+        textoMusica.textContent = "Música";
+        btnMusica.title = "Continuar música";
+        btnMusica.setAttribute("aria-label", "Continuar música");
+
+        iconeMusica.innerHTML = `
+            <path d="m7 4 12 8-12 8z"></path>
+        `;
     }
+}
 
-    caption.textContent =
-        arquivo.nome;
+function configurarMusica() {
+    audioTema.src = "midia/tema.mp3";
+    audioTema.loop = true;
+    audioTema.currentTime = 0;
+    estado.musicaPausadaManualmente = false;
 
-    lightbox.classList.add(
-        "aberto"
-    );
+    audioTema.play()
+        .then(() => atualizarBotaoMusica(true))
+        .catch(() => atualizarBotaoMusica(false));
+}
 
-    lightbox.setAttribute(
-        "aria-hidden",
-        "false"
-    );
+async function alternarMusica() {
+    if (audioTema.paused) {
+        try {
+            estado.musicaPausadaManualmente = false;
+            await audioTema.play();
+            atualizarBotaoMusica(true);
+        } catch (_) {
+            atualizarBotaoMusica(false);
+        }
+    } else {
+        estado.musicaPausadaManualmente = true;
+        audioTema.pause();
+        atualizarBotaoMusica(false);
+    }
+}
 
-    document.body.style.overflow =
-        "hidden";
+btnMusica.addEventListener("click", alternarMusica);
 
-    if (
-        !history.state ||
-        !history.state.nossosMomentosLightbox
-    ) {
+function tentarAutoplay() {
+    if (audioTema.src && audioTema.paused && !estado.musicaPausadaManualmente) {
+        audioTema.play()
+            .then(() => atualizarBotaoMusica(true))
+            .catch(() => {});
+    }
+}
+
+document.addEventListener("pointerdown", tentarAutoplay, { once: true });
+document.addEventListener("touchstart", tentarAutoplay, { once: true });
+document.addEventListener("keydown", tentarAutoplay, { once: true });
+
+audioTema.addEventListener("play", () => atualizarBotaoMusica(true));
+audioTema.addEventListener("pause", () => atualizarBotaoMusica(false));
+audioTema.addEventListener("error", () => atualizarBotaoMusica(false));
+
+function abrirLightbox(arquivo, lista, index, origem) {
+    const lightbox = document.getElementById("lightbox");
+    const content = document.getElementById("lightboxContent");
+    const caption = document.getElementById("lightboxCaption");
+
+    estado.ultimaFocada = origem;
+    estado.lightboxAberto = true;
+
+    content.innerHTML = "";
+
+    const imagem = document.createElement("img");
+    imagem.className = "lightbox-img";
+    imagem.src = arquivo.url;
+    imagem.alt = arquivo.nome;
+
+    content.appendChild(imagem);
+    caption.textContent = arquivo.nome;
+
+    lightbox.classList.add("aberto");
+    lightbox.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+
+    if (!history.state?.momentosLightbox) {
         history.pushState(
-            {
-                ...(history.state || {}),
-                nossosMomentosLightbox: true
-            },
+            { ...(history.state || {}), momentosLightbox: true },
             ""
         );
-
-        estado.lightboxUsouHistorico =
-            true;
-    } else {
-        estado.lightboxUsouHistorico =
-            false;
+        estado.lightboxUsouHistorico = true;
     }
-
-    requestAnimationFrame(
-        () => {
-            document
-                .getElementById(
-                    "lightboxClose"
-                )
-                ?.focus();
-        }
-    );
 }
 
-function renderizarFallbackLightbox(
-    arquivo,
-    tituloTexto,
-    descricaoTexto
-) {
-    const content =
-        document.getElementById(
-            "lightboxContent"
-        );
+function fecharLightbox(viaHistorico = false) {
+    const lightbox = document.getElementById("lightbox");
+    if (!estado.lightboxAberto) return;
 
-    content.innerHTML =
-        "";
+    estado.lightboxAberto = false;
+    lightbox.classList.remove("aberto");
+    lightbox.setAttribute("aria-hidden", "true");
 
-    const fallback =
-        document.createElement(
-            "div"
-        );
+    document.body.style.overflow = "";
 
-    fallback.className =
-        "lightbox-fallback";
+    document.getElementById("lightboxContent").innerHTML = "";
+    document.getElementById("lightboxCaption").textContent = "";
 
-    const titulo =
-        document.createElement(
-            "strong"
-        );
+    const foco = estado.ultimaFocada;
+    estado.ultimaFocada = null;
 
-    titulo.textContent =
-        tituloTexto;
-
-    const descricao =
-        document.createElement(
-            "p"
-        );
-
-    descricao.textContent =
-        descricaoTexto;
-
-    const link =
-        document.createElement(
-            "a"
-        );
-
-    link.className =
-        "raw-link";
-
-    link.href =
-        arquivo.url;
-
-    link.target =
-        "_blank";
-
-    link.rel =
-        "noopener noreferrer";
-
-    link.textContent =
-        "Abrir arquivo original";
-
-    fallback.append(
-        titulo,
-        descricao,
-        link
-    );
-
-    content.appendChild(
-        fallback
-    );
-}
-
-function fecharLightbox(
-    iniciadoPeloHistorico = false
-) {
-    const lightbox =
-        document.getElementById(
-            "lightbox"
-        );
-
-    if (
-        !estado.lightboxAberto &&
-        !lightbox.classList.contains(
-            "aberto"
-        )
-    ) {
-        return;
-    }
-
-    estado.lightboxAberto =
-        false;
-
-    lightbox.classList.remove(
-        "aberto"
-    );
-
-    lightbox.setAttribute(
-        "aria-hidden",
-        "true"
-    );
-
-    document.body.style.overflow =
-        "";
-
-    document.getElementById(
-        "lightboxContent"
-    ).innerHTML = "";
-
-    document.getElementById(
-        "lightboxCaption"
-    ).textContent = "";
-
-    estado.indiceFotoAtual =
-        -1;
-
-    const foco =
-        estado.ultimaFocada;
-
-    estado.ultimaFocada =
-        null;
-
-    if (
-        !iniciadoPeloHistorico &&
-        estado.lightboxUsouHistorico &&
-        history.state?.nossosMomentosLightbox
-    ) {
-        estado.lightboxUsouHistorico =
-            false;
-
+    if (!viaHistorico && estado.lightboxUsouHistorico && history.state?.momentosLightbox) {
+        estado.lightboxUsouHistorico = false;
         history.back();
         return;
     }
 
-    estado.lightboxUsouHistorico =
-        false;
+    estado.lightboxUsouHistorico = false;
 
-    if (
-        foco &&
-        typeof foco.focus === "function"
-    ) {
-        requestAnimationFrame(
-            () => foco.focus()
-        );
+    if (foco && typeof foco.focus === "function") {
+        requestAnimationFrame(() => foco.focus());
     }
 }
 
-/* ============================================================
-   EVENTOS DO LIGHTBOX
-   ============================================================ */
+document.getElementById("lightboxClose").addEventListener("click", () => fecharLightbox());
+document.getElementById("lightbox").addEventListener("click", event => {
+    if (event.target.id === "lightbox") fecharLightbox();
+});
 
-const lightbox =
-    document.getElementById(
-        "lightbox"
-    );
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && estado.lightboxAberto) fecharLightbox();
+});
 
-lightbox.addEventListener(
-    "click",
-    event => {
-        if (
-            event.target === lightbox
-        ) {
-            fecharLightbox();
-        }
-    }
-);
-
-document.getElementById(
-    "lightboxClose"
-).addEventListener(
-    "click",
-    event => {
-        event.stopPropagation();
-        fecharLightbox();
-    }
-);
-
-document.addEventListener(
-    "keydown",
-    event => {
-        if (
-            event.key === "Escape" &&
-            estado.lightboxAberto
-        ) {
-            event.preventDefault();
-            fecharLightbox();
-        }
-    }
-);
-
-window.addEventListener(
-    "popstate",
-    () => {
-        if (
-            estado.lightboxAberto
-        ) {
-            fecharLightbox(true);
-        }
-    }
-);
-
-/* ============================================================
-   ABAS DE MÍDIA
-   ============================================================ */
+window.addEventListener("popstate", () => {
+    if (estado.lightboxAberto) fecharLightbox(true);
+});
 
 function trocarSecao(nome) {
-    document.querySelectorAll(
-        ".media-tab"
-    ).forEach(
-        botao => {
-            const ativo =
-                botao.dataset.section ===
-                nome;
+    document.querySelectorAll(".media-tab").forEach(botao => {
+        const ativo = botao.dataset.section === nome;
+        botao.classList.toggle("active", ativo);
+        botao.setAttribute("aria-selected", String(ativo));
+    });
 
-            botao.classList.toggle(
-                "active",
-                ativo
-            );
-
-            botao.setAttribute(
-                "aria-selected",
-                String(ativo)
-            );
-        }
-    );
-
-    document.querySelectorAll(
-        ".section"
-    ).forEach(
-        secao => {
-            const ativo =
-                secao.id ===
-                `section-${nome}`;
-
-            secao.classList.toggle(
-                "active",
-                ativo
-            );
-
-            secao.hidden =
-                !ativo;
-        }
-    );
+    document.querySelectorAll(".section").forEach(secao => {
+        const ativo = secao.id === `section-${nome}`;
+        secao.classList.toggle("active", ativo);
+        secao.hidden = !ativo;
+    });
 }
 
-document.querySelectorAll(
-    ".media-tab"
-).forEach(
-    botao => {
-        botao.addEventListener(
-            "click",
-            () => {
-                trocarSecao(
-                    botao.dataset.section
-                );
-            }
-        );
-    }
-);
+document.querySelectorAll(".media-tab").forEach(botao => {
+    botao.addEventListener("click", () => {
+        trocarSecao(botao.dataset.section);
+    });
+});
 
-/* ============================================================
-   TECLADO DAS ABAS
-   ============================================================ */
-
-document.getElementById(
-    "mediaTabs"
-).addEventListener(
-    "keydown",
-    event => {
-        const botoes =
-            Array.from(
-                document.querySelectorAll(
-                    ".media-tab"
-                )
-            );
-
-        const indice =
-            botoes.indexOf(
-                event.target
-            );
-
-        if (indice === -1) {
-            return;
-        }
-
-        let novoIndice =
-            indice;
-
-        if (
-            event.key === "ArrowRight"
-        ) {
-            novoIndice =
-                (indice + 1) %
-                botoes.length;
-        } else if (
-            event.key === "ArrowLeft"
-        ) {
-            novoIndice =
-                (indice - 1 +
-                    botoes.length) %
-                botoes.length;
-        } else if (
-            event.key === "Home"
-        ) {
-            novoIndice = 0;
-        } else if (
-            event.key === "End"
-        ) {
-            novoIndice =
-                botoes.length - 1;
-        } else {
-            return;
-        }
-
-        event.preventDefault();
-
-        botoes[
-            novoIndice
-        ].focus();
-
-        trocarSecao(
-            botoes[
-                novoIndice
-            ].dataset.section
-        );
-    }
-);
-
-/* ============================================================
-   NAVEGAÇÃO PARA HOME.HTML
-   ============================================================ */
-
-function voltarHome() {
-    window.location.href =
-        "home.html";
-}
-
-document.getElementById(
-    "btnVoltar"
-).addEventListener(
-    "click",
-    voltarHome
-);
-
-document.getElementById(
-    "btnVoltarInferior"
-).addEventListener(
-    "click",
-    voltarHome
-);
-
-/* ============================================================
-   ERRO GLOBAL
-   ============================================================ */
-
-function mostrarErroGlobal(
-    erro
-) {
-    const box =
-        document.getElementById(
-            "globalError"
-        );
-
-    const detectado =
-        detectarRepositorioAutomaticamente();
-
-    const owner =
-        detectado.owner ||
-        "(vazio)";
-
-    const repo =
-        detectado.repo ||
-        "(vazio)";
-
-    const branch =
-        detectado.branch ||
-        "(será descoberto)";
-
-    box.innerHTML =
-        "";
-
-    const estadoErro =
-        document.createElement(
-            "div"
-        );
-
-    estadoErro.className =
-        "error-state";
-
-    const titulo =
-        document.createElement(
-            "strong"
-        );
-
-    titulo.textContent =
-        "Não consegui consultar as mídias do GitHub.";
-
-    const detalhe =
-        document.createElement(
-            "div"
-        );
-
-    detalhe.textContent =
-        erro?.message ||
-        "Ocorreu um erro inesperado.";
-
-    const orientacao =
-        document.createElement(
-            "div"
-        );
-
-    orientacao.style.marginTop =
-        "9px";
-
-    orientacao.textContent =
-        "Confira se o repositório é público, se as três pastas existem exatamente com os nomes midia/Fotos/, midia/Áudios/ e midia/Vídeos/, e se owner/repo estão corretos quando a página estiver em domínio personalizado.";
-
-    const configuracao =
-        document.createElement(
-            "div"
-        );
-
-    configuracao.style.marginTop =
-        "9px";
-
-    configuracao.innerHTML =
-        "<small>Configuração detectada: " +
-        "<code>" +
-        escaparHTML(
-            `${owner}/${repo} · ${branch}`
-        ) +
-        "</code></small>";
-
-    estadoErro.append(
-        titulo,
-        document.createElement(
-            "br"
-        ),
-        detalhe,
-        orientacao,
-        configuracao
-    );
-
-    box.appendChild(
-        estadoErro
-    );
-
-    document.getElementById(
-        "collectionNote"
-    ).textContent =
-        "Não foi possível carregar o catálogo de mídias.";
-}
-
-/* ============================================================
-   FALLBACK DE FALHA INDIVIDUAL
-   ============================================================ */
-
-window.addEventListener(
-    "unhandledrejection",
-    event => {
-        console.error(
-            "Promise rejeitada:",
-            event.reason
-        );
-    }
-);
-
-/* ============================================================
-   INICIALIZAÇÃO
-   ============================================================ */
+document.getElementById("btnVoltar").addEventListener("click", () => {
+    window.location.href = "home.html";
+});
 
 async function iniciar() {
-    try {
-        await carregarCatalogo();
-    } catch (erro) {
-        console.error(
-            "Falha ao iniciar Nossos Momentos:",
-            erro
-        );
-
-        estado.carregando =
-            false;
-
-        esconderCarregamento(
-            "fotoLoading"
-        );
-
-        esconderCarregamento(
-            "audioLoading"
-        );
-
-        esconderCarregamento(
-            "videoLoading"
-        );
-
-        document.getElementById(
-            "fotoEmpty"
-        ).classList.add(
-            "visible"
-        );
-
-        document.getElementById(
-            "fotoEmpty"
-        ).innerHTML =
-            "<strong>Não foi possível carregar a galeria</strong>" +
-            "Confira a configuração do repositório e tente novamente.";
-
-        document.getElementById(
-            "audioEmpty"
-        ).classList.add(
-            "visible"
-        );
-
-        document.getElementById(
-            "audioEmpty"
-        ).innerHTML =
-            "<strong>Não foi possível carregar os áudios</strong>" +
-            "A consulta ao repositório não foi concluída.";
-
-        document.getElementById(
-            "videoEmpty"
-        ).classList.add(
-            "visible"
-        );
-
-        document.getElementById(
-            "videoEmpty"
-        ).innerHTML =
-            "<strong>Não foi possível carregar os vídeos</strong>" +
-            "A consulta ao repositório não foi concluída.";
-
-        mostrarErroGlobal(
-            erro
-        );
-    }
+    estado.usuario = obterUsuario();
+    await carregarCatalogo();
 }
 
 iniciar();
 </script>
+
 </body>
-   </html>
+</html>
