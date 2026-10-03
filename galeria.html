@@ -2,312 +2,182 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#09050f">
-<meta name="color-scheme" content="dark">
-<meta name="description" content="Nossos Momentos">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#17131c">
 <title>Nossos Momentos</title>
 
 <style>
 @font-face {
-    font-family: "Quillen";
-    src:
-        local("Quillen"),
-        url("Quillen.otf") format("opentype");
-    font-display: swap;
-    font-style: normal;
-    font-weight: 400;
+    font-family: Quillen;
+    src: url("Quillen.otf") format("opentype");
 }
 
 :root {
-    --bg: #08050d;
-    --bg-2: #100817;
-    --surface: rgba(24, 15, 34, .78);
-    --surface-2: rgba(32, 20, 46, .84);
-    --surface-3: rgba(45, 28, 62, .72);
-    --primary: #b84dff;
-    --primary-2: #d78aff;
-    --primary-3: #8b3dcc;
-    --primary-soft: rgba(184, 77, 255, .13);
-    --primary-glow: rgba(184, 77, 255, .28);
-    --text: #f8efff;
-    --muted: #b9a9c4;
-    --muted-2: #87758f;
-    --line: rgba(215, 138, 255, .13);
-    --line-strong: rgba(215, 138, 255, .26);
-    --danger: #ff8ea8;
-    --shadow-sm: 0 8px 28px rgba(0, 0, 0, .20);
-    --shadow-md: 0 18px 50px rgba(0, 0, 0, .28);
-    --shadow-lg: 0 30px 100px rgba(0, 0, 0, .42);
-    --radius-xl: 32px;
-    --radius-lg: 25px;
-    --radius-md: 19px;
-    --radius-sm: 15px;
+    --bg: #f8f4fb;
+    --surface: #ffffff;
+    --surface-soft: #fbf8fd;
+    --primary: #9857dc;
+    --primary-dark: #7740b6;
+    --primary-soft: #f0e4fb;
+    --accent: #d58fbf;
+    --text: #28242d;
+    --muted: #85808a;
+    --border: #e8e2eb;
+    --shadow: 0 12px 35px rgba(102, 58, 140, .10);
 }
 
 * {
-    margin: 0;
-    padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 html {
-    min-height: 100%;
     scroll-behavior: smooth;
 }
 
 body {
+    margin: 0;
     min-height: 100vh;
-    min-height: 100dvh;
-    overflow-x: hidden;
+    background:
+        radial-gradient(circle at top left, rgba(190, 137, 238, .14), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(222, 154, 196, .12), transparent 30%),
+        var(--bg);
     color: var(--text);
-    font-family:
-        Inter,
-        ui-sans-serif,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Helvetica,
-        Arial,
-        sans-serif;
-    background:
-        radial-gradient(circle at 8% -10%, rgba(184,77,255,.23), transparent 32%),
-        radial-gradient(circle at 95% 7%, rgba(215,138,255,.15), transparent 28%),
-        radial-gradient(circle at 50% 115%, rgba(124,45,167,.16), transparent 38%),
-        linear-gradient(145deg, var(--bg), var(--bg-2));
-    padding:
-        max(18px, env(safe-area-inset-top))
-        max(14px, env(safe-area-inset-right))
-        max(30px, env(safe-area-inset-bottom))
-        max(14px, env(safe-area-inset-left));
-}
-
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: -2;
-    background:
-        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
-    background-size: 42px 42px;
-    mask-image: linear-gradient(to bottom, black, transparent 78%);
-    -webkit-mask-image: linear-gradient(to bottom, black, transparent 78%);
-}
-
-body::after {
-    content: "";
-    position: fixed;
-    width: 420px;
-    height: 420px;
-    right: -180px;
-    top: 20%;
-    border-radius: 50%;
-    background: rgba(184,77,255,.08);
-    filter: blur(100px);
-    pointer-events: none;
-    z-index: -1;
-}
-
-button,
-a {
-    font: inherit;
-    -webkit-tap-highlight-color: transparent;
+    font-family: Georgia, "Times New Roman", serif;
 }
 
 button {
-    border: 0;
+    font: inherit;
 }
 
-button:focus-visible,
-a:focus-visible,
-[tabindex]:focus-visible {
-    outline: 2px solid var(--primary-2);
-    outline-offset: 3px;
-}
-
-.app-shell {
-    width: min(100%, 1220px);
+.app {
+    width: min(100%, 760px);
+    min-height: 100vh;
     margin: 0 auto;
-    animation: pageIn .5s ease both;
-}
-
-@keyframes pageIn {
-    from {
-        opacity: 0;
-        transform: translateY(14px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    background: rgba(255, 255, 255, .82);
+    box-shadow: 0 0 50px rgba(82, 46, 108, .08);
+    overflow: hidden;
 }
 
 .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    height: 64px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 13px;
+    gap: 14px;
+    padding: 0 18px;
+    background: rgba(255, 255, 255, .92);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(18px);
 }
 
-.navigation-button {
-    min-width: 48px;
-    min-height: 48px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 8px 12px;
-    border: 1px solid var(--line);
-    border-radius: 17px;
-    color: var(--primary-2);
-    background: rgba(22, 13, 31, .72);
-    box-shadow: var(--shadow-sm);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+.back-button {
+    width: 42px;
+    height: 42px;
+    border: 0;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background: var(--primary-soft);
+    color: var(--primary-dark);
     cursor: pointer;
+    font-size: 24px;
     transition: .2s ease;
 }
 
-.navigation-button:hover {
-    transform: translateY(-2px);
-    border-color: var(--line-strong);
-    background: rgba(39, 22, 53, .86);
-    box-shadow: 0 12px 32px rgba(184,77,255,.12);
+.back-button:active {
+    transform: scale(.94);
 }
 
-.navigation-button:active {
-    transform: scale(.96);
-}
-
-.navigation-button svg {
-    width: 21px;
-    height: 21px;
-}
-
-.navigation-label {
-    max-width: 0;
-    opacity: 0;
-    overflow: hidden;
+.top-title {
+    flex: 1;
+    min-width: 0;
+    font-family: Quillen, Georgia, serif;
+    font-size: 24px;
+    color: var(--text);
     white-space: nowrap;
-    font-size: 11px;
-    font-weight: 800;
-    transition: .2s ease;
-}
-
-.navigation-button:hover .navigation-label,
-.navigation-button:focus-visible .navigation-label {
-    max-width: 80px;
-    opacity: 1;
-}
-
-.topbar-spacer {
-    width: 48px;
-    height: 48px;
-}
-
-.container {
-    width: 100%;
-    padding: clamp(20px, 4vw, 35px);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-xl);
-    background:
-        linear-gradient(145deg, rgba(30,18,42,.88), rgba(15,9,23,.80));
-    box-shadow: var(--shadow-lg);
-    backdrop-filter: blur(22px);
-    -webkit-backdrop-filter: blur(22px);
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .hero {
+    padding: 34px 24px 18px;
     text-align: center;
-    margin-bottom: 28px;
 }
 
-.hero h1 {
-    font-family: "Quillen", Georgia, serif;
-    font-size: clamp(42px, 8vw, 68px);
-    font-weight: 400;
+.hero-title {
+    margin: 0;
+    font-family: Quillen, Georgia, serif;
+    font-size: clamp(34px, 8vw, 52px);
     line-height: 1;
-    letter-spacing: .01em;
-    background: linear-gradient(100deg, #fff, #d78aff, #b84dff);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    text-shadow: 0 0 35px rgba(184,77,255,.16);
+    color: var(--primary-dark);
+    font-weight: 400;
 }
 
-.subtitulo {
-    max-width: 680px;
-    margin: 12px auto 0;
-    color: var(--muted);
-    font-family: "Quillen", Georgia, serif;
-    font-size: 17px;
-    line-height: 1.55;
+.hero-subtitle {
+    max-width: 590px;
+    margin: 15px auto 0;
+    color: #77717c;
+    font-size: 20px;
+    line-height: 1.45;
 }
 
-.overview {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    margin-bottom: 16px;
+.content {
+    padding: 0 20px 40px;
 }
 
-.contador {
-    min-width: 120px;
-    padding: 9px 14px;
-    text-align: center;
-    border: 1px solid var(--line);
+.counter {
+    width: fit-content;
+    min-width: 150px;
+    margin: 16px 0 22px;
+    padding: 13px 25px;
+    border: 1px solid #eadcf5;
     border-radius: 999px;
     background: var(--primary-soft);
-    color: var(--primary-2);
-    font-size: 12px;
-    font-weight: 800;
+    color: var(--primary-dark);
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
 }
 
-.media-tabs {
+.tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 26px;
+}
+
+.tab {
+    min-height: 64px;
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    background: var(--surface);
+    color: #807b84;
     display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-}
-
-.media-tab {
-    min-height: 45px;
-    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 0 17px;
-    border: 1px solid var(--line);
-    border-radius: 15px;
-    background: rgba(255,255,255,.035);
-    color: var(--muted);
+    gap: 10px;
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
     cursor: pointer;
-    font-size: 13px;
-    font-weight: 800;
-    transition: .2s ease;
+    box-shadow: 0 5px 18px rgba(91, 50, 120, .04);
+    transition: .25s ease;
 }
 
-.media-tab:hover {
-    color: var(--primary-2);
-    border-color: var(--line-strong);
-    background: var(--primary-soft);
-    transform: translateY(-1px);
-}
-
-.media-tab.active {
+.tab.active {
+    background: linear-gradient(135deg, #a45be2, #8e4fd0);
     color: #fff;
-    border-color: rgba(215,138,255,.45);
-    background: linear-gradient(135deg, #9b42d5, #b84dff);
-    box-shadow: 0 8px 28px rgba(184,77,255,.25);
+    border-color: transparent;
+    box-shadow: 0 12px 25px rgba(142, 79, 208, .23);
 }
 
-.media-tab svg {
-    width: 17px;
-    height: 17px;
+.tab-icon {
+    font-size: 23px;
+    line-height: 1;
 }
 
 .section {
@@ -316,143 +186,10 @@ a:focus-visible,
 
 .section.active {
     display: block;
-    animation: sectionIn .25s ease both;
+    animation: appear .3s ease;
 }
 
-@keyframes sectionIn {
-    from {
-        opacity: .2;
-        transform: translateY(5px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.section-head {
-    display: flex;
-    align-items: end;
-    justify-content: space-between;
-    gap: 12px;
-    margin: 2px 1px 14px;
-}
-
-.section-head h2 {
-    font-family: "Quillen", Georgia, serif;
-    font-size: 28px;
-    font-weight: 400;
-}
-
-.section-head p {
-    color: var(--muted-2);
-    font-size: 11px;
-}
-
-.exclusive-section {
-    margin-top: 32px;
-    padding-top: 27px;
-    border-top: 1px solid var(--line);
-}
-
-.exclusive-title {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 15px;
-}
-
-.exclusive-title h2 {
-    font-family: "Quillen", Georgia, serif;
-    font-size: 28px;
-    font-weight: 400;
-}
-
-.exclusive-user {
-    display: inline-flex;
-    align-items: center;
-    max-width: 48%;
-    padding: 7px 11px;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    background: var(--primary-soft);
-    color: var(--primary-2);
-    font-size: 10px;
-    font-weight: 800;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.exclusive-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
-}
-
-.exclusive-card {
-    min-width: 0;
-    padding: 15px;
-    border: 1px solid var(--line);
-    border-radius: var(--radius-md);
-    background:
-        linear-gradient(145deg, rgba(184,77,255,.09), rgba(255,255,255,.025));
-    box-shadow: var(--shadow-sm);
-}
-
-.exclusive-card h3 {
-    margin-bottom: 5px;
-    font-family: "Quillen", Georgia, serif;
-    font-size: 22px;
-    font-weight: 400;
-}
-
-.exclusive-card p {
-    margin-bottom: 12px;
-    color: var(--muted-2);
-    font-size: 11px;
-}
-
-.exclusive-card audio,
-.exclusive-card video {
-    width: 100%;
-}
-
-.exclusive-photo {
-    position: relative;
-    overflow: hidden;
-    padding: 0;
-    cursor: zoom-in;
-}
-
-.exclusive-photo img {
-    display: block;
-    width: 100%;
-    height: auto;
-    transition: transform .3s ease;
-}
-
-.exclusive-photo:hover img {
-    transform: scale(1.025);
-}
-
-.galeria {
-    column-count: 5;
-    column-gap: 14px;
-    padding: 0 1px;
-}
-
-.media-card {
-    display: block;
-    break-inside: avoid;
-    margin-bottom: 14px;
-    cursor: zoom-in;
-    animation: mediaIn .35s ease both;
-}
-
-@keyframes mediaIn {
+@keyframes appear {
     from {
         opacity: 0;
         transform: translateY(8px);
@@ -464,391 +201,242 @@ a:focus-visible,
     }
 }
 
-.photo-shell {
-    position: relative;
-    overflow: hidden;
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    background: #140b1c;
-    box-shadow: var(--shadow-sm);
+.section-title {
+    margin: 0 0 7px;
+    font-family: Quillen, Georgia, serif;
+    font-size: 31px;
+    font-weight: 400;
+    color: var(--text);
 }
 
-.photo-shell img {
-    display: block;
-    width: 100%;
-    height: auto;
-    transition: transform .3s ease, opacity .3s ease;
+.section-status {
+    margin: 0 0 18px;
+    color: var(--muted);
+    font-family: Arial, sans-serif;
+    font-size: 14px;
 }
 
-.media-card:hover .photo-shell img {
-    transform: scale(1.018);
-    opacity: .92;
-}
-
-.photo-overlay {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    padding: 32px 11px 11px;
-    background: linear-gradient(transparent, rgba(7,3,11,.72));
-    color: #fff;
-    font-size: 11px;
-    font-weight: 700;
-    opacity: 0;
-    transition: .2s ease;
-    pointer-events: none;
-}
-
-.media-card:hover .photo-overlay,
-.media-card:focus-visible .photo-overlay {
-    opacity: 1;
-}
-
-.media-grid {
+.photo-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 13px;
+    gap: 12px;
 }
 
-.media-panel {
-    min-width: 0;
-    padding: 17px;
-    border: 1px solid var(--line);
-    border-radius: var(--radius-md);
-    background: linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.018));
-    box-shadow: var(--shadow-sm);
+.photo-card {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 20px;
+    background: #eee8f1;
+    box-shadow: var(--shadow);
+    cursor: pointer;
 }
 
-.media-panel h3 {
-    margin-bottom: 5px;
-    font-family: "Quillen", Georgia, serif;
-    font-size: 25px;
-    font-weight: 400;
+.photo-card img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    transition: transform .45s ease;
 }
 
-.media-panel p {
-    margin-bottom: 13px;
-    color: var(--muted-2);
-    font-size: 11px;
+.photo-card:active img {
+    transform: scale(1.035);
 }
 
-.audio-item,
-.video-item {
-    margin-bottom: 9px;
-    padding: 12px;
-    border: 1px solid var(--line);
+.media-list {
+    display: grid;
+    gap: 12px;
+}
+
+.audio-card,
+.video-card {
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.audio-card audio {
+    width: 100%;
+    display: block;
+}
+
+.video-card video {
+    width: 100%;
+    max-height: 430px;
+    display: block;
     border-radius: 15px;
-    background: rgba(0,0,0,.14);
-}
-
-.audio-item:last-child,
-.video-item:last-child {
-    margin-bottom: 0;
+    background: #111;
 }
 
 .media-name {
-    display: block;
-    margin-bottom: 8px;
+    margin: 0 0 12px;
     color: var(--text);
-    font-size: 12px;
-    font-weight: 800;
-    line-height: 1.4;
-    overflow-wrap: anywhere;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    word-break: break-word;
 }
 
-audio,
-video {
-    display: block;
-    width: 100%;
-    border-radius: 11px;
-}
-
-audio {
-    min-height: 42px;
-}
-
-video {
-    max-height: 460px;
-    background: #050307;
-    object-fit: contain;
-}
-
-.loading-state {
-    min-height: 145px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    color: var(--muted);
-    font-size: 13px;
-}
-
-.loader-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--primary);
-    box-shadow: 0 0 15px var(--primary);
-    animation: pulse 1s ease-in-out infinite;
-}
-
-@keyframes pulse {
-    0%, 100% {
-        opacity: .35;
-        transform: scale(.8);
-    }
-
-    50% {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-.empty-state {
-    display: none;
-    padding: 32px 16px;
+.empty {
+    padding: 54px 20px;
+    border: 1px dashed #e4dce7;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, .55);
     text-align: center;
-    border: 1px dashed var(--line);
-    border-radius: 18px;
-    background: rgba(255,255,255,.018);
+}
+
+.empty-title {
+    margin: 0;
+    color: #302b34;
+    font-size: 25px;
+}
+
+.empty-text {
+    margin: 12px 0 0;
     color: var(--muted);
+    font-family: Arial, sans-serif;
+    font-size: 15px;
 }
 
-.empty-state.visible {
-    display: block;
+.exclusive-box {
+    margin-bottom: 20px;
+    padding: 18px;
+    border: 1px solid #e7d8f2;
+    border-radius: 24px;
+    background: linear-gradient(145deg, #fcf8ff, #f5ecfc);
 }
 
-.empty-state strong {
-    display: block;
-    margin-bottom: 5px;
-    color: var(--text);
-    font-family: "Quillen", Georgia, serif;
-    font-size: 22px;
-    font-weight: 400;
+.exclusive-title {
+    margin: 0;
+    color: var(--primary-dark);
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
 }
 
-.actions {
-    display: flex;
-    justify-content: center;
-    margin-top: 24px;
+.exclusive-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 14px;
 }
 
-.action-button {
-    min-height: 46px;
-    padding: 0 19px;
-    border: 1px solid var(--line);
-    border-radius: 15px;
-    background: rgba(255,255,255,.035);
-    color: var(--muted);
+.exclusive-tab {
+    min-height: 42px;
+    border: 1px solid #e3d8eb;
+    border-radius: 14px;
+    background: #fff;
+    color: #827b87;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
     cursor: pointer;
-    font-size: 13px;
-    font-weight: 800;
-    transition: .2s ease;
 }
 
-.action-button:hover {
+.exclusive-tab.active {
+    border-color: transparent;
+    background: var(--primary);
     color: #fff;
-    border-color: var(--line-strong);
-    background: var(--primary-soft);
-    transform: translateY(-1px);
+}
+
+.exclusive-content {
+    display: none;
+}
+
+.exclusive-content.active {
+    display: block;
 }
 
 .lightbox {
     position: fixed;
     inset: 0;
-    z-index: 1000;
-    display: flex;
+    z-index: 100;
+    display: none;
     align-items: center;
     justify-content: center;
-    padding:
-        max(14px, env(safe-area-inset-top))
-        max(12px, env(safe-area-inset-right))
-        max(14px, env(safe-area-inset-bottom))
-        max(12px, env(safe-area-inset-left));
-    background: rgba(5,2,8,.88);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: .24s ease;
+    padding: 20px;
+    background: rgba(20, 14, 24, .94);
+    backdrop-filter: blur(12px);
 }
 
-.lightbox.aberto {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-}
-
-.lightbox-content {
-    position: relative;
-    width: min(96vw, 1400px);
-    max-height: 94vh;
-    max-height: 94dvh;
+.lightbox.active {
     display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
-.lightbox-img {
-    max-width: 96vw;
+.lightbox img {
+    max-width: 100%;
     max-height: 88vh;
-    max-height: 88dvh;
-    width: auto;
-    height: auto;
     object-fit: contain;
-    border-radius: 13px;
-    box-shadow: 0 30px 100px rgba(0,0,0,.65);
+    border-radius: 12px;
+    box-shadow: 0 20px 70px rgba(0, 0, 0, .4);
 }
 
 .lightbox-close {
     position: fixed;
-    top: max(16px, env(safe-area-inset-top));
-    right: max(16px, env(safe-area-inset-right));
-    z-index: 3;
+    top: 18px;
+    right: 18px;
     width: 46px;
     height: 46px;
-    display: grid;
-    place-items: center;
-    border: 1px solid rgba(255,255,255,.18);
+    border: 0;
     border-radius: 50%;
-    background: rgba(255,255,255,.07);
+    background: rgba(255, 255, 255, .14);
     color: #fff;
-    font-size: 25px;
+    font-size: 28px;
     cursor: pointer;
-    transition: .2s ease;
 }
 
-.lightbox-close:hover {
-    background: rgba(184,77,255,.20);
-    transform: scale(1.04);
-}
-
-.lightbox-caption {
-    position: fixed;
-    left: 50%;
-    bottom: max(16px, env(safe-area-inset-bottom));
-    transform: translateX(-50%);
-    max-width: min(90vw, 760px);
-    padding: 9px 14px;
-    border: 1px solid rgba(255,255,255,.14);
-    border-radius: 999px;
-    background: rgba(25,12,35,.75);
-    color: #fff;
-    font-size: 11px;
+.home-button {
+    width: 100%;
+    min-height: 52px;
+    margin-top: 28px;
+    border: 1px solid #dfd2e7;
+    border-radius: 18px;
+    background: #fff;
+    color: var(--primary-dark);
+    font-family: Arial, sans-serif;
+    font-size: 14px;
     font-weight: 700;
-    text-align: center;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    overflow-wrap: anywhere;
+    cursor: pointer;
 }
 
-@media (max-width: 1180px) {
-    .galeria {
-        column-count: 4;
-    }
-}
-
-@media (max-width: 900px) {
-    .galeria {
-        column-count: 3;
+@media (max-width: 560px) {
+    .topbar {
+        padding: 0 14px;
     }
 
-    .media-grid,
-    .exclusive-grid {
+    .hero {
+        padding: 28px 18px 16px;
+    }
+
+    .hero-title {
+        font-size: 38px;
+    }
+
+    .hero-subtitle {
+        font-size: 18px;
+    }
+
+    .content {
+        padding: 0 14px 34px;
+    }
+
+    .tabs {
         grid-template-columns: 1fr;
     }
-}
 
-@media (max-width: 680px) {
-    body {
-        padding-top: max(12px, env(safe-area-inset-top));
+    .tab {
+        min-height: 58px;
     }
 
-    .container {
-        padding: 19px 13px 16px;
-        border-radius: 25px;
+    .photo-grid {
+        gap: 9px;
     }
 
-    .navigation-button,
-    .topbar-spacer {
-        width: 44px;
-        min-width: 44px;
-        height: 44px;
-        min-height: 44px;
-        border-radius: 14px;
-    }
-
-    .navigation-label {
-        display: none;
-    }
-
-    .galeria {
-        column-count: 2;
-        column-gap: 9px;
-    }
-
-    .media-card {
-        margin-bottom: 9px;
-    }
-
-    .photo-shell {
-        border-radius: 14px;
-    }
-
-    .overview {
-        justify-content: flex-start;
-    }
-
-    .section-head {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .media-tab {
-        flex: 1 1 calc(50% - 8px);
-    }
-
-    .exclusive-title {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .exclusive-user {
-        max-width: 100%;
-    }
-}
-
-@media (max-width: 390px) {
-    .galeria {
-        column-count: 1;
-    }
-
-    .media-tab {
-        flex-basis: 100%;
-    }
-
-    .hero h1 {
-        font-size: 40px;
-    }
-
-    .subtitulo {
-        font-size: 15px;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    html {
-        scroll-behavior: auto;
-    }
-
-    *,
-    *::before,
-    *::after {
-        animation-duration: .001ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: .001ms !important;
+    .exclusive-tabs {
+        gap: 6px;
     }
 }
 </style>
@@ -856,242 +444,103 @@ video {
 
 <body>
 
-<main class="app-shell">
+<div class="app">
 
-    <div class="topbar">
-        <button
-            class="navigation-button"
-            type="button"
-            id="btnVoltar"
-            aria-label="Voltar para home.html"
-            title="Voltar"
-        >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M19 12H5"></path>
-                <path d="m12 19-7-7 7-7"></path>
-            </svg>
-            <span class="navigation-label">Voltar</span>
-        </button>
+    <header class="topbar">
+        <button class="back-button" type="button" onclick="window.location.href='home.html'">‹</button>
+        <div class="top-title">Nossos Momentos</div>
+    </header>
 
-        <div class="topbar-spacer" aria-hidden="true"></div>
-    </div>
+    <main>
 
-    <section class="container">
-
-        <header class="hero">
-            <h1>Nossos Momentos</h1>
-            <p class="subtitulo">
-                Pequenos pedacinhos de nós, quero deixar guardados aqui ♡
-            </p>
-        </header>
-
-        <div class="overview">
-            <div class="contador" id="contador">
-                0 mídias
-            </div>
-        </div>
-
-        <div
-            class="media-tabs"
-            id="mediaTabs"
-            role="tablist"
-            aria-label="Tipos de mídia"
-        >
-
-            <button
-                class="media-tab active"
-                type="button"
-                role="tab"
-                aria-selected="true"
-                aria-controls="section-fotos"
-                id="tab-fotos"
-                data-section="fotos"
-            >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <rect x="3" y="4" width="18" height="16" rx="3"></rect>
-                    <circle cx="8.5" cy="9" r="1.5"></circle>
-                    <path d="m5.5 17 4.5-4.5 3.5-3.5 6 6"></path>
-                </svg>
-                Fotos
-            </button>
-
-            <button
-                class="media-tab"
-                type="button"
-                role="tab"
-                aria-selected="false"
-                aria-controls="section-audios"
-                id="tab-audios"
-                data-section="audios"
-            >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M9 18V5l11-2v13"></path>
-                    <circle cx="6" cy="18" r="3"></circle>
-                    <circle cx="17" cy="16" r="3"></circle>
-                </svg>
-                Áudios
-            </button>
-
-            <button
-                class="media-tab"
-                type="button"
-                role="tab"
-                aria-selected="false"
-                aria-controls="section-videos"
-                id="tab-videos"
-                data-section="videos"
-            >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <rect x="3" y="5" width="13" height="14" rx="2"></rect>
-                    <path d="m16 10 5-3v10l-5-3z"></path>
-                </svg>
-                Vídeos
-            </button>
-
-        </div>
-
-        <section
-            class="section active"
-            id="section-fotos"
-            role="tabpanel"
-            aria-labelledby="tab-fotos"
-        >
-            <div class="section-head">
-                <h2>Momentos</h2>
-                <p id="fotoStatus">Carregando...</p>
-            </div>
-
-            <div
-                class="galeria"
-                id="galeria"
-                aria-live="polite"
-                aria-busy="true"
-            ></div>
-
-            <div class="loading-state" id="fotoLoading">
-                <span class="loader-dot"></span>
-                carregando...
-            </div>
-
-            <div class="empty-state" id="fotoEmpty">
-                <strong>Nenhuma foto encontrada</strong>
-            </div>
+        <section class="hero">
+            <h1 class="hero-title">Nossos Momentos</h1>
+            <p class="hero-subtitle">Pequenos pedacinhos de nós, quero deixar guardados aqui ♡</p>
         </section>
 
-        <section
-            class="section"
-            id="section-audios"
-            role="tabpanel"
-            aria-labelledby="tab-audios"
-            hidden
-        >
-            <div class="section-head">
-                <h2>Vozes</h2>
-                <p id="audioStatus">Carregando...</p>
-            </div>
+        <div class="content">
 
-            <div id="audios" class="media-grid"></div>
+            <div class="counter" id="counter">0 mídias</div>
 
-            <div class="loading-state" id="audioLoading">
-                <span class="loader-dot"></span>
-                carregando...
-            </div>
+            <nav class="tabs">
+                <button class="tab active" type="button" data-tab="fotos">
+                    <span class="tab-icon">▧</span>
+                    <span>Fotos</span>
+                </button>
 
-            <div class="empty-state" id="audioEmpty">
-                <strong>Nenhum áudio encontrado</strong>
-            </div>
-        </section>
+                <button class="tab" type="button" data-tab="audios">
+                    <span class="tab-icon">♫</span>
+                    <span>Áudios</span>
+                </button>
 
-        <section
-            class="section"
-            id="section-videos"
-            role="tabpanel"
-            aria-labelledby="tab-videos"
-            hidden
-        >
-            <div class="section-head">
-                <h2>Vídeos</h2>
-                <p id="videoStatus">Carregando...</p>
-            </div>
+                <button class="tab" type="button" data-tab="videos">
+                    <span class="tab-icon">▹</span>
+                    <span>Vídeos</span>
+                </button>
 
-            <div id="videos" class="media-grid"></div>
+                <button class="tab" type="button" data-tab="exclusivo">
+                    <span class="tab-icon">♧</span>
+                    <span>Exclusivo</span>
+                </button>
+            </nav>
 
-            <div class="loading-state" id="videoLoading">
-                <span class="loader-dot"></span>
-                carregando...
-            </div>
+            <section class="section active" id="section-fotos">
+                <h2 class="section-title">Momentos</h2>
+                <p class="section-status" id="foto-status">Carregando...</p>
+                <div id="fotos-container"></div>
+            </section>
 
-            <div class="empty-state" id="videoEmpty">
-                <strong>Nenhum vídeo encontrado</strong>
-            </div>
-        </section>
+            <section class="section" id="section-audios">
+                <h2 class="section-title">Áudios</h2>
+                <p class="section-status" id="audio-status">Carregando...</p>
+                <div id="audios-container"></div>
+            </section>
 
-        <section class="exclusive-section">
+            <section class="section" id="section-videos">
+                <h2 class="section-title">Vídeos</h2>
+                <p class="section-status" id="video-status">Carregando...</p>
+                <div id="videos-container"></div>
+            </section>
 
-            <div class="exclusive-title">
-                <h2>Conteúdo exclusivo</h2>
-                <div class="exclusive-user" id="exclusiveUser">
-                    Carregando...
+            <section class="section" id="section-exclusivo">
+                <div class="exclusive-box">
+                    <h2 class="exclusive-title">Conteúdo Exclusivo</h2>
+
+                    <div class="exclusive-tabs">
+                        <button class="exclusive-tab active" type="button" data-exclusive="fotos">Fotos</button>
+                        <button class="exclusive-tab" type="button" data-exclusive="audios">Áudios</button>
+                        <button class="exclusive-tab" type="button" data-exclusive="videos">Vídeos</button>
+                    </div>
                 </div>
-            </div>
 
-            <div
-                class="exclusive-grid"
-                id="exclusiveGrid"
-            ></div>
+                <div class="exclusive-content active" id="exclusive-fotos">
+                    <div id="exclusive-fotos-container"></div>
+                </div>
 
-            <div
-                class="empty-state"
-                id="exclusiveEmpty"
-            >
-                <strong>Sem conteúdo exclusivo</strong>
-            </div>
+                <div class="exclusive-content" id="exclusive-audios">
+                    <div id="exclusive-audios-container"></div>
+                </div>
 
-        </section>
+                <div class="exclusive-content" id="exclusive-videos">
+                    <div id="exclusive-videos-container"></div>
+                </div>
+            </section>
 
-        <div class="actions">
-            <button
-                class="action-button"
-                type="button"
-                id="btnVoltarInferior"
-            >
-                ← Voltar
+            <button class="home-button" type="button" onclick="window.location.href='home.html'">
+                Voltar para home
             </button>
+
         </div>
 
-    </section>
-
-</main>
-
-<div
-    class="lightbox"
-    id="lightbox"
-    aria-hidden="true"
-    role="dialog"
-    aria-modal="true"
-    aria-label="Visualização ampliada"
->
-    <button
-        class="lightbox-close"
-        type="button"
-        id="lightboxClose"
-        aria-label="Fechar"
-    >
-        ×
-    </button>
-
-    <div
-        class="lightbox-content"
-        id="lightboxContent"
-    ></div>
-
-    <div
-        class="lightbox-caption"
-        id="lightboxCaption"
-    ></div>
+    </main>
 </div>
 
-<script>
+<div class="lightbox" id="lightbox">
+    <button class="lightbox-close" type="button" id="lightbox-close">×</button>
+    <img id="lightbox-image" src="" alt="">
+</div>
+
+    <script>
 "use strict";
 
 const REPOSITORIO = {
@@ -1103,38 +552,14 @@ const REPOSITORIO = {
 
 const EXTENSOES = {
     fotos: new Set([
-        "jpg",
-        "jpeg",
-        "png",
-        "webp",
-        "gif",
-        "avif",
-        "bmp",
-        "svg",
-        "heic",
-        "heif",
-        "jfif",
-        "tif",
-        "tiff"
+        "jpg", "jpeg", "png", "webp", "gif", "avif",
+        "bmp", "svg", "heic", "heif", "jfif", "tif", "tiff"
     ]),
     audios: new Set([
-        "mp3",
-        "m4a",
-        "wav",
-        "ogg",
-        "oga",
-        "aac",
-        "flac",
-        "opus"
+        "mp3", "m4a", "wav", "ogg", "oga", "aac", "flac", "opus"
     ]),
     videos: new Set([
-        "mp4",
-        "webm",
-        "mov",
-        "m4v",
-        "ogv",
-        "avi",
-        "mkv"
+        "mp4", "webm", "mov", "m4v", "ogv", "avi", "mkv"
     ])
 };
 
@@ -1152,6 +577,7 @@ const MIME_POR_EXTENSAO = {
     jfif: "image/jpeg",
     tif: "image/tiff",
     tiff: "image/tiff",
+
     mp3: "audio/mpeg",
     m4a: "audio/mp4",
     wav: "audio/wav",
@@ -1160,6 +586,7 @@ const MIME_POR_EXTENSAO = {
     aac: "audio/aac",
     flac: "audio/flac",
     opus: "audio/opus",
+
     mp4: "video/mp4",
     webm: "video/webm",
     mov: "video/quicktime",
@@ -1170,146 +597,173 @@ const MIME_POR_EXTENSAO = {
 };
 
 const estado = {
-    usuario: "",
-    pastaUsuario: "",
-    arquivos: {
-        fotos: [],
-        audios: [],
-        videos: []
-    },
-    exclusivos: {
-        fotos: [],
-        audios: [],
-        videos: []
-    },
     configuracao: null,
-    lightboxAberto: false,
-    ultimaFocada: null
+
+    publico: {
+        fotos: [],
+        audios: [],
+        videos: []
+    },
+
+    exclusivo: {
+        fotos: [],
+        audios: [],
+        videos: []
+    },
+
+    usuario: "",
+    carregando: true
 };
-
-function obterUsuarioAtual() {
-    const chaves = [
-        "username",
-        "userName",
-        "usuario",
-        "user",
-        "currentUser"
-    ];
-
-    for (const chave of chaves) {
-        const valor = localStorage.getItem(chave);
-
-        if (valor && valor.trim()) {
-            return valor.trim();
-        }
-    }
-
-    return "";
-}
-
-function normalizarNomeUsuario(valor) {
-    return String(valor || "")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase()
-        .replace(/[\s_-]+/g, "");
-}
 
 function obterExtensao(nome) {
     const base = String(nome || "").split("/").pop();
     const posicao = base.lastIndexOf(".");
-
-    if (posicao === -1) {
-        return "";
-    }
-
+    if (posicao === -1) return "";
     return base.slice(posicao + 1).toLowerCase();
-}
-
-function obterNomeSemExtensao(nome) {
-    const base = String(nome || "").split("/").pop();
-    const posicao = base.lastIndexOf(".");
-
-    if (posicao <= 0) {
-        return base;
-    }
-
-    return base.slice(0, posicao);
 }
 
 function classificarArquivo(nome, mime = "") {
     const extensao = obterExtensao(nome);
     const tipoMime = String(mime || "").toLowerCase();
 
-    if (tipoMime.startsWith("image/")) {
-        return "fotos";
-    }
+    if (tipoMime.startsWith("image/")) return "fotos";
+    if (tipoMime.startsWith("audio/")) return "audios";
+    if (tipoMime.startsWith("video/")) return "videos";
 
-    if (tipoMime.startsWith("audio/")) {
-        return "audios";
-    }
-
-    if (tipoMime.startsWith("video/")) {
-        return "videos";
-    }
-
-    if (EXTENSOES.fotos.has(extensao)) {
-        return "fotos";
-    }
-
-    if (EXTENSOES.audios.has(extensao)) {
-        return "audios";
-    }
-
-    if (EXTENSOES.videos.has(extensao)) {
-        return "videos";
-    }
+    if (EXTENSOES.fotos.has(extensao)) return "fotos";
+    if (EXTENSOES.audios.has(extensao)) return "audios";
+    if (EXTENSOES.videos.has(extensao)) return "videos";
 
     return null;
 }
 
-function obterCaminhoRaw(caminho, configuracao) {
-    const partes = String(caminho)
-        .split("/")
-        .map(encodeURIComponent)
-        .join("/");
-
-    const branch = configuracao.branch || "main";
-
-    return `https://raw.githubusercontent.com/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/${encodeURIComponent(branch)}/${partes}`;
+function tipoMimePorArquivo(arquivo) {
+    if (arquivo.mime) return arquivo.mime;
+    return MIME_POR_EXTENSAO[obterExtensao(arquivo.nome)] || "";
 }
 
-function detectarRepositorio() {
-    const configuracao = {
-        ...REPOSITORIO
-    };
+function compararNomes(a, b) {
+    return String(a.nome).localeCompare(String(b.nome), "pt-BR", {
+        numeric: true,
+        sensitivity: "base"
+    });
+}
 
+function normalizarTexto(valor) {
+    return String(valor || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[\s_-]+/g, "")
+        .replace(/[^a-z0-9]/g, "");
+}
+
+function extrairUsuario(valor) {
+    if (!valor) return "";
+
+    if (typeof valor === "string") {
+        const texto = valor.trim();
+
+        if (!texto) return "";
+
+        try {
+            const objeto = JSON.parse(texto);
+            return extrairUsuario(objeto);
+        } catch (_) {
+            return texto;
+        }
+    }
+
+    if (typeof valor === "object") {
+        const possibilidades = [
+            valor.username,
+            valor.usuarioAtual,
+            valor.usuarioLogado,
+            valor.currentUser,
+            valor.loggedUser,
+            valor.usuario,
+            valor.user,
+            valor.nome,
+            valor.name
+        ];
+
+        for (const item of possibilidades) {
+            if (typeof item === "string" && item.trim()) {
+                return item.trim();
+            }
+
+            if (item && typeof item === "object") {
+                const resultado = extrairUsuario(item);
+                if (resultado) return resultado;
+            }
+        }
+    }
+
+    return "";
+}
+
+function obterUsuarioAtual() {
+    const chaves = [
+        "username",
+        "usuarioAtual",
+        "usuarioLogado",
+        "currentUser",
+        "loggedUser",
+        "usuario",
+        "user"
+    ];
+
+    for (const chave of chaves) {
+        try {
+            const valor = localStorage.getItem(chave);
+            const usuario = extrairUsuario(valor);
+
+            if (usuario) {
+                return usuario;
+            }
+        } catch (_) {}
+    }
+
+    for (const chave of chaves) {
+        try {
+            const valor = sessionStorage.getItem(chave);
+            const usuario = extrairUsuario(valor);
+
+            if (usuario) {
+                return usuario;
+            }
+        } catch (_) {}
+    }
+
+    return "";
+}
+
+function detectarRepositorioAutomaticamente() {
     const host = window.location.hostname;
     const caminho = window.location.pathname
         .split("/")
         .filter(Boolean);
 
-    if (
-        !configuracao.owner &&
-        host.endsWith(".github.io")
-    ) {
+    const configuracao = { ...REPOSITORIO };
+    const ehGithubPages = host.endsWith(".github.io");
+
+    if (!configuracao.owner && ehGithubPages) {
         configuracao.owner = host.split(".")[0];
     }
 
-    if (
-        !configuracao.repo &&
-        host.endsWith(".github.io") &&
-        caminho.length > 0 &&
-        !caminho[0].includes(".")
-    ) {
-        configuracao.repo = caminho[0];
+    if (!configuracao.repo && ehGithubPages) {
+        const primeiroSegmento = caminho[0] || "";
+
+        const primeiroEhArquivo =
+            primeiroSegmento.includes(".") ||
+            primeiroSegmento.toLowerCase().endsWith(".html");
+
+        if (primeiroSegmento && !primeiroEhArquivo) {
+            configuracao.repo = primeiroSegmento;
+        }
     }
 
-    if (
-        !configuracao.repo &&
-        host.endsWith(".github.io") &&
-        configuracao.owner
-    ) {
+    if (!configuracao.repo && ehGithubPages && configuracao.owner) {
         configuracao.repo = `${configuracao.owner}.github.io`;
     }
 
@@ -1327,62 +781,153 @@ async function githubFetch(url) {
     });
 
     if (!resposta.ok) {
-        let mensagem = "";
+        let detalhe = "";
 
         try {
-            const dados = await resposta.json();
+            const json = await resposta.json();
 
-            if (dados && dados.message) {
-                mensagem = dados.message;
+            if (json && json.message) {
+                detalhe = ` — ${json.message}`;
             }
         } catch (_) {}
 
         throw new Error(
-            `GitHub HTTP ${resposta.status}${mensagem ? `: ${mensagem}` : ""}`
+            `GitHub respondeu HTTP ${resposta.status}${detalhe}`
         );
     }
 
     return resposta.json();
 }
 
-async function obterConfiguracao() {
-    const configuracao = detectarRepositorio();
+async function testarRepositorio(configuracao) {
+    const url =
+        `https://api.github.com/repos/` +
+        `${encodeURIComponent(configuracao.owner)}/` +
+        `${encodeURIComponent(configuracao.repo)}`;
 
-    if (!configuracao.owner || !configuracao.repo) {
-        throw new Error("Repositorio não identificado.");
-    }
-
-    if (!configuracao.branch) {
-        const url =
-            `https://api.github.com/repos/` +
-            `${encodeURIComponent(configuracao.owner)}/` +
-            `${encodeURIComponent(configuracao.repo)}`;
-
+    try {
         const dados = await githubFetch(url);
 
-        configuracao.branch =
-            dados.default_branch || "main";
-    }
+        if (!dados || dados.private) {
+            return false;
+        }
 
-    return configuracao;
+        if (!configuracao.branch) {
+            configuracao.branch = dados.default_branch || "main";
+        }
+
+        return true;
+    } catch (_) {
+        return false;
+    }
 }
 
-function separarCatalogo(tree, configuracao) {
-    const publico = {
-        fotos: [],
-        audios: [],
-        videos: []
-    };
+async function obterConfiguracaoEfetiva() {
+    const configuracao = detectarRepositorioAutomaticamente();
 
-    const exclusivos = {
-        fotos: [],
-        audios: [],
-        videos: []
+    if (!configuracao.owner || !configuracao.repo) {
+        throw new Error(
+            "Não foi possível descobrir automaticamente o proprietário e o repositório do GitHub."
+        );
+    }
+
+    if (await testarRepositorio(configuracao)) {
+        return configuracao;
+    }
+
+    if (
+        window.location.hostname.endsWith(".github.io") &&
+        configuracao.repo !== `${configuracao.owner}.github.io`
+    ) {
+        const alternativa = {
+            ...configuracao,
+            repo: `${configuracao.owner}.github.io`
+        };
+
+        if (await testarRepositorio(alternativa)) {
+            return alternativa;
+        }
+    }
+
+    throw new Error(
+        `Não foi possível acessar o repositório ${configuracao.owner}/${configuracao.repo}.`
+    );
+}
+
+function construirRawUrl(caminho, configuracao) {
+    const partes = String(caminho)
+        .split("/")
+        .map(encodeURIComponent);
+
+    const branch = configuracao.branch || "main";
+
+    return (
+        `https://raw.githubusercontent.com/` +
+        `${encodeURIComponent(configuracao.owner)}/` +
+        `${encodeURIComponent(configuracao.repo)}/` +
+        `${encodeURIComponent(branch)}/` +
+        `${partes.join("/")}`
+    );
+}
+
+function criarArquivo(item, configuracao) {
+    const nome = item.name || item.path?.split("/").pop() || "";
+    const tipo = classificarArquivo(
+        nome,
+        item.mime_type || item.mime || ""
+    );
+
+    if (!tipo) return null;
+
+    return {
+        nome,
+        caminho: item.path,
+        url:
+            item.download_url ||
+            construirRawUrl(item.path, configuracao),
+        apiUrl: item.url || "",
+        sha: item.sha || "",
+        tamanho: Number(item.size || 0),
+        mime:
+            item.mime_type ||
+            item.mime ||
+            MIME_POR_EXTENSAO[obterExtensao(nome)] ||
+            "",
+        tipo
     };
+}
+
+async function listarCatalogoViaTree(configuracao) {
+    const url =
+        `https://api.github.com/repos/` +
+        `${encodeURIComponent(configuracao.owner)}/` +
+        `${encodeURIComponent(configuracao.repo)}/git/trees/` +
+        `${encodeURIComponent(configuracao.branch)}?recursive=1`;
+
+    const dados = await githubFetch(url);
+
+    if (!dados || !Array.isArray(dados.tree)) {
+        throw new Error(
+            "A API do GitHub não retornou a árvore do repositório."
+        );
+    }
+
+    if (dados.truncated) {
+        return null;
+    }
 
     const prefixo = `${configuracao.pastaMidia}/`;
 
-    for (const item of tree) {
+    const resultado = {
+        publico: {
+            fotos: [],
+            audios: [],
+            videos: []
+        },
+        pastas: new Map()
+    };
+
+    for (const item of dados.tree) {
         if (
             !item ||
             item.type !== "blob" ||
@@ -1392,114 +937,75 @@ function separarCatalogo(tree, configuracao) {
             continue;
         }
 
-        const caminhoRelativo =
-            item.path.slice(prefixo.length);
+        const relativo = item.path.slice(prefixo.length);
 
-        const partes = caminhoRelativo.split("/");
+        if (!relativo || !relativo.includes("/")) {
+            const arquivo = criarArquivo(
+                {
+                    name: item.path.split("/").pop(),
+                    path: item.path,
+                    url: item.url,
+                    sha: item.sha,
+                    size: item.size
+                },
+                configuracao
+            );
 
-        if (partes.length === 1) {
-            const nome = partes[0];
-            const tipo = classificarArquivo(nome);
-
-            if (!tipo) {
-                continue;
+            if (arquivo) {
+                resultado.publico[arquivo.tipo].push(arquivo);
             }
 
-            publico[tipo].push({
-                nome,
-                caminho: item.path,
-                url: obterCaminhoRaw(item.path, configuracao),
-                tamanho: Number(item.size || 0),
-                mime: MIME_POR_EXTENSAO[
-                    obterExtensao(nome)
-                ] || "",
-                tipo
+            continue;
+        }
+
+        const partes = relativo.split("/");
+        const pastaUsuario = partes[0];
+
+        if (!pastaUsuario) continue;
+
+        const arquivo = criarArquivo(
+            {
+                name: item.path.split("/").pop(),
+                path: item.path,
+                url: item.url,
+                sha: item.sha,
+                size: item.size
+            },
+            configuracao
+        );
+
+        if (!arquivo) continue;
+
+        const chave = normalizarTexto(pastaUsuario);
+
+        if (!resultado.pastas.has(chave)) {
+            resultado.pastas.set(chave, {
+                nome: pastaUsuario,
+                arquivos: []
             });
-
-            continue;
         }
 
-        if (partes.length < 2 || !estado.usuario) {
-            continue;
-        }
-
-        const pasta = partes[0];
-        const pastaNormalizada =
-            normalizarNomeUsuario(pasta);
-
-        const usuarioNormalizado =
-            normalizarNomeUsuario(estado.usuario);
-
-        if (
-            pastaNormalizada !== usuarioNormalizado
-        ) {
-            continue;
-        }
-
-        const nome = partes[partes.length - 1];
-        const tipo = classificarArquivo(nome);
-
-        if (!tipo) {
-            continue;
-        }
-
-        exclusivos[tipo].push({
-            nome,
-            caminho: item.path,
-            url: obterCaminhoRaw(item.path, configuracao),
-            tamanho: Number(item.size || 0),
-            mime: MIME_POR_EXTENSAO[
-                obterExtensao(nome)
-            ] || "",
-            tipo
-        });
-
-        if (!estado.pastaUsuario) {
-            estado.pastaUsuario = pasta;
-        }
+        resultado.pastas
+            .get(chave)
+            .arquivos
+            .push(arquivo);
     }
 
-    return {
-        publico,
-        exclusivos
-    };
+    return resultado;
 }
 
-async function listarTree(configuracao) {
+async function listarPastaViaContentsRecursivo(
+    caminho,
+    configuracao
+) {
     const url =
         `https://api.github.com/repos/` +
         `${encodeURIComponent(configuracao.owner)}/` +
-        `${encodeURIComponent(configuracao.repo)}` +
-        `/git/trees/` +
-        `${encodeURIComponent(configuracao.branch)}` +
-        `?recursive=1`;
-
-    const dados = await githubFetch(url);
-
-    if (
-        !dados ||
-        !Array.isArray(dados.tree)
-    ) {
-        throw new Error("Árvore do repositório inválida.");
-    }
-
-    if (dados.truncated) {
-        return null;
-    }
-
-    return dados.tree;
-}
-
-async function listarPasta(caminho, configuracao) {
-    const url =
-        `https://api.github.com/repos/` +
-        `${encodeURIComponent(configuracao.owner)}/` +
-        `${encodeURIComponent(configuracao.repo)}` +
-        `/contents/` +
-        caminho
+        `${encodeURIComponent(configuracao.repo)}/contents/` +
+        `${caminho
             .split("/")
             .map(encodeURIComponent)
-            .join("/") +
+            .join("/")}` +
         `?ref=${encodeURIComponent(configuracao.branch)}`;
 
     const dados = await githubFetch(url);
@@ -1508,958 +1014,221 @@ async function listarPasta(caminho, configuracao) {
         return [];
     }
 
-    return dados;
-}
+    let resultados = [];
 
-async function listarArquivosDaPasta(
-    caminho,
-    configuracao
-) {
-    const itens = await listarPasta(
-        caminho,
-        configuracao
-    );
-
-    const resultado = [];
-
-    for (const item of itens) {
-        if (!item) {
-            continue;
-        }
-
-        if (item.type === "file") {
-            const tipo = classificarArquivo(
-                item.name,
-                item.mime_type || ""
-            );
-
-            if (!tipo) {
-                continue;
-            }
-
-            resultado.push({
-                nome: item.name,
-                caminho: item.path,
-                url:
-                    item.download_url ||
-                    obterCaminhoRaw(
-                        item.path,
-                        configuracao
-                    ),
-                tamanho: Number(item.size || 0),
-                mime:
-                    item.mime_type ||
-                    MIME_POR_EXTENSAO[
-                        obterExtensao(item.name)
-                    ] ||
-                    "",
-                tipo
-            });
-
-            continue;
-        }
+    for (const item of dados) {
+        if (!item) continue;
 
         if (item.type === "dir") {
-            const subarquivos =
-                await listarArquivosDaPasta(
+            const filhos =
+                await listarPastaViaContentsRecursivo(
                     item.path,
                     configuracao
                 );
 
-            resultado.push(...subarquivos);
+            resultados = resultados.concat(filhos);
+            continue;
+        }
+
+        if (item.type !== "file") continue;
+
+        const arquivo = criarArquivo(item, configuracao);
+
+        if (arquivo) {
+            resultados.push(arquivo);
+        }
+    }
+
+    return resultados;
+}
+
+function separarConteudo(todosArquivos, usuario) {
+    const resultado = {
+        publico: {
+            fotos: [],
+            audios: [],
+            videos: []
+        },
+        exclusivo: {
+            fotos: [],
+            audios: [],
+            videos: []
+        }
+    };
+
+    const prefixo = `${REPOSITORIO.pastaMidia}/`;
+
+    const usuarioNormalizado = normalizarTexto(usuario);
+
+    for (const arquivo of todosArquivos) {
+        if (!arquivo || !arquivo.caminho) continue;
+
+        if (!arquivo.caminho.startsWith(prefixo)) {
+            continue;
+        }
+
+        const relativo =
+            arquivo.caminho.slice(prefixo.length);
+
+        const partes = relativo.split("/");
+
+        if (partes.length === 1) {
+            resultado.publico[arquivo.tipo].push(arquivo);
+            continue;
+        }
+
+        if (
+            usuarioNormalizado &&
+            normalizarTexto(partes[0]) === usuarioNormalizado
+        ) {
+            resultado.exclusivo[arquivo.tipo].push(arquivo);
         }
     }
 
     return resultado;
 }
 
-function adicionarAoCatalogo(
-    catalogo,
-    arquivo
-) {
-    if (!catalogo[arquivo.tipo]) {
-        return;
+async function carregarCatalogoPorContents(configuracao) {
+    const todosArquivos =
+        await listarPastaViaContentsRecursivo(
+            configuracao.pastaMidia,
+            configuracao
+        );
+
+    return separarConteudo(
+        todosArquivos,
+        estado.usuario
+    );
+}
+
+function localizarPastaUsuario(pastas, usuario) {
+    if (!usuario) return null;
+
+    const usuarioTexto = String(usuario).trim();
+
+    for (const pasta of pastas.values()) {
+        if (
+            String(pasta.nome).trim().toLowerCase() ===
+            usuarioTexto.toLowerCase()
+        ) {
+            return pasta;
+        }
     }
 
-    catalogo[arquivo.tipo].push(arquivo);
+    const chave = normalizarTexto(usuarioTexto);
+
+    for (const pasta of pastas.values()) {
+        if (normalizarTexto(pasta.nome) === chave) {
+            return pasta;
+        }
+    }
+
+    return null;
 }
 
 async function carregarCatalogo() {
     estado.usuario = obterUsuarioAtual();
 
-    document.getElementById(
-        "exclusiveUser"
-    ).textContent =
-        estado.usuario || "Visitante";
-
     const configuracao =
-        await obterConfiguracao();
+        await obterConfiguracaoEfetiva();
 
     estado.configuracao = configuracao;
 
-    const tree =
-        await listarTree(configuracao);
+    let catalogo =
+        await listarCatalogoViaTree(configuracao);
 
-    if (tree) {
-        const catalogo =
-            separarCatalogo(
-                tree,
-                configuracao
+    if (catalogo) {
+        const pastaUsuario =
+            localizarPastaUsuario(
+                catalogo.pastas,
+                estado.usuario
             );
 
-        estado.arquivos =
-            catalogo.publico;
+        estado.publico = catalogo.publico;
 
-        estado.exclusivos =
-            catalogo.exclusivos;
-    } else {
-        const publico =
-            await listarArquivosDaPasta(
-                configuracao.pastaMidia,
-                configuracao
-            );
-
-        const catalogoPublico = {
+        estado.exclusivo = {
             fotos: [],
             audios: [],
             videos: []
         };
 
-        const catalogoExclusivo = {
-            fotos: [],
-            audios: [],
-            videos: []
-        };
-
-        for (const arquivo of publico) {
-            const relativo =
-                arquivo.caminho
-                    .slice(
-                        `${configuracao.pastaMidia}/`
-                            .length
-                    )
-                    .split("/");
-
-            if (relativo.length === 1) {
-                adicionarAoCatalogo(
-                    catalogoPublico,
-                    arquivo
-                );
-            }
-        }
-
-        if (estado.usuario) {
-            const raizUsuario =
-                `${configuracao.pastaMidia}/${estado.usuario}`;
-
-            try {
-                const exclusivos =
-                    await listarArquivosDaPasta(
-                        raizUsuario,
-                        configuracao
-                    );
-
-                for (const arquivo of exclusivos) {
-                    adicionarAoCatalogo(
-                        catalogoExclusivo,
+        if (pastaUsuario) {
+            for (const arquivo of pastaUsuario.arquivos) {
+                if (
+                    estado.exclusivo[arquivo.tipo]
+                ) {
+                    estado.exclusivo[arquivo.tipo].push(
                         arquivo
                     );
                 }
-
-                estado.pastaUsuario =
-                    estado.usuario;
-            } catch (erro) {
-                const raizAlternativa =
-                    `${configuracao.pastaMidia}`;
-
-                const todos =
-                    await listarPasta(
-                        raizAlternativa,
-                        configuracao
-                    );
-
-                const pastaEncontrada =
-                    todos.find(
-                        item =>
-                            item &&
-                            item.type === "dir" &&
-                            normalizarNomeUsuario(
-                                item.name
-                            ) ===
-                            normalizarNomeUsuario(
-                                estado.usuario
-                            )
-                    );
-
-                if (pastaEncontrada) {
-                    const exclusivos =
-                        await listarArquivosDaPasta(
-                            pastaEncontrada.path,
-                            configuracao
-                        );
-
-                    for (const arquivo of exclusivos) {
-                        adicionarAoCatalogo(
-                            catalogoExclusivo,
-                            arquivo
-                        );
-                    }
-
-                    estado.pastaUsuario =
-                        pastaEncontrada.name;
-                }
             }
         }
-
-        estado.arquivos =
-            catalogoPublico;
-
-        estado.exclusivos =
-            catalogoExclusivo;
-    }
-
-    atualizarResumo();
-    renderizarFotos();
-    renderizarAudios();
-    renderizarVideos();
-    renderizarExclusivos();
-}
-
-function atualizarResumo() {
-    const fotos =
-        estado.arquivos.fotos.length;
-
-    const audios =
-        estado.arquivos.audios.length;
-
-    const videos =
-        estado.arquivos.videos.length;
-
-    const total =
-        fotos +
-        audios +
-        videos;
-
-    document.getElementById(
-        "contador"
-    ).textContent =
-        `${total} ${total === 1 ? "mídia" : "mídias"}`;
-
-    document.getElementById(
-        "fotoStatus"
-    ).textContent =
-        `${fotos} ${fotos === 1 ? "foto" : "fotos"}`;
-
-    document.getElementById(
-        "audioStatus"
-    ).textContent =
-        `${audios} ${audios === 1 ? "áudio" : "áudios"}`;
-
-    document.getElementById(
-        "videoStatus"
-    ).textContent =
-        `${videos} ${videos === 1 ? "vídeo" : "vídeos"}`;
-}
-
-function removerLoading(id) {
-    const elemento =
-        document.getElementById(id);
-
-    if (elemento) {
-        elemento.remove();
-    }
-}
-
-function renderizarFotos() {
-    const container =
-        document.getElementById("galeria");
-
-    container.innerHTML = "";
-    container.setAttribute(
-        "aria-busy",
-        "false"
-    );
-
-    removerLoading("fotoLoading");
-
-    const vazio =
-        document.getElementById("fotoEmpty");
-
-    vazio.classList.toggle(
-        "visible",
-        estado.arquivos.fotos.length === 0
-    );
-
-    estado.arquivos.fotos.forEach(
-        (arquivo, indice) => {
-            container.appendChild(
-                criarCartaoFoto(
-                    arquivo,
-                    indice
-                )
-            );
-        }
-    );
-}
-
-function criarCartaoFoto(
-    arquivo,
-    indice
-) {
-    const card =
-        document.createElement("article");
-
-    card.className = "media-card";
-    card.tabIndex = 0;
-    card.setAttribute(
-        "role",
-        "button"
-    );
-    card.setAttribute(
-        "aria-label",
-        `Abrir ${arquivo.nome}`
-    );
-
-    const shell =
-        document.createElement("div");
-
-    shell.className =
-        "photo-shell";
-
-    const imagem =
-        document.createElement("img");
-
-    imagem.loading = "lazy";
-    imagem.decoding = "async";
-    imagem.src = arquivo.url;
-    imagem.alt =
-        `Foto: ${arquivo.nome}`;
-
-    imagem.addEventListener(
-        "error",
-        () => {
-            shell.innerHTML = "";
-
-            const fallback =
-                document.createElement("div");
-
-            fallback.className =
-                "empty-state visible";
-
-            const texto =
-                document.createElement("strong");
-
-            texto.textContent =
-                "Imagem indisponível";
-
-            fallback.appendChild(texto);
-            shell.appendChild(fallback);
-        },
-        { once: true }
-    );
-
-    const overlay =
-        document.createElement("div");
-
-    overlay.className =
-        "photo-overlay";
-
-    overlay.textContent =
-        obterNomeSemExtensao(
-            arquivo.nome
-        );
-
-    shell.append(
-        imagem,
-        overlay
-    );
-
-    card.appendChild(shell);
-
-    const abrir = () =>
-        abrirLightbox(
-            arquivo,
-            card
-        );
-
-    card.addEventListener(
-        "click",
-        abrir
-    );
-
-    card.addEventListener(
-        "keydown",
-        evento => {
-            if (
-                evento.key === "Enter" ||
-                evento.key === " "
-            ) {
-                evento.preventDefault();
-                abrir();
-            }
-        }
-    );
-
-    card.style.animationDelay =
-        `${Math.min(indice * .012, .35)}s`;
-
-    return card;
-}
-
-function renderizarAudios() {
-    const container =
-        document.getElementById("audios");
-
-    container.innerHTML = "";
-
-    removerLoading("audioLoading");
-
-    const vazio =
-        document.getElementById("audioEmpty");
-
-    vazio.classList.toggle(
-        "visible",
-        estado.arquivos.audios.length === 0
-    );
-
-    if (
-        estado.arquivos.audios.length === 0
-    ) {
-        return;
-    }
-
-    const panel =
-        document.createElement("article");
-
-    panel.className =
-        "media-panel";
-
-    const titulo =
-        document.createElement("h3");
-
-    titulo.textContent =
-        "Nossas vozes";
-
-    const descricao =
-        document.createElement("p");
-
-    descricao.textContent =
-        `${estado.arquivos.audios.length} ${estado.arquivos.audios.length === 1 ? "áudio" : "áudios"}`;
-
-    panel.append(
-        titulo,
-        descricao
-    );
-
-    for (const arquivo of estado.arquivos.audios) {
-        panel.appendChild(
-            criarItemAudio(arquivo)
-        );
-    }
-
-    container.appendChild(panel);
-}
-
-function criarItemAudio(arquivo) {
-    const item =
-        document.createElement("div");
-
-    item.className =
-        "audio-item";
-
-    const nome =
-        document.createElement("span");
-
-    nome.className =
-        "media-name";
-
-    nome.textContent =
-        arquivo.nome;
-
-    const player =
-        document.createElement("audio");
-
-    player.controls = true;
-    player.preload = "none";
-    player.playsInline = true;
-    player.src = arquivo.url;
-
-    item.append(
-        nome,
-        player
-    );
-
-    return item;
-}
-
-function renderizarVideos() {
-    const container =
-        document.getElementById("videos");
-
-    container.innerHTML = "";
-
-    removerLoading("videoLoading");
-
-    const vazio =
-        document.getElementById("videoEmpty");
-
-    vazio.classList.toggle(
-        "visible",
-        estado.arquivos.videos.length === 0
-    );
-
-    if (
-        estado.arquivos.videos.length === 0
-    ) {
-        return;
-    }
-
-    const panel =
-        document.createElement("article");
-
-    panel.className =
-        "media-panel";
-
-    const titulo =
-        document.createElement("h3");
-
-    titulo.textContent =
-        "Nossos vídeos";
-
-    const descricao =
-        document.createElement("p");
-
-    descricao.textContent =
-        `${estado.arquivos.videos.length} ${estado.arquivos.videos.length === 1 ? "vídeo" : "vídeos"}`;
-
-    panel.append(
-        titulo,
-        descricao
-    );
-
-    for (const arquivo of estado.arquivos.videos) {
-        panel.appendChild(
-            criarItemVideo(arquivo)
-        );
-    }
-
-    container.appendChild(panel);
-}
-
-function criarItemVideo(arquivo) {
-    const item =
-        document.createElement("div");
-
-    item.className =
-        "video-item";
-
-    const nome =
-        document.createElement("span");
-
-    nome.className =
-        "media-name";
-
-    nome.textContent =
-        arquivo.nome;
-
-    const player =
-        document.createElement("video");
-
-    player.controls = true;
-    player.preload = "metadata";
-    player.playsInline = true;
-    player.src = arquivo.url;
-
-    const tipo =
-        arquivo.mime ||
-        MIME_POR_EXTENSAO[
-            obterExtensao(
-                arquivo.nome
-            )
-        ] ||
-        "";
-
-    if (tipo) {
-        player.setAttribute(
-            "type",
-            tipo
-        );
-    }
-
-    item.append(
-        nome,
-        player
-    );
-
-    return item;
-}
-
-function renderizarExclusivos() {
-    const container =
-        document.getElementById(
-            "exclusiveGrid"
-        );
-
-    container.innerHTML = "";
-
-    const total =
-        estado.exclusivos.fotos.length +
-        estado.exclusivos.audios.length +
-        estado.exclusivos.videos.length;
-
-    const vazio =
-        document.getElementById(
-            "exclusiveEmpty"
-        );
-
-    vazio.classList.toggle(
-        "visible",
-        total === 0
-    );
-
-    if (total === 0) {
-        return;
-    }
-
-    for (const arquivo of estado.exclusivos.fotos) {
-        container.appendChild(
-            criarExclusivoFoto(arquivo)
-        );
-    }
-
-    for (const arquivo of estado.exclusivos.audios) {
-        container.appendChild(
-            criarExclusivoAudio(arquivo)
-        );
-    }
-
-    for (const arquivo of estado.exclusivos.videos) {
-        container.appendChild(
-            criarExclusivoVideo(arquivo)
-        );
-    }
-}
-
-function criarExclusivoFoto(arquivo) {
-    const card =
-        document.createElement("article");
-
-    card.className =
-        "exclusive-card exclusive-photo";
-
-    const imagem =
-        document.createElement("img");
-
-    imagem.loading = "lazy";
-    imagem.decoding = "async";
-    imagem.src = arquivo.url;
-    imagem.alt =
-        `Conteúdo exclusivo: ${arquivo.nome}`;
-
-    card.appendChild(imagem);
-
-    card.addEventListener(
-        "click",
-        () =>
-            abrirLightbox(
-                arquivo,
-                card
-            )
-    );
-
-    return card;
-}
-
-function criarExclusivoAudio(arquivo) {
-    const card =
-        document.createElement("article");
-
-    card.className =
-        "exclusive-card";
-
-    const titulo =
-        document.createElement("h3");
-
-    titulo.textContent =
-        "Áudio";
-
-    const nome =
-        document.createElement("p");
-
-    nome.textContent =
-        arquivo.nome;
-
-    const player =
-        document.createElement("audio");
-
-    player.controls = true;
-    player.preload = "none";
-    player.src = arquivo.url;
-
-    card.append(
-        titulo,
-        nome,
-        player
-    );
-
-    return card;
-}
-
-function criarExclusivoVideo(arquivo) {
-    const card =
-        document.createElement("article");
-
-    card.className =
-        "exclusive-card";
-
-    const titulo =
-        document.createElement("h3");
-
-    titulo.textContent =
-        "Vídeo";
-
-    const nome =
-        document.createElement("p");
-
-    nome.textContent =
-        arquivo.nome;
-
-    const player =
-        document.createElement("video");
-
-    player.controls = true;
-    player.preload = "metadata";
-    player.playsInline = true;
-    player.src = arquivo.url;
-
-    if (arquivo.mime) {
-        player.setAttribute(
-            "type",
-            arquivo.mime
-        );
-    }
-
-    card.append(
-        titulo,
-        nome,
-        player
-    );
-
-    return card;
-}
-
-function abrirLightbox(
-    arquivo,
-    origem
-) {
-    const lightbox =
-        document.getElementById(
-            "lightbox"
-        );
-
-    const content =
-        document.getElementById(
-            "lightboxContent"
-        );
-
-    const caption =
-        document.getElementById(
-            "lightboxCaption"
-        );
-
-    estado.ultimaFocada =
-        origem ||
-        document.activeElement;
-
-    content.innerHTML = "";
-
-    const imagem =
-        document.createElement("img");
-
-    imagem.className =
-        "lightbox-img";
-
-    imagem.src =
-        arquivo.url;
-
-    imagem.alt =
-        `Visualização: ${arquivo.nome}`;
-
-    content.appendChild(imagem);
-
-    caption.textContent =
-        arquivo.nome;
-
-    lightbox.classList.add(
-        "aberto"
-    );
-
-    lightbox.setAttribute(
-        "aria-hidden",
-        "false"
-    );
-
-    estado.lightboxAberto = true;
-
-    document.body.style.overflow =
-        "hidden";
-
-    requestAnimationFrame(() => {
-        document.getElementById(
-            "lightboxClose"
-        )?.focus();
-    });
-}
-
-function fecharLightbox() {
-    if (!estado.lightboxAberto) {
-        return;
-    }
-
-    const lightbox =
-        document.getElementById(
-            "lightbox"
-        );
-
-    lightbox.classList.remove(
-        "aberto"
-    );
-
-    lightbox.setAttribute(
-        "aria-hidden",
-        "true"
-    );
-
-    document.getElementById(
-        "lightboxContent"
-    ).innerHTML = "";
-
-    document.getElementById(
-        "lightboxCaption"
-    ).textContent = "";
-
-    document.body.style.overflow =
-        "";
-
-    estado.lightboxAberto = false;
-
-    const foco =
-        estado.ultimaFocada;
-
-    estado.ultimaFocada =
-        null;
-
-    if (
-        foco &&
-        typeof foco.focus === "function"
-    ) {
-        requestAnimationFrame(
-            () => foco.focus()
-        );
-    }
-}
-
-document
-    .getElementById("lightbox")
-    .addEventListener(
-        "click",
-        evento => {
-            if (
-                evento.target.id ===
-                "lightbox"
-            ) {
-                fecharLightbox();
-            }
-        }
-    );
-
-document
-    .getElementById("lightboxClose")
-    .addEventListener(
-        "click",
-        fecharLightbox
-    );
-
-document.addEventListener(
-    "keydown",
-    evento => {
-        if (
-            evento.key === "Escape" &&
-            estado.lightboxAberto
-        ) {
-            fecharLightbox();
-        }
-    }
-);
-
-function trocarSecao(nome) {
-    document
-        .querySelectorAll(".media-tab")
-        .forEach(botao => {
-            const ativo =
-                botao.dataset.section ===
-                nome;
-
-            botao.classList.toggle(
-                "active",
-                ativo
+    } else {
+        const catalogoContents =
+            await carregarCatalogoPorContents(
+                configuracao
             );
 
-            botao.setAttribute(
-                "aria-selected",
-                String(ativo)
-            );
-        });
+        estado.publico =
+            catalogoContents.publico;
 
-    document
-        .querySelectorAll(".section")
-        .forEach(secao => {
-            const ativo =
-                secao.id ===
-                `section-${nome}`;
+        estado.exclusivo =
+            catalogoContents.exclusivo;
+    }
 
-            secao.classList.toggle(
-                "active",
-                ativo
-            );
+    for (const tipo of ["fotos", "audios", "videos"]) {
+        estado.publico[tipo].sort(compararNomes);
+        estado.exclusivo[tipo].sort(compararNomes);
+    }
 
-            secao.hidden =
-                !ativo;
-        });
+    renderizarCatalogoGaleria();
 }
 
-document
-    .querySelectorAll(".media-tab")
-    .forEach(botao => {
-        botao.addEventListener(
-            "click",
-            () =>
-                trocarSecao(
-                    botao.dataset.section
-                )
-        );
-    });
+function renderizarCatalogoGaleria() {
+    const publico = estado.publico;
+    const exclusivo = estado.exclusivo;
 
-function voltarHome() {
-    window.location.href =
-        "home.html";
+    const fotos = [
+        ...publico.fotos,
+        ...exclusivo.fotos
+    ];
+
+    const audios = [
+        ...publico.audios,
+        ...exclusivo.audios
+    ];
+
+    const videos = [
+        ...publico.videos,
+        ...exclusivo.videos
+    ];
+
+    estado.arquivos = {
+        fotos,
+        audios,
+        videos
+    };
+
+    if (typeof atualizarResumo === "function") {
+        atualizarResumo();
+    }
+
+    if (typeof renderizarFotos === "function") {
+        renderizarFotos();
+    }
+
+    if (typeof renderizarAudios === "function") {
+        renderizarAudios();
+    }
+
+    if (typeof renderizarVideos === "function") {
+        renderizarVideos();
+    }
+
+    estado.carregando = false;
 }
 
-document
-    .getElementById("btnVoltar")
-    .addEventListener(
-        "click",
-        voltarHome
-    );
-
-document
-    .getElementById("btnVoltarInferior")
-    .addEventListener(
-        "click",
-        voltarHome
-    );
-
-async function iniciar() {
+async function iniciarCarregamentoGaleria() {
     try {
         await carregarCatalogo();
     } catch (erro) {
@@ -2468,50 +1237,44 @@ async function iniciar() {
             erro
         );
 
-        removerLoading(
-            "fotoLoading"
-        );
+        estado.carregando = false;
 
-        removerLoading(
-            "audioLoading"
-        );
-
-        removerLoading(
+        const carregamentos = [
+            "fotoLoading",
+            "audioLoading",
             "videoLoading"
-        );
+        ];
 
-        document
-            .getElementById("fotoEmpty")
-            .classList.add("visible");
+        for (const id of carregamentos) {
+            const elemento =
+                document.getElementById(id);
 
-        document
-            .getElementById("audioEmpty")
-            .classList.add("visible");
+            if (elemento) {
+                elemento.remove();
+            }
+        }
 
-        document
-            .getElementById("videoEmpty")
-            .classList.add("visible");
+        const vazios = [
+            "fotoEmpty",
+            "audioEmpty",
+            "videoEmpty"
+        ];
 
-        document
-            .getElementById("exclusiveEmpty")
-            .classList.add("visible");
+        for (const id of vazios) {
+            const elemento =
+                document.getElementById(id);
 
-        document.getElementById(
-            "fotoStatus"
-        ).textContent = "";
+            if (elemento) {
+                elemento.classList.add("visible");
+            }
+        }
 
-        document.getElementById(
-            "audioStatus"
-        ).textContent = "";
-
-        document.getElementById(
-            "videoStatus"
-        ).textContent = "";
+        console.error(erro);
     }
 }
 
-iniciar();
+iniciarCarregamentoGaleria();
 </script>
 
 </body>
-    </html>
+</html>
