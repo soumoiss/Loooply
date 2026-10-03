@@ -158,6 +158,77 @@ a:focus-visible,
     height: 21px;
 }
 
+.music-button {
+    width: 46px;
+    height: 46px;
+    flex: 0 0 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    background: rgba(255,255,255,.88);
+    color: var(--primary);
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition:
+        transform .18s ease,
+        background .18s ease,
+        box-shadow .18s ease,
+        color .18s ease;
+}
+
+.music-button:hover {
+    transform: translateY(-2px);
+    background: var(--lilac);
+    color: var(--primary-dark);
+    box-shadow: var(--shadow-md);
+}
+
+.music-button:active {
+    transform: scale(.95);
+}
+
+.music-button.playing {
+    color: var(--white);
+    background: var(--primary);
+    border-color: var(--primary);
+    box-shadow: 0 7px 18px rgba(112,16,176,.22);
+}
+
+.music-button.playing:hover {
+    background: var(--primary-dark);
+}
+
+.music-button svg {
+    width: 21px;
+    height: 21px;
+}
+
+.music-button .icon-pause {
+    display: none;
+}
+
+.music-button.playing .icon-play {
+    display: none;
+}
+
+.music-button.playing .icon-pause {
+    display: block;
+}
+
+.music-button.paused .icon-play {
+    display: block;
+}
+
+.music-button.paused .icon-pause {
+    display: none;
+}
+
+.music-button.music-error {
+    color: var(--error);
+}
+
 .brand-mini {
     display: flex;
     align-items: center;
@@ -851,7 +922,8 @@ video {
         margin-bottom: 9px;
     }
 
-    .navigation-button {
+    .navigation-button,
+    .music-button {
         min-width: 43px;
         width: 43px;
         min-height: 43px;
@@ -927,9 +999,18 @@ video {
 
 <body>
 
+<audio
+    id="musicaTema"
+    src="midia/tema.mp3"
+    preload="auto"
+    loop
+    playsinline
+></audio>
+
 <main class="app-shell">
 
     <div class="topbar">
+
         <button
             class="navigation-button"
             type="button"
@@ -944,15 +1025,45 @@ video {
         </button>
 
         <div class="brand-mini">
+
             <div class="logo-mark">
                 <span class="logo-ring"></span>
             </div>
+
+            <button
+                class="music-button paused"
+                type="button"
+                id="btnMusica"
+                aria-label="Continuar música"
+                title="Continuar música"
+            >
+                <svg
+                    class="icon-play"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    aria-hidden="true"
+                >
+                    <path d="M8 5.14v13.72a1 1 0 0 0 1.52.85l10.2-6.86a1 1 0 0 0 0-1.66L9.52 4.29A1 1 0 0 0 8 5.14Z"></path>
+                </svg>
+
+                <svg
+                    class="icon-pause"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    aria-hidden="true"
+                >
+                    <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+                    <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+                </svg>
+            </button>
+
         </div>
     </div>
 
     <section class="container" aria-label="Nossos Momentos">
 
         <header class="hero">
+
             <div class="hero-logo" aria-hidden="true">
                 <span class="logo-ring"></span>
             </div>
@@ -962,6 +1073,7 @@ video {
             <p class="subtitulo">
                 Pequenos pedacinhos de nós, quero deixar guardados aqui ♡
             </p>
+
         </header>
 
         <div class="overview">
@@ -981,6 +1093,7 @@ video {
             role="tablist"
             aria-label="Tipos de mídia"
         >
+
             <button
                 class="media-tab active"
                 type="button"
@@ -1046,6 +1159,7 @@ video {
                 </svg>
                 Exclusivo
             </button>
+
         </div>
 
         <section
@@ -1135,6 +1249,7 @@ video {
             hidden
         >
             <div class="exclusive-banner">
+
                 <div class="exclusive-title">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="4" y="10" width="16" height="11" rx="2"></rect>
@@ -1147,6 +1262,7 @@ video {
                     Este espaço reúne conteúdos preparados especialmente para
                     <span class="exclusive-user" id="exclusiveUser">você</span>.
                 </p>
+
             </div>
 
             <div class="section-head">
@@ -1172,6 +1288,7 @@ video {
                 Ainda não há fotos, áudios ou vídeos destinados a este usuário.
             </div>
         </section>
+
     </section>
 </main>
 
@@ -1280,9 +1397,155 @@ const estado = {
     carregando: true
 };
 
+const musicaTema =
+    document.getElementById(
+        "musicaTema"
+    );
+
+const btnMusica =
+    document.getElementById(
+        "btnMusica"
+    );
+
+let musicaAtiva = false;
+
+function atualizarBotaoMusica(
+    tocando
+) {
+    musicaAtiva =
+        Boolean(tocando);
+
+    btnMusica.classList.toggle(
+        "playing",
+        musicaAtiva
+    );
+
+    btnMusica.classList.toggle(
+        "paused",
+        !musicaAtiva
+    );
+
+    btnMusica.classList.remove(
+        "music-error"
+    );
+
+    btnMusica.setAttribute(
+        "aria-label",
+        musicaAtiva
+            ? "Pausar música"
+            : "Continuar música"
+    );
+
+    btnMusica.setAttribute(
+        "title",
+        musicaAtiva
+            ? "Pausar música"
+            : "Continuar música"
+    );
+}
+
+async function iniciarMusica() {
+    if (!musicaTema) {
+        return;
+    }
+
+    musicaTema.loop = true;
+
+    try {
+        await musicaTema.play();
+        atualizarBotaoMusica(true);
+    } catch (_) {
+        atualizarBotaoMusica(false);
+    }
+}
+
+async function alternarMusica() {
+    if (!musicaTema) {
+        return;
+    }
+
+    if (
+        musicaTema.paused ||
+        musicaTema.ended
+    ) {
+        try {
+            await musicaTema.play();
+            atualizarBotaoMusica(true);
+        } catch (_) {
+            atualizarBotaoMusica(false);
+            btnMusica.classList.add(
+                "music-error"
+            );
+        }
+    } else {
+        musicaTema.pause();
+        atualizarBotaoMusica(false);
+    }
+}
+
+btnMusica.addEventListener(
+    "click",
+    alternarMusica
+);
+
+musicaTema.addEventListener(
+    "play",
+    () => atualizarBotaoMusica(true)
+);
+
+musicaTema.addEventListener(
+    "pause",
+    () => atualizarBotaoMusica(false)
+);
+
+musicaTema.addEventListener(
+    "ended",
+    () => {
+        musicaTema.currentTime = 0;
+
+        musicaTema
+            .play()
+            .then(
+                () =>
+                    atualizarBotaoMusica(
+                        true
+                    )
+            )
+            .catch(
+                () =>
+                    atualizarBotaoMusica(
+                        false
+                    )
+            );
+    }
+);
+
+musicaTema.addEventListener(
+    "error",
+    () => {
+        atualizarBotaoMusica(false);
+
+        btnMusica.classList.add(
+            "music-error"
+        );
+
+        btnMusica.setAttribute(
+            "aria-label",
+            "Música indisponível"
+        );
+
+        btnMusica.setAttribute(
+            "title",
+            "Não foi possível carregar tema.mp3"
+        );
+    }
+);
+
 function obterUsuarioAtual() {
     const usuario =
-        localStorage.getItem("username");
+        localStorage.getItem(
+            "username"
+        );
 
     if (!usuario) {
         return "";
@@ -1322,54 +1585,94 @@ function obterNomeSemExtensao(nome) {
         return base;
     }
 
-    return base.slice(0,posicao);
+    return base.slice(
+        0,
+        posicao
+    );
 }
 
-function classificarArquivo(nome,mime = "") {
+function classificarArquivo(
+    nome,
+    mime = ""
+) {
     const extensao =
         obterExtensao(nome);
 
     const tipoMime =
-        String(mime || "").toLowerCase();
+        String(
+            mime || ""
+        ).toLowerCase();
 
-    if (tipoMime.startsWith("image/")) {
+    if (
+        tipoMime.startsWith(
+            "image/"
+        )
+    ) {
         return "fotos";
     }
 
-    if (tipoMime.startsWith("audio/")) {
+    if (
+        tipoMime.startsWith(
+            "audio/"
+        )
+    ) {
         return "audios";
     }
 
-    if (tipoMime.startsWith("video/")) {
+    if (
+        tipoMime.startsWith(
+            "video/"
+        )
+    ) {
         return "videos";
     }
 
-    if (EXTENSOES.fotos.has(extensao)) {
+    if (
+        EXTENSOES.fotos.has(
+            extensao
+        )
+    ) {
         return "fotos";
     }
 
-    if (EXTENSOES.audios.has(extensao)) {
+    if (
+        EXTENSOES.audios.has(
+            extensao
+        )
+    ) {
         return "audios";
     }
 
-    if (EXTENSOES.videos.has(extensao)) {
+    if (
+        EXTENSOES.videos.has(
+            extensao
+        )
+    ) {
         return "videos";
     }
 
     return null;
 }
 
-function tipoMimePorArquivo(arquivo) {
+function tipoMimePorArquivo(
+    arquivo
+) {
     if (arquivo.mime) {
         return arquivo.mime;
     }
 
-    return MIME_POR_EXTENSAO[
-        obterExtensao(arquivo.nome)
-    ] || "";
+    return (
+        MIME_POR_EXTENSAO[
+            obterExtensao(
+                arquivo.nome
+            )
+        ] || ""
+    );
 }
 
-function shuffleArray(array) {
+function shuffleArray(
+    array
+) {
     for (
         let i = array.length - 1;
         i > 0;
@@ -1377,7 +1680,8 @@ function shuffleArray(array) {
     ) {
         const j =
             Math.floor(
-                Math.random() * (i + 1)
+                Math.random() *
+                (i + 1)
             );
 
         [
@@ -1392,13 +1696,20 @@ function shuffleArray(array) {
     return array;
 }
 
-function compararNomes(a,b) {
-    return String(a.nome).localeCompare(
-        String(b.nome),
+function compararNomes(
+    a,
+    b
+) {
+    return String(
+        a.nome
+    ).localeCompare(
+        String(
+            b.nome
+        ),
         "pt-BR",
         {
-            numeric:true,
-            sensitivity:"base"
+            numeric: true,
+            sensitivity: "base"
         }
     );
 }
@@ -1413,10 +1724,14 @@ function detectarRepositorioAutomaticamente() {
             .filter(Boolean);
 
     const configuracao =
-        {...REPOSITORIO};
+        {
+            ...REPOSITORIO
+        };
 
     const ehGithubPages =
-        host.endsWith(".github.io");
+        host.endsWith(
+            ".github.io"
+        );
 
     if (
         !configuracao.owner &&
@@ -1448,7 +1763,9 @@ function detectarRepositorioAutomaticamente() {
     return configuracao;
 }
 
-function validarConfiguracaoMinima(configuracao) {
+function validarConfiguracaoMinima(
+    configuracao
+) {
     if (
         !configuracao.owner ||
         !configuracao.repo
@@ -1466,7 +1783,9 @@ function construirRawUrl(
     const partes =
         String(caminho)
             .split("/")
-            .map(encodeURIComponent);
+            .map(
+                encodeURIComponent
+            );
 
     const branch =
         configuracao.branch ||
@@ -1475,18 +1794,23 @@ function construirRawUrl(
     return `https://raw.githubusercontent.com/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/${encodeURIComponent(branch)}/${partes.join("/")}`;
 }
 
-async function githubFetch(url) {
+async function githubFetch(
+    url
+) {
     const resposta =
-        await fetch(url,{
-            method:"GET",
-            headers:{
-                "Accept":
-                    "application/vnd.github+json",
-                "X-GitHub-Api-Version":
-                    API_VERSION
-            },
-            cache:"no-store"
-        });
+        await fetch(
+            url,
+            {
+                method: "GET",
+                headers: {
+                    "Accept":
+                        "application/vnd.github+json",
+                    "X-GitHub-Api-Version":
+                        API_VERSION
+                },
+                cache: "no-store"
+            }
+        );
 
     if (!resposta.ok) {
         let detalhe = "";
@@ -1525,7 +1849,9 @@ async function obterConfiguracaoEfetiva() {
             `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}`;
 
         const metadados =
-            await githubFetch(url);
+            await githubFetch(
+                url
+            );
 
         configuracao.branch =
             metadados.default_branch ||
@@ -1550,11 +1876,15 @@ async function listarCatalogoViaTree(
         `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/git/trees/${encodeURIComponent(configuracao.branch)}?recursive=1`;
 
     const dados =
-        await githubFetch(url);
+        await githubFetch(
+            url
+        );
 
     if (
         !dados ||
-        !Array.isArray(dados.tree)
+        !Array.isArray(
+            dados.tree
+        )
     ) {
         throw new Error(
             "A API do GitHub não retornou a árvore do repositório."
@@ -1571,7 +1901,9 @@ async function listarCatalogoViaTree(
     const resultado =
         criarCatalogoVazio();
 
-    for (const item of dados.tree) {
+    for (
+        const item of dados.tree
+    ) {
         if (
             !item ||
             item.type !== "blob" ||
@@ -1588,9 +1920,24 @@ async function listarCatalogoViaTree(
             continue;
         }
 
+        const caminhoRelativo =
+            item.path.slice(
+                prefixo.length
+            );
+
+        if (
+            caminhoRelativo.includes(
+                "/"
+            )
+        ) {
+            continue;
+        }
+
         const nome =
             item.path.slice(
-                item.path.lastIndexOf("/") + 1
+                item.path.lastIndexOf(
+                    "/"
+                ) + 1
             );
 
         const tipo =
@@ -1603,21 +1950,28 @@ async function listarCatalogoViaTree(
             continue;
         }
 
-        resultado[tipo].push({
+        resultado[
+            tipo
+        ].push({
             nome,
-            caminho:item.path,
-            url:construirRawUrl(
+            caminho: item.path,
+            url: construirRawUrl(
                 item.path,
                 configuracao
             ),
-            apiUrl:item.url || "",
-            sha:item.sha || "",
-            tamanho:Number(
-                item.size || 0
-            ),
+            apiUrl:
+                item.url || "",
+            sha:
+                item.sha || "",
+            tamanho:
+                Number(
+                    item.size || 0
+                ),
             mime:
                 MIME_POR_EXTENSAO[
-                    obterExtensao(nome)
+                    obterExtensao(
+                        nome
+                    )
                 ] || "",
             tipo
         });
@@ -1634,20 +1988,30 @@ async function listarPastaViaContentsRecursivo(
         `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/contents/${caminho.split("/").map(encodeURIComponent).join("/")}?ref=${encodeURIComponent(configuracao.branch)}`;
 
     const dados =
-        await githubFetch(url);
+        await githubFetch(
+            url
+        );
 
     let resultados = [];
 
-    if (!Array.isArray(dados)) {
+    if (
+        !Array.isArray(
+            dados
+        )
+    ) {
         return resultados;
     }
 
-    for (const item of dados) {
+    for (
+        const item of dados
+    ) {
         if (!item) {
             continue;
         }
 
-        if (item.type === "dir") {
+        if (
+            item.type === "dir"
+        ) {
             const subResultados =
                 await listarPastaViaContentsRecursivo(
                     item.path,
@@ -1662,11 +2026,14 @@ async function listarPastaViaContentsRecursivo(
             continue;
         }
 
-        if (item.type === "file") {
+        if (
+            item.type === "file"
+        ) {
             const tipo =
                 classificarArquivo(
                     item.name,
-                    item.mime_type || ""
+                    item.mime_type ||
+                        ""
                 );
 
             if (!tipo) {
@@ -1674,19 +2041,22 @@ async function listarPastaViaContentsRecursivo(
             }
 
             resultados.push({
-                nome:item.name,
-                caminho:item.path,
+                nome: item.name,
+                caminho: item.path,
                 url:
                     item.download_url ||
                     construirRawUrl(
                         item.path,
                         configuracao
                     ),
-                apiUrl:item.url || "",
-                sha:item.sha || "",
-                tamanho:Number(
-                    item.size || 0
-                ),
+                apiUrl:
+                    item.url || "",
+                sha:
+                    item.sha || "",
+                tamanho:
+                    Number(
+                        item.size || 0
+                    ),
                 mime:
                     item.mime_type ||
                     MIME_POR_EXTENSAO[
@@ -1703,8 +2073,90 @@ async function listarPastaViaContentsRecursivo(
     return resultados;
 }
 
+async function listarMidiaPublicaViaContents(
+    configuracao
+) {
+    const caminho =
+        configuracao.pastaMidia;
+
+    const url =
+        `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/contents/${caminho.split("/").map(encodeURIComponent).join("/")}?ref=${encodeURIComponent(configuracao.branch)}`;
+
+    const dados =
+        await githubFetch(
+            url
+        );
+
+    const resultado =
+        criarCatalogoVazio();
+
+    if (
+        !Array.isArray(
+            dados
+        )
+    ) {
+        return resultado;
+    }
+
+    for (
+        const item of dados
+    ) {
+        if (
+            !item ||
+            item.type !== "file"
+        ) {
+            continue;
+        }
+
+        const tipo =
+            classificarArquivo(
+                item.name,
+                item.mime_type ||
+                    ""
+            );
+
+        if (!tipo) {
+            continue;
+        }
+
+        resultado[
+            tipo
+        ].push({
+            nome: item.name,
+            caminho: item.path,
+            url:
+                item.download_url ||
+                construirRawUrl(
+                    item.path,
+                    configuracao
+                ),
+            apiUrl:
+                item.url || "",
+            sha:
+                item.sha || "",
+            tamanho:
+                Number(
+                    item.size || 0
+                ),
+            mime:
+                item.mime_type ||
+                MIME_POR_EXTENSAO[
+                    obterExtensao(
+                        item.name
+                    )
+                ] ||
+                "",
+            tipo
+        });
+    }
+
+    return resultado;
+}
+
 function obterPastaExclusiva() {
-    if (!estado.usuario) {
+    if (
+        !estado.usuario
+    ) {
         return "";
     }
 
@@ -1720,29 +2172,37 @@ async function carregarConteudoExclusivo(
     const prefixo =
         `${pastaExclusiva}/`;
 
-    let catalogoTree = null;
+    let catalogoTree =
+        null;
 
     try {
         const url =
             `https://api.github.com/repos/${encodeURIComponent(estado.configuracao.owner)}/${encodeURIComponent(estado.configuracao.repo)}/git/trees/${encodeURIComponent(estado.configuracao.branch)}?recursive=1`;
 
         const dados =
-            await githubFetch(url);
+            await githubFetch(
+                url
+            );
 
         if (
             dados &&
-            Array.isArray(dados.tree) &&
+            Array.isArray(
+                dados.tree
+            ) &&
             !dados.truncated
         ) {
             catalogoTree =
                 dados.tree;
         }
     } catch (_) {
-        catalogoTree = null;
+        catalogoTree =
+            null;
     }
 
     if (catalogoTree) {
-        for (const item of catalogoTree) {
+        for (
+            const item of catalogoTree
+        ) {
             if (
                 !item ||
                 item.type !== "blob" ||
@@ -1761,7 +2221,9 @@ async function carregarConteudoExclusivo(
 
             const nome =
                 item.path.slice(
-                    item.path.lastIndexOf("/") + 1
+                    item.path.lastIndexOf(
+                        "/"
+                    ) + 1
                 );
 
             const tipo =
@@ -1774,21 +2236,28 @@ async function carregarConteudoExclusivo(
                 continue;
             }
 
-            resultado[tipo].push({
+            resultado[
+                tipo
+            ].push({
                 nome,
-                caminho:item.path,
-                url:construirRawUrl(
+                caminho: item.path,
+                url: construirRawUrl(
                     item.path,
                     estado.configuracao
                 ),
-                apiUrl:item.url || "",
-                sha:item.sha || "",
-                tamanho:Number(
-                    item.size || 0
-                ),
+                apiUrl:
+                    item.url || "",
+                sha:
+                    item.sha || "",
+                tamanho:
+                    Number(
+                        item.size || 0
+                    ),
                 mime:
                     MIME_POR_EXTENSAO[
-                        obterExtensao(nome)
+                        obterExtensao(
+                            nome
+                        )
                     ] || "",
                 tipo
             });
@@ -1804,13 +2273,19 @@ async function carregarConteudoExclusivo(
                 estado.configuracao
             );
 
-        for (const arquivo of arquivos) {
+        for (
+            const arquivo of arquivos
+        ) {
             if (
-                resultado[arquivo.tipo]
+                resultado[
+                    arquivo.tipo
+                ]
             ) {
                 resultado[
                     arquivo.tipo
-                ].push(arquivo);
+                ].push(
+                    arquivo
+                );
             }
         }
     } catch (_) {}
@@ -1831,26 +2306,10 @@ async function carregarCatalogo() {
         );
 
     if (!catalogo) {
-        const todosArquivos =
-            await listarPastaViaContentsRecursivo(
-                configuracao.pastaMidia,
+        catalogo =
+            await listarMidiaPublicaViaContents(
                 configuracao
             );
-
-        catalogo =
-            criarCatalogoVazio();
-
-        for (
-            const item of todosArquivos
-        ) {
-            if (
-                catalogo[item.tipo]
-            ) {
-                catalogo[
-                    item.tipo
-                ].push(item);
-            }
-        }
     }
 
     estado.arquivos =
@@ -1859,7 +2318,9 @@ async function carregarCatalogo() {
     const pastaExclusiva =
         obterPastaExclusiva();
 
-    if (pastaExclusiva) {
+    if (
+        pastaExclusiva
+    ) {
         estado.exclusivos =
             await carregarConteudoExclusivo(
                 pastaExclusiva
@@ -1950,9 +2411,13 @@ function atualizarResumo() {
         `${exclusivas} ${exclusivas === 1 ? "item" : "itens"}`;
 }
 
-function esconderCarregamento(id) {
+function esconderCarregamento(
+    id
+) {
     const elemento =
-        document.getElementById(id);
+        document.getElementById(
+            id
+        );
 
     if (elemento) {
         elemento.remove();
@@ -1965,7 +2430,8 @@ function renderizarFotos() {
             "galeria"
         );
 
-    container.innerHTML = "";
+    container.innerHTML =
+        "";
 
     container.setAttribute(
         "aria-busy",
@@ -1983,11 +2449,15 @@ function renderizarFotos() {
 
     vazio.classList.toggle(
         "visible",
-        estado.arquivos.fotos.length === 0
+        estado.arquivos.fotos.length ===
+            0
     );
 
     estado.arquivos.fotos.forEach(
-        (arquivo,index) => {
+        (
+            arquivo,
+            index
+        ) => {
             container.appendChild(
                 criarCartaoFoto(
                     arquivo,
@@ -2010,7 +2480,8 @@ function criarCartaoFoto(
     card.className =
         "media-card";
 
-    card.tabIndex = 0;
+    card.tabIndex =
+        0;
 
     card.setAttribute(
         "role",
@@ -2026,7 +2497,10 @@ function criarCartaoFoto(
         String(index);
 
     card.style.animationDelay =
-        `${Math.min(index * .012,.35)}s`;
+        `${Math.min(
+            index * .012,
+            .35
+        )}s`;
 
     const shell =
         document.createElement(
@@ -2060,7 +2534,9 @@ function criarCartaoFoto(
                 shell,
                 arquivo
             ),
-        {once:true}
+        {
+            once: true
+        }
     );
 
     const overlay =
@@ -2081,14 +2557,17 @@ function criarCartaoFoto(
         overlay
     );
 
-    card.appendChild(shell);
+    card.appendChild(
+        shell
+    );
 
-    const abrir = () =>
-        abrirLightbox(
-            arquivo,
-            card,
-            index
-        );
+    const abrir =
+        () =>
+            abrirLightbox(
+                arquivo,
+                card,
+                index
+            );
 
     card.addEventListener(
         "click",
@@ -2099,8 +2578,10 @@ function criarCartaoFoto(
         "keydown",
         event => {
             if (
-                event.key === "Enter" ||
-                event.key === " "
+                event.key ===
+                    "Enter" ||
+                event.key ===
+                    " "
             ) {
                 event.preventDefault();
                 abrir();
@@ -2125,7 +2606,8 @@ function mostrarFallbackImagem(
     shell.dataset.fallback =
         "true";
 
-    shell.innerHTML = "";
+    shell.innerHTML =
+        "";
 
     const box =
         document.createElement(
@@ -2166,8 +2648,13 @@ function mostrarFallbackImagem(
         detalhe
     );
 
-    box.appendChild(texto);
-    shell.appendChild(box);
+    box.appendChild(
+        texto
+    );
+
+    shell.appendChild(
+        box
+    );
 
     shell.style.cursor =
         "pointer";
@@ -2185,10 +2672,13 @@ function mostrarFallbackImagem(
                 );
 
             if (janela) {
-                janela.opener = null;
+                janela.opener =
+                    null;
             }
         },
-        {once:true}
+        {
+            once: true
+        }
     );
 }
 
@@ -2198,7 +2688,8 @@ function renderizarAudios() {
             "audios"
         );
 
-    container.innerHTML = "";
+    container.innerHTML =
+        "";
 
     esconderCarregamento(
         "audioLoading"
@@ -2211,11 +2702,13 @@ function renderizarAudios() {
 
     vazio.classList.toggle(
         "visible",
-        estado.arquivos.audios.length === 0
+        estado.arquivos.audios.length ===
+            0
     );
 
     if (
-        estado.arquivos.audios.length === 0
+        estado.arquivos.audios.length ===
+        0
     ) {
         return;
     }
@@ -2294,7 +2787,9 @@ function renderizarAudios() {
                         item,
                         "Este navegador não conseguiu reproduzir este áudio."
                     ),
-                {once:true}
+                {
+                    once: true
+                }
             );
 
             item.append(
@@ -2302,11 +2797,15 @@ function renderizarAudios() {
                 player
             );
 
-            panel.appendChild(item);
+            panel.appendChild(
+                item
+            );
         }
     );
 
-    container.appendChild(panel);
+    container.appendChild(
+        panel
+    );
 }
 
 function renderizarVideos() {
@@ -2315,7 +2814,8 @@ function renderizarVideos() {
             "videos"
         );
 
-    container.innerHTML = "";
+    container.innerHTML =
+        "";
 
     esconderCarregamento(
         "videoLoading"
@@ -2328,11 +2828,13 @@ function renderizarVideos() {
 
     vazio.classList.toggle(
         "visible",
-        estado.arquivos.videos.length === 0
+        estado.arquivos.videos.length ===
+            0
     );
 
     if (
-        estado.arquivos.videos.length === 0
+        estado.arquivos.videos.length ===
+        0
     ) {
         return;
     }
@@ -2423,7 +2925,9 @@ function renderizarVideos() {
                         item,
                         "Este navegador encontrou o arquivo, mas não consegue reproduzir esse formato diretamente."
                     ),
-                {once:true}
+                {
+                    once: true
+                }
             );
 
             item.append(
@@ -2431,11 +2935,15 @@ function renderizarVideos() {
                 player
             );
 
-            panel.appendChild(item);
+            panel.appendChild(
+                item
+            );
         }
     );
 
-    container.appendChild(panel);
+    container.appendChild(
+        panel
+    );
 }
 
 function renderizarExclusivos() {
@@ -2472,10 +2980,14 @@ function renderizarExclusivos() {
             "exclusiveFotos"
         );
 
-    galeria.innerHTML = "";
+    galeria.innerHTML =
+        "";
 
     fotos.forEach(
-        (arquivo,index) => {
+        (
+            arquivo,
+            index
+        ) => {
             galeria.appendChild(
                 criarCartaoFoto(
                     arquivo,
@@ -2490,9 +3002,12 @@ function renderizarExclusivos() {
             "exclusiveMedia"
         );
 
-    media.innerHTML = "";
+    media.innerHTML =
+        "";
 
-    if (audios.length > 0) {
+    if (
+        audios.length > 0
+    ) {
         const panel =
             document.createElement(
                 "article"
@@ -2565,14 +3080,20 @@ function renderizarExclusivos() {
                     player
                 );
 
-                panel.appendChild(item);
+                panel.appendChild(
+                    item
+                );
             }
         );
 
-        media.appendChild(panel);
+        media.appendChild(
+            panel
+        );
     }
 
-    if (videos.length > 0) {
+    if (
+        videos.length > 0
+    ) {
         const panel =
             document.createElement(
                 "article"
@@ -2657,11 +3178,15 @@ function renderizarExclusivos() {
                     player
                 );
 
-                panel.appendChild(item);
+                panel.appendChild(
+                    item
+                );
             }
         );
 
-        media.appendChild(panel);
+        media.appendChild(
+            panel
+        );
     }
 }
 
@@ -2688,7 +3213,9 @@ function adicionarErroMedia(
     erro.textContent =
         mensagem;
 
-    container.appendChild(erro);
+    container.appendChild(
+        erro
+    );
 }
 
 function abrirLightbox(
@@ -2716,14 +3243,17 @@ function abrirLightbox(
         document.activeElement;
 
     estado.indiceFotoAtual =
-        Number.isInteger(indice)
+        Number.isInteger(
+            indice
+        )
             ? indice
             : -1;
 
     estado.lightboxAberto =
         true;
 
-    content.innerHTML = "";
+    content.innerHTML =
+        "";
 
     const extensao =
         obterExtensao(
@@ -2762,10 +3292,14 @@ function abrirLightbox(
                     "Não foi possível visualizar esta imagem",
                     "O arquivo existe no repositório, mas este navegador não conseguiu decodificá-lo."
                 ),
-            {once:true}
+            {
+                once: true
+            }
         );
 
-        content.appendChild(imagem);
+        content.appendChild(
+            imagem
+        );
     }
 
     caption.textContent =
@@ -2790,7 +3324,8 @@ function abrirLightbox(
         history.pushState(
             {
                 ...(history.state || {}),
-                nossosMomentosLightbox:true
+                nossosMomentosLightbox:
+                    true
             },
             ""
         );
@@ -2822,7 +3357,8 @@ function renderizarFallbackLightbox(
             "lightboxContent"
         );
 
-    content.innerHTML = "";
+    content.innerHTML =
+        "";
 
     const fallback =
         document.createElement(
@@ -2913,11 +3449,13 @@ function fecharLightbox(
 
     document.getElementById(
         "lightboxContent"
-    ).innerHTML = "";
+    ).innerHTML =
+        "";
 
     document.getElementById(
         "lightboxCaption"
-    ).textContent = "";
+    ).textContent =
+        "";
 
     estado.indiceFotoAtual =
         -1;
@@ -2937,6 +3475,7 @@ function fecharLightbox(
             false;
 
         history.back();
+
         return;
     }
 
@@ -2949,7 +3488,8 @@ function fecharLightbox(
             "function"
     ) {
         requestAnimationFrame(
-            () => foco.focus()
+            () =>
+                foco.focus()
         );
     }
 }
@@ -2987,7 +3527,8 @@ document.addEventListener(
     "keydown",
     event => {
         if (
-            event.key === "Escape" &&
+            event.key ===
+                "Escape" &&
             estado.lightboxAberto
         ) {
             event.preventDefault();
@@ -3002,12 +3543,16 @@ window.addEventListener(
         if (
             estado.lightboxAberto
         ) {
-            fecharLightbox(true);
+            fecharLightbox(
+                true
+            );
         }
     }
 );
 
-function trocarSecao(nome) {
+function trocarSecao(
+    nome
+) {
     document
         .querySelectorAll(
             ".media-tab"
@@ -3086,7 +3631,9 @@ document
                     event.target
                 );
 
-            if (indice === -1) {
+            if (
+                indice === -1
+            ) {
                 return;
             }
 
@@ -3112,11 +3659,13 @@ document
                     ) %
                     botoes.length;
             } else if (
-                event.key === "Home"
+                event.key ===
+                "Home"
             ) {
                 novoIndice = 0;
             } else if (
-                event.key === "End"
+                event.key ===
+                "End"
             ) {
                 novoIndice =
                     botoes.length - 1;
@@ -3166,6 +3715,12 @@ function prepararUsuario() {
 async function iniciar() {
     prepararUsuario();
 
+    atualizarBotaoMusica(
+        false
+    );
+
+    iniciarMusica();
+
     try {
         await carregarCatalogo();
     } catch (erro) {
@@ -3199,4 +3754,4 @@ iniciar();
 </script>
 
 </body>
-</html>
+    </html>
