@@ -2,182 +2,312 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#17131c">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#09050f">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="Nossos Momentos">
 <title>Nossos Momentos</title>
 
 <style>
 @font-face {
-    font-family: Quillen;
-    src: url("Quillen.otf") format("opentype");
+    font-family: "Quillen";
+    src:
+        local("Quillen"),
+        url("Quillen.otf") format("opentype");
+    font-display: swap;
+    font-style: normal;
+    font-weight: 400;
 }
 
 :root {
-    --bg: #f8f4fb;
-    --surface: #ffffff;
-    --surface-soft: #fbf8fd;
-    --primary: #9857dc;
-    --primary-dark: #7740b6;
-    --primary-soft: #f0e4fb;
-    --accent: #d58fbf;
-    --text: #28242d;
-    --muted: #85808a;
-    --border: #e8e2eb;
-    --shadow: 0 12px 35px rgba(102, 58, 140, .10);
+    --bg: #08050d;
+    --bg-2: #100817;
+    --surface: rgba(24, 15, 34, .78);
+    --surface-2: rgba(32, 20, 46, .84);
+    --surface-3: rgba(45, 28, 62, .72);
+    --primary: #b84dff;
+    --primary-2: #d78aff;
+    --primary-3: #8b3dcc;
+    --primary-soft: rgba(184, 77, 255, .13);
+    --primary-glow: rgba(184, 77, 255, .28);
+    --text: #f8efff;
+    --muted: #b9a9c4;
+    --muted-2: #87758f;
+    --line: rgba(215, 138, 255, .13);
+    --line-strong: rgba(215, 138, 255, .26);
+    --danger: #ff8ea8;
+    --shadow-sm: 0 8px 28px rgba(0, 0, 0, .20);
+    --shadow-md: 0 18px 50px rgba(0, 0, 0, .28);
+    --shadow-lg: 0 30px 100px rgba(0, 0, 0, .42);
+    --radius-xl: 32px;
+    --radius-lg: 25px;
+    --radius-md: 19px;
+    --radius-sm: 15px;
 }
 
 * {
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
 }
 
 html {
+    min-height: 100%;
     scroll-behavior: smooth;
 }
 
 body {
-    margin: 0;
     min-height: 100vh;
-    background:
-        radial-gradient(circle at top left, rgba(190, 137, 238, .14), transparent 32%),
-        radial-gradient(circle at bottom right, rgba(222, 154, 196, .12), transparent 30%),
-        var(--bg);
+    min-height: 100dvh;
+    overflow-x: hidden;
     color: var(--text);
-    font-family: Georgia, "Times New Roman", serif;
+    font-family:
+        Inter,
+        ui-sans-serif,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+    background:
+        radial-gradient(circle at 8% -10%, rgba(184,77,255,.23), transparent 32%),
+        radial-gradient(circle at 95% 7%, rgba(215,138,255,.15), transparent 28%),
+        radial-gradient(circle at 50% 115%, rgba(124,45,167,.16), transparent 38%),
+        linear-gradient(145deg, var(--bg), var(--bg-2));
+    padding:
+        max(18px, env(safe-area-inset-top))
+        max(14px, env(safe-area-inset-right))
+        max(30px, env(safe-area-inset-bottom))
+        max(14px, env(safe-area-inset-left));
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -2;
+    background:
+        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: linear-gradient(to bottom, black, transparent 78%);
+    -webkit-mask-image: linear-gradient(to bottom, black, transparent 78%);
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    width: 420px;
+    height: 420px;
+    right: -180px;
+    top: 20%;
+    border-radius: 50%;
+    background: rgba(184,77,255,.08);
+    filter: blur(100px);
+    pointer-events: none;
+    z-index: -1;
+}
+
+button,
+a {
+    font: inherit;
+    -webkit-tap-highlight-color: transparent;
 }
 
 button {
-    font: inherit;
+    border: 0;
 }
 
-.app {
-    width: min(100%, 760px);
-    min-height: 100vh;
+button:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid var(--primary-2);
+    outline-offset: 3px;
+}
+
+.app-shell {
+    width: min(100%, 1220px);
     margin: 0 auto;
-    background: rgba(255, 255, 255, .82);
-    box-shadow: 0 0 50px rgba(82, 46, 108, .08);
-    overflow: hidden;
+    animation: pageIn .5s ease both;
+}
+
+@keyframes pageIn {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .topbar {
-    position: sticky;
-    top: 0;
-    z-index: 30;
-    height: 64px;
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 0 18px;
-    background: rgba(255, 255, 255, .92);
-    border-bottom: 1px solid var(--border);
-    backdrop-filter: blur(18px);
+    justify-content: space-between;
+    margin-bottom: 13px;
 }
 
-.back-button {
-    width: 42px;
-    height: 42px;
-    border: 0;
-    border-radius: 14px;
-    display: grid;
-    place-items: center;
-    background: var(--primary-soft);
-    color: var(--primary-dark);
-    cursor: pointer;
-    font-size: 24px;
-    transition: .2s ease;
-}
-
-.back-button:active {
-    transform: scale(.94);
-}
-
-.top-title {
-    flex: 1;
-    min-width: 0;
-    font-family: Quillen, Georgia, serif;
-    font-size: 24px;
-    color: var(--text);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.hero {
-    padding: 34px 24px 18px;
-    text-align: center;
-}
-
-.hero-title {
-    margin: 0;
-    font-family: Quillen, Georgia, serif;
-    font-size: clamp(34px, 8vw, 52px);
-    line-height: 1;
-    color: var(--primary-dark);
-    font-weight: 400;
-}
-
-.hero-subtitle {
-    max-width: 590px;
-    margin: 15px auto 0;
-    color: #77717c;
-    font-size: 20px;
-    line-height: 1.45;
-}
-
-.content {
-    padding: 0 20px 40px;
-}
-
-.counter {
-    width: fit-content;
-    min-width: 150px;
-    margin: 16px 0 22px;
-    padding: 13px 25px;
-    border: 1px solid #eadcf5;
-    border-radius: 999px;
-    background: var(--primary-soft);
-    color: var(--primary-dark);
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    text-align: center;
-}
-
-.tabs {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-bottom: 26px;
-}
-
-.tab {
-    min-height: 64px;
-    border: 1px solid var(--border);
-    border-radius: 22px;
-    background: var(--surface);
-    color: #807b84;
-    display: flex;
+.navigation-button {
+    min-width: 48px;
+    min-height: 48px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    font-weight: 700;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 17px;
+    color: var(--primary-2);
+    background: rgba(22, 13, 31, .72);
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     cursor: pointer;
-    box-shadow: 0 5px 18px rgba(91, 50, 120, .04);
-    transition: .25s ease;
+    transition: .2s ease;
 }
 
-.tab.active {
-    background: linear-gradient(135deg, #a45be2, #8e4fd0);
-    color: #fff;
-    border-color: transparent;
-    box-shadow: 0 12px 25px rgba(142, 79, 208, .23);
+.navigation-button:hover {
+    transform: translateY(-2px);
+    border-color: var(--line-strong);
+    background: rgba(39, 22, 53, .86);
+    box-shadow: 0 12px 32px rgba(184,77,255,.12);
 }
 
-.tab-icon {
-    font-size: 21px;
+.navigation-button:active {
+    transform: scale(.96);
+}
+
+.navigation-button svg {
+    width: 21px;
+    height: 21px;
+}
+
+.navigation-label {
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 800;
+    transition: .2s ease;
+}
+
+.navigation-button:hover .navigation-label,
+.navigation-button:focus-visible .navigation-label {
+    max-width: 80px;
+    opacity: 1;
+}
+
+.topbar-spacer {
+    width: 48px;
+    height: 48px;
+}
+
+.container {
+    width: 100%;
+    padding: clamp(20px, 4vw, 35px);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-xl);
+    background:
+        linear-gradient(145deg, rgba(30,18,42,.88), rgba(15,9,23,.80));
+    box-shadow: var(--shadow-lg);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+}
+
+.hero {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.hero h1 {
+    font-family: "Quillen", Georgia, serif;
+    font-size: clamp(42px, 8vw, 68px);
+    font-weight: 400;
     line-height: 1;
+    letter-spacing: .01em;
+    background: linear-gradient(100deg, #fff, #d78aff, #b84dff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 35px rgba(184,77,255,.16);
+}
+
+.subtitulo {
+    max-width: 680px;
+    margin: 12px auto 0;
+    color: var(--muted);
+    font-family: "Quillen", Georgia, serif;
+    font-size: 17px;
+    line-height: 1.55;
+}
+
+.overview {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.contador {
+    min-width: 120px;
+    padding: 9px 14px;
+    text-align: center;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--primary-soft);
+    color: var(--primary-2);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.media-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.media-tab {
+    min-height: 45px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 17px;
+    border: 1px solid var(--line);
+    border-radius: 15px;
+    background: rgba(255,255,255,.035);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 800;
+    transition: .2s ease;
+}
+
+.media-tab:hover {
+    color: var(--primary-2);
+    border-color: var(--line-strong);
+    background: var(--primary-soft);
+    transform: translateY(-1px);
+}
+
+.media-tab.active {
+    color: #fff;
+    border-color: rgba(215,138,255,.45);
+    background: linear-gradient(135deg, #9b42d5, #b84dff);
+    box-shadow: 0 8px 28px rgba(184,77,255,.25);
+}
+
+.media-tab svg {
+    width: 17px;
+    height: 17px;
 }
 
 .section {
@@ -186,10 +316,143 @@ button {
 
 .section.active {
     display: block;
-    animation: appear .3s ease;
+    animation: sectionIn .25s ease both;
 }
 
-@keyframes appear {
+@keyframes sectionIn {
+    from {
+        opacity: .2;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.section-head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 2px 1px 14px;
+}
+
+.section-head h2 {
+    font-family: "Quillen", Georgia, serif;
+    font-size: 28px;
+    font-weight: 400;
+}
+
+.section-head p {
+    color: var(--muted-2);
+    font-size: 11px;
+}
+
+.exclusive-section {
+    margin-top: 32px;
+    padding-top: 27px;
+    border-top: 1px solid var(--line);
+}
+
+.exclusive-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.exclusive-title h2 {
+    font-family: "Quillen", Georgia, serif;
+    font-size: 28px;
+    font-weight: 400;
+}
+
+.exclusive-user {
+    display: inline-flex;
+    align-items: center;
+    max-width: 48%;
+    padding: 7px 11px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--primary-soft);
+    color: var(--primary-2);
+    font-size: 10px;
+    font-weight: 800;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.exclusive-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.exclusive-card {
+    min-width: 0;
+    padding: 15px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background:
+        linear-gradient(145deg, rgba(184,77,255,.09), rgba(255,255,255,.025));
+    box-shadow: var(--shadow-sm);
+}
+
+.exclusive-card h3 {
+    margin-bottom: 5px;
+    font-family: "Quillen", Georgia, serif;
+    font-size: 22px;
+    font-weight: 400;
+}
+
+.exclusive-card p {
+    margin-bottom: 12px;
+    color: var(--muted-2);
+    font-size: 11px;
+}
+
+.exclusive-card audio,
+.exclusive-card video {
+    width: 100%;
+}
+
+.exclusive-photo {
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+    cursor: zoom-in;
+}
+
+.exclusive-photo img {
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: transform .3s ease;
+}
+
+.exclusive-photo:hover img {
+    transform: scale(1.025);
+}
+
+.galeria {
+    column-count: 5;
+    column-gap: 14px;
+    padding: 0 1px;
+}
+
+.media-card {
+    display: block;
+    break-inside: avoid;
+    margin-bottom: 14px;
+    cursor: zoom-in;
+    animation: mediaIn .35s ease both;
+}
+
+@keyframes mediaIn {
     from {
         opacity: 0;
         transform: translateY(8px);
@@ -201,244 +464,391 @@ button {
     }
 }
 
-.section-title {
-    margin: 0 0 7px;
-    font-family: Quillen, Georgia, serif;
-    font-size: 31px;
-    font-weight: 400;
-    color: var(--text);
+.photo-shell {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: #140b1c;
+    box-shadow: var(--shadow-sm);
 }
 
-.section-status {
-    margin: 0 0 18px;
-    color: var(--muted);
-    font-family: Arial, sans-serif;
-    font-size: 14px;
+.photo-shell img {
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: transform .3s ease, opacity .3s ease;
 }
 
-.photo-grid {
+.media-card:hover .photo-shell img {
+    transform: scale(1.018);
+    opacity: .92;
+}
+
+.photo-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 32px 11px 11px;
+    background: linear-gradient(transparent, rgba(7,3,11,.72));
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    opacity: 0;
+    transition: .2s ease;
+    pointer-events: none;
+}
+
+.media-card:hover .photo-overlay,
+.media-card:focus-visible .photo-overlay {
+    opacity: 1;
+}
+
+.media-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    gap: 13px;
 }
 
-.photo-card {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    padding: 0;
-    overflow: hidden;
-    border: 0;
-    border-radius: 20px;
-    background: #eee8f1;
-    box-shadow: var(--shadow);
-    cursor: pointer;
+.media-panel {
+    min-width: 0;
+    padding: 17px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background: linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.018));
+    box-shadow: var(--shadow-sm);
 }
 
-.photo-card img {
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: cover;
-    transition: transform .45s ease;
+.media-panel h3 {
+    margin-bottom: 5px;
+    font-family: "Quillen", Georgia, serif;
+    font-size: 25px;
+    font-weight: 400;
 }
 
-.photo-card:active img {
-    transform: scale(1.035);
+.media-panel p {
+    margin-bottom: 13px;
+    color: var(--muted-2);
+    font-size: 11px;
 }
 
-.media-list {
-    display: grid;
-    gap: 12px;
-}
-
-.audio-card,
-.video-card {
-    padding: 16px;
-    border: 1px solid var(--border);
-    border-radius: 22px;
-    background: var(--surface);
-    box-shadow: var(--shadow);
-}
-
-.audio-card audio {
-    width: 100%;
-    display: block;
-}
-
-.video-card video {
-    width: 100%;
-    max-height: 430px;
-    display: block;
+.audio-item,
+.video-item {
+    margin-bottom: 9px;
+    padding: 12px;
+    border: 1px solid var(--line);
     border-radius: 15px;
-    background: #111;
+    background: rgba(0,0,0,.14);
+}
+
+.audio-item:last-child,
+.video-item:last-child {
+    margin-bottom: 0;
 }
 
 .media-name {
-    margin: 0 0 12px;
-    color: var(--text);
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    word-break: break-word;
-}
-
-.empty {
-    padding: 54px 20px;
-    border: 1px dashed #e4dce7;
-    border-radius: 24px;
-    background: rgba(255, 255, 255, .55);
-    text-align: center;
-}
-
-.empty-title {
-    margin: 0;
-    color: #302b34;
-    font-size: 25px;
-}
-
-.exclusive-box {
-    margin-bottom: 20px;
-    padding: 18px;
-    border: 1px solid #e7d8f2;
-    border-radius: 24px;
-    background: linear-gradient(145deg, #fcf8ff, #f5ecfc);
-}
-
-.exclusive-title {
-    margin: 0;
-    color: var(--primary-dark);
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-}
-
-.exclusive-tabs {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-top: 14px;
-}
-
-.exclusive-tab {
-    min-height: 42px;
-    border: 1px solid #e3d8eb;
-    border-radius: 14px;
-    background: #fff;
-    color: #827b87;
-    font-family: Arial, sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-.exclusive-tab.active {
-    border-color: transparent;
-    background: var(--primary);
-    color: #fff;
-}
-
-.exclusive-content {
-    display: none;
-}
-
-.exclusive-content.active {
     display: block;
+    margin-bottom: 8px;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+audio,
+video {
+    display: block;
+    width: 100%;
+    border-radius: 11px;
+}
+
+audio {
+    min-height: 42px;
+}
+
+video {
+    max-height: 460px;
+    background: #050307;
+    object-fit: contain;
+}
+
+.loading-state {
+    min-height: 145px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.loader-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary);
+    box-shadow: 0 0 15px var(--primary);
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: .35;
+        transform: scale(.8);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.empty-state {
+    display: none;
+    padding: 32px 16px;
+    text-align: center;
+    border: 1px dashed var(--line);
+    border-radius: 18px;
+    background: rgba(255,255,255,.018);
+    color: var(--muted);
+}
+
+.empty-state.visible {
+    display: block;
+}
+
+.empty-state strong {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text);
+    font-family: "Quillen", Georgia, serif;
+    font-size: 22px;
+    font-weight: 400;
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+}
+
+.action-button {
+    min-height: 46px;
+    padding: 0 19px;
+    border: 1px solid var(--line);
+    border-radius: 15px;
+    background: rgba(255,255,255,.035);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 800;
+    transition: .2s ease;
+}
+
+.action-button:hover {
+    color: #fff;
+    border-color: var(--line-strong);
+    background: var(--primary-soft);
+    transform: translateY(-1px);
 }
 
 .lightbox {
     position: fixed;
     inset: 0;
-    z-index: 100;
-    display: none;
+    z-index: 1000;
+    display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
-    background: rgba(20, 14, 24, .94);
-    backdrop-filter: blur(12px);
+    padding:
+        max(14px, env(safe-area-inset-top))
+        max(12px, env(safe-area-inset-right))
+        max(14px, env(safe-area-inset-bottom))
+        max(12px, env(safe-area-inset-left));
+    background: rgba(5,2,8,.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: .24s ease;
 }
 
-.lightbox.active {
+.lightbox.aberto {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.lightbox-content {
+    position: relative;
+    width: min(96vw, 1400px);
+    max-height: 94vh;
+    max-height: 94dvh;
     display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.lightbox img {
-    max-width: 100%;
+.lightbox-img {
+    max-width: 96vw;
     max-height: 88vh;
+    max-height: 88dvh;
+    width: auto;
+    height: auto;
     object-fit: contain;
-    border-radius: 12px;
-    box-shadow: 0 20px 70px rgba(0, 0, 0, .4);
+    border-radius: 13px;
+    box-shadow: 0 30px 100px rgba(0,0,0,.65);
 }
 
 .lightbox-close {
     position: fixed;
-    top: 18px;
-    right: 18px;
+    top: max(16px, env(safe-area-inset-top));
+    right: max(16px, env(safe-area-inset-right));
+    z-index: 3;
     width: 46px;
     height: 46px;
-    border: 0;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255,255,255,.18);
     border-radius: 50%;
-    background: rgba(255, 255, 255, .14);
+    background: rgba(255,255,255,.07);
     color: #fff;
-    font-size: 28px;
+    font-size: 25px;
     cursor: pointer;
+    transition: .2s ease;
 }
 
-.home-button {
-    width: 100%;
-    min-height: 52px;
-    margin-top: 28px;
-    border: 1px solid #dfd2e7;
-    border-radius: 18px;
-    background: #fff;
-    color: var(--primary-dark);
-    font-family: Arial, sans-serif;
-    font-size: 14px;
+.lightbox-close:hover {
+    background: rgba(184,77,255,.20);
+    transform: scale(1.04);
+}
+
+.lightbox-caption {
+    position: fixed;
+    left: 50%;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    max-width: min(90vw, 760px);
+    padding: 9px 14px;
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 999px;
+    background: rgba(25,12,35,.75);
+    color: #fff;
+    font-size: 11px;
     font-weight: 700;
-    cursor: pointer;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    overflow-wrap: anywhere;
 }
 
-@media (max-width: 560px) {
-    .topbar {
-        padding: 0 14px;
-    }
-
-    .hero {
-        padding: 28px 18px 16px;
-    }
-
-    .hero-title {
-        font-size: 38px;
-    }
-
-    .hero-subtitle {
-        font-size: 18px;
-    }
-
-    .content {
-        padding: 0 14px 34px;
-    }
-
-    .tabs {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .tab {
-        min-height: 58px;
-    }
-
-    .photo-grid {
-        gap: 9px;
-    }
-
-    .exclusive-tabs {
-        gap: 6px;
+@media (max-width: 1180px) {
+    .galeria {
+        column-count: 4;
     }
 }
 
-@media (max-width: 360px) {
-    .tabs {
+@media (max-width: 900px) {
+    .galeria {
+        column-count: 3;
+    }
+
+    .media-grid,
+    .exclusive-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 680px) {
+    body {
+        padding-top: max(12px, env(safe-area-inset-top));
+    }
+
+    .container {
+        padding: 19px 13px 16px;
+        border-radius: 25px;
+    }
+
+    .navigation-button,
+    .topbar-spacer {
+        width: 44px;
+        min-width: 44px;
+        height: 44px;
+        min-height: 44px;
+        border-radius: 14px;
+    }
+
+    .navigation-label {
+        display: none;
+    }
+
+    .galeria {
+        column-count: 2;
+        column-gap: 9px;
+    }
+
+    .media-card {
+        margin-bottom: 9px;
+    }
+
+    .photo-shell {
+        border-radius: 14px;
+    }
+
+    .overview {
+        justify-content: flex-start;
+    }
+
+    .section-head {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .media-tab {
+        flex: 1 1 calc(50% - 8px);
+    }
+
+    .exclusive-title {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .exclusive-user {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 390px) {
+    .galeria {
+        column-count: 1;
+    }
+
+    .media-tab {
+        flex-basis: 100%;
+    }
+
+    .hero h1 {
+        font-size: 40px;
+    }
+
+    .subtitulo {
+        font-size: 15px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .001ms !important;
     }
 }
 </style>
@@ -446,103 +856,244 @@ button {
 
 <body>
 
-<div class="app">
+<main class="app-shell">
 
-    <header class="topbar">
-        <button class="back-button" type="button" id="back-button" aria-label="Voltar">‹</button>
-        <div class="top-title">Nossos Momentos</div>
-    </header>
+    <div class="topbar">
+        <button
+            class="navigation-button"
+            type="button"
+            id="btnVoltar"
+            aria-label="Voltar para home.html"
+            title="Voltar"
+        >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M19 12H5"></path>
+                <path d="m12 19-7-7 7-7"></path>
+            </svg>
+            <span class="navigation-label">Voltar</span>
+        </button>
 
-    <main>
+        <div class="topbar-spacer" aria-hidden="true"></div>
+    </div>
 
-        <section class="hero">
-            <h1 class="hero-title">Nossos Momentos</h1>
-            <p class="hero-subtitle">Pequenos pedacinhos de nós, quero deixar guardados aqui ♡</p>
-        </section>
+    <section class="container">
 
-        <div class="content">
+        <header class="hero">
+            <h1>Nossos Momentos</h1>
+            <p class="subtitulo">
+                Pequenos pedacinhos de nós, quero deixar guardados aqui ♡
+            </p>
+        </header>
 
-            <div class="counter" id="counter">0 mídias</div>
+        <div class="overview">
+            <div class="contador" id="contador">
+                0 mídias
+            </div>
+        </div>
 
-            <nav class="tabs">
-                <button class="tab active" type="button" data-tab="fotos">
-                    <span class="tab-icon">▧</span>
-                    <span>Fotos</span>
-                </button>
+        <div
+            class="media-tabs"
+            id="mediaTabs"
+            role="tablist"
+            aria-label="Tipos de mídia"
+        >
 
-                <button class="tab" type="button" data-tab="audios">
-                    <span class="tab-icon">♫</span>
-                    <span>Áudios</span>
-                </button>
+            <button
+                class="media-tab active"
+                type="button"
+                role="tab"
+                aria-selected="true"
+                aria-controls="section-fotos"
+                id="tab-fotos"
+                data-section="fotos"
+            >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="4" width="18" height="16" rx="3"></rect>
+                    <circle cx="8.5" cy="9" r="1.5"></circle>
+                    <path d="m5.5 17 4.5-4.5 3.5-3.5 6 6"></path>
+                </svg>
+                Fotos
+            </button>
 
-                <button class="tab" type="button" data-tab="videos">
-                    <span class="tab-icon">▹</span>
-                    <span>Vídeos</span>
-                </button>
+            <button
+                class="media-tab"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                aria-controls="section-audios"
+                id="tab-audios"
+                data-section="audios"
+            >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M9 18V5l11-2v13"></path>
+                    <circle cx="6" cy="18" r="3"></circle>
+                    <circle cx="17" cy="16" r="3"></circle>
+                </svg>
+                Áudios
+            </button>
 
-                <button class="tab" type="button" data-tab="exclusivo">
-                    <span class="tab-icon">♧</span>
-                    <span>Exclusivo</span>
-                </button>
-            </nav>
-
-            <section class="section active" id="section-fotos">
-                <h2 class="section-title">Momentos</h2>
-                <p class="section-status" id="foto-status">Carregando...</p>
-                <div id="fotos-container"></div>
-            </section>
-
-            <section class="section" id="section-audios">
-                <h2 class="section-title">Áudios</h2>
-                <p class="section-status" id="audio-status">Carregando...</p>
-                <div id="audios-container"></div>
-            </section>
-
-            <section class="section" id="section-videos">
-                <h2 class="section-title">Vídeos</h2>
-                <p class="section-status" id="video-status">Carregando...</p>
-                <div id="videos-container"></div>
-            </section>
-
-            <section class="section" id="section-exclusivo">
-                <div class="exclusive-box">
-                    <h2 class="exclusive-title">Conteúdo Exclusivo</h2>
-
-                    <div class="exclusive-tabs">
-                        <button class="exclusive-tab active" type="button" data-exclusive="fotos">Fotos</button>
-                        <button class="exclusive-tab" type="button" data-exclusive="audios">Áudios</button>
-                        <button class="exclusive-tab" type="button" data-exclusive="videos">Vídeos</button>
-                    </div>
-                </div>
-
-                <div class="exclusive-content active" id="exclusive-fotos">
-                    <div id="exclusive-fotos-container"></div>
-                </div>
-
-                <div class="exclusive-content" id="exclusive-audios">
-                    <div id="exclusive-audios-container"></div>
-                </div>
-
-                <div class="exclusive-content" id="exclusive-videos">
-                    <div id="exclusive-videos-container"></div>
-                </div>
-            </section>
-
-            <button class="home-button" type="button" id="home-button">
-                Voltar para home
+            <button
+                class="media-tab"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                aria-controls="section-videos"
+                id="tab-videos"
+                data-section="videos"
+            >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="5" width="13" height="14" rx="2"></rect>
+                    <path d="m16 10 5-3v10l-5-3z"></path>
+                </svg>
+                Vídeos
             </button>
 
         </div>
 
-    </main>
-</div>
+        <section
+            class="section active"
+            id="section-fotos"
+            role="tabpanel"
+            aria-labelledby="tab-fotos"
+        >
+            <div class="section-head">
+                <h2>Momentos</h2>
+                <p id="fotoStatus">Carregando...</p>
+            </div>
 
-<div class="lightbox" id="lightbox">
-    <button class="lightbox-close" type="button" id="lightbox-close" aria-label="Fechar">×</button>
-    <img id="lightbox-image" src="" alt="">
+            <div
+                class="galeria"
+                id="galeria"
+                aria-live="polite"
+                aria-busy="true"
+            ></div>
+
+            <div class="loading-state" id="fotoLoading">
+                <span class="loader-dot"></span>
+                carregando...
+            </div>
+
+            <div class="empty-state" id="fotoEmpty">
+                <strong>Nenhuma foto encontrada</strong>
+            </div>
+        </section>
+
+        <section
+            class="section"
+            id="section-audios"
+            role="tabpanel"
+            aria-labelledby="tab-audios"
+            hidden
+        >
+            <div class="section-head">
+                <h2>Vozes</h2>
+                <p id="audioStatus">Carregando...</p>
+            </div>
+
+            <div id="audios" class="media-grid"></div>
+
+            <div class="loading-state" id="audioLoading">
+                <span class="loader-dot"></span>
+                carregando...
+            </div>
+
+            <div class="empty-state" id="audioEmpty">
+                <strong>Nenhum áudio encontrado</strong>
+            </div>
+        </section>
+
+        <section
+            class="section"
+            id="section-videos"
+            role="tabpanel"
+            aria-labelledby="tab-videos"
+            hidden
+        >
+            <div class="section-head">
+                <h2>Vídeos</h2>
+                <p id="videoStatus">Carregando...</p>
+            </div>
+
+            <div id="videos" class="media-grid"></div>
+
+            <div class="loading-state" id="videoLoading">
+                <span class="loader-dot"></span>
+                carregando...
+            </div>
+
+            <div class="empty-state" id="videoEmpty">
+                <strong>Nenhum vídeo encontrado</strong>
+            </div>
+        </section>
+
+        <section class="exclusive-section">
+
+            <div class="exclusive-title">
+                <h2>Conteúdo exclusivo</h2>
+                <div class="exclusive-user" id="exclusiveUser">
+                    Carregando...
+                </div>
+            </div>
+
+            <div
+                class="exclusive-grid"
+                id="exclusiveGrid"
+            ></div>
+
+            <div
+                class="empty-state"
+                id="exclusiveEmpty"
+            >
+                <strong>Sem conteúdo exclusivo</strong>
+            </div>
+
+        </section>
+
+        <div class="actions">
+            <button
+                class="action-button"
+                type="button"
+                id="btnVoltarInferior"
+            >
+                ← Voltar
+            </button>
+        </div>
+
+    </section>
+
+</main>
+
+<div
+    class="lightbox"
+    id="lightbox"
+    aria-hidden="true"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Visualização ampliada"
+>
+    <button
+        class="lightbox-close"
+        type="button"
+        id="lightboxClose"
+        aria-label="Fechar"
+    >
+        ×
+    </button>
+
+    <div
+        class="lightbox-content"
+        id="lightboxContent"
+    ></div>
+
+    <div
+        class="lightbox-caption"
+        id="lightboxCaption"
+    ></div>
 </div>
 
 <script>
+"use strict";
+
 const REPOSITORIO = {
     owner: "",
     repo: "",
@@ -551,483 +1102,273 @@ const REPOSITORIO = {
 };
 
 const EXTENSOES = {
-    imagens: ["jpg", "jpeg", "png", "gif", "webp", "avif", "bmp", "svg"],
-    audios: ["mp3", "wav", "ogg", "m4a", "aac", "flac", "opus"],
-    videos: ["mp4", "webm", "mov", "m4v", "avi", "mkv"]
+    fotos: new Set([
+        "jpg",
+        "jpeg",
+        "png",
+        "webp",
+        "gif",
+        "avif",
+        "bmp",
+        "svg",
+        "heic",
+        "heif",
+        "jfif",
+        "tif",
+        "tiff"
+    ]),
+    audios: new Set([
+        "mp3",
+        "m4a",
+        "wav",
+        "ogg",
+        "oga",
+        "aac",
+        "flac",
+        "opus"
+    ]),
+    videos: new Set([
+        "mp4",
+        "webm",
+        "mov",
+        "m4v",
+        "ogv",
+        "avi",
+        "mkv"
+    ])
 };
 
-let catalogoPublico = {
-    fotos: [],
-    audios: [],
-    videos: []
+const MIME_POR_EXTENSAO = {
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    webp: "image/webp",
+    gif: "image/gif",
+    avif: "image/avif",
+    bmp: "image/bmp",
+    svg: "image/svg+xml",
+    heic: "image/heic",
+    heif: "image/heif",
+    jfif: "image/jpeg",
+    tif: "image/tiff",
+    tiff: "image/tiff",
+    mp3: "audio/mpeg",
+    m4a: "audio/mp4",
+    wav: "audio/wav",
+    ogg: "audio/ogg",
+    oga: "audio/ogg",
+    aac: "audio/aac",
+    flac: "audio/flac",
+    opus: "audio/opus",
+    mp4: "video/mp4",
+    webm: "video/webm",
+    mov: "video/quicktime",
+    m4v: "video/mp4",
+    ogv: "video/ogg",
+    avi: "video/x-msvideo",
+    mkv: "video/x-matroska"
 };
 
-let catalogoExclusivo = {
-    fotos: [],
-    audios: [],
-    videos: []
+const estado = {
+    usuario: "",
+    pastaUsuario: "",
+    arquivos: {
+        fotos: [],
+        audios: [],
+        videos: []
+    },
+    exclusivos: {
+        fotos: [],
+        audios: [],
+        videos: []
+    },
+    configuracao: null,
+    lightboxAberto: false,
+    ultimaFocada: null
 };
-
-let branchAtual = "";
-let repositorioAtual = {
-    owner: "",
-    repo: ""
-};
-
-let historicoLightbox = false;
-
-function normalizarTexto(valor) {
-    return String(valor || "")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase()
-        .replace(/[^a-z0-9]/g, "");
-}
-
-function extrairUsuario(valor) {
-    if (!valor) {
-        return "";
-    }
-
-    if (typeof valor === "object") {
-        return valor.nome ||
-            valor.username ||
-            valor.usuario ||
-            valor.user ||
-            valor.name ||
-            "";
-    }
-
-    const texto = String(valor).trim();
-
-    try {
-        const objeto = JSON.parse(texto);
-
-        if (objeto && typeof objeto === "object") {
-            return objeto.nome ||
-                objeto.username ||
-                objeto.usuario ||
-                objeto.user ||
-                objeto.name ||
-                "";
-        }
-    } catch (_) {}
-
-    return texto;
-}
 
 function obterUsuarioAtual() {
     const chaves = [
         "username",
-        "usuarioAtual",
-        "usuarioLogado",
-        "currentUser",
-        "loggedUser",
+        "userName",
         "usuario",
-        "user"
+        "user",
+        "currentUser"
     ];
 
     for (const chave of chaves) {
-        const valorLocal = localStorage.getItem(chave);
-        const usuarioLocal = extrairUsuario(valorLocal);
+        const valor = localStorage.getItem(chave);
 
-        if (usuarioLocal) {
-            return usuarioLocal;
-        }
-
-        const valorSessao = sessionStorage.getItem(chave);
-        const usuarioSessao = extrairUsuario(valorSessao);
-
-        if (usuarioSessao) {
-            return usuarioSessao;
+        if (valor && valor.trim()) {
+            return valor.trim();
         }
     }
 
     return "";
 }
 
-async function testarRepositorio(owner, repo) {
-    if (!owner || !repo) {
-        return false;
-    }
-
-    try {
-        const resposta = await fetch(
-            `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`,
-            {
-                headers: {
-                    "Accept": "application/vnd.github+json",
-                    "X-GitHub-Api-Version": "2022-11-28"
-                }
-            }
-        );
-
-        return resposta.ok;
-    } catch (_) {
-        return false;
-    }
-}
-
-async function descobrirRepositorio() {
-    if (REPOSITORIO.owner && REPOSITORIO.repo) {
-        return {
-            owner: REPOSITORIO.owner,
-            repo: REPOSITORIO.repo
-        };
-    }
-
-    const host = window.location.hostname;
-    const partes = window.location.pathname
-        .split("/")
-        .map(item => item.trim())
-        .filter(Boolean);
-
-    if (!host.endsWith(".github.io")) {
-        return {
-            owner: "",
-            repo: ""
-        };
-    }
-
-    const owner = host.split(".")[0];
-
-    const primeiroSegmento = partes[0] || "";
-
-    const eArquivo =
-        primeiroSegmento.includes(".") ||
-        primeiroSegmento.toLowerCase().endsWith(".html");
-
-    if (!eArquivo && primeiroSegmento) {
-        const projeto = primeiroSegmento;
-
-        if (await testarRepositorio(owner, projeto)) {
-            return {
-                owner,
-                repo: projeto
-            };
-        }
-    }
-
-    const repositorioPrincipal = `${owner}.github.io`;
-
-    if (await testarRepositorio(owner, repositorioPrincipal)) {
-        return {
-            owner,
-            repo: repositorioPrincipal
-        };
-    }
-
-    if (primeiroSegmento) {
-        return {
-            owner,
-            repo: primeiroSegmento
-        };
-    }
-
-    return {
-        owner,
-        repo: repositorioPrincipal
-    };
-}
-
-async function obterBranch(owner, repo) {
-    if (REPOSITORIO.branch) {
-        return REPOSITORIO.branch;
-    }
-
-    const resposta = await fetch(
-        `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`,
-        {
-            headers: {
-                "Accept": "application/vnd.github+json",
-                "X-GitHub-Api-Version": "2022-11-28"
-            }
-        }
-    );
-
-    if (!resposta.ok) {
-        throw new Error("Repositorio não encontrado");
-    }
-
-    const dados = await resposta.json();
-
-    return dados.default_branch || "main";
+function normalizarNomeUsuario(valor) {
+    return String(valor || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[\s_-]+/g, "");
 }
 
 function obterExtensao(nome) {
-    const partes = String(nome).toLowerCase().split(".");
+    const base = String(nome || "").split("/").pop();
+    const posicao = base.lastIndexOf(".");
 
-    return partes.length > 1 ? partes.pop() : "";
-}
-
-function identificarTipo(nome) {
-    const extensao = obterExtensao(nome);
-
-    if (EXTENSOES.imagens.includes(extensao)) {
-        return "fotos";
-    }
-
-    if (EXTENSOES.audios.includes(extensao)) {
-        return "audios";
-    }
-
-    if (EXTENSOES.videos.includes(extensao)) {
-        return "videos";
-    }
-
-    return "";
-}
-
-function ordenarArquivos(lista) {
-    return [...lista].sort((a, b) =>
-        a.name.localeCompare(b.name, "pt-BR", {
-            numeric: true,
-            sensitivity: "base"
-        })
-    );
-}
-
-function criarUrlRaw(path, branch) {
-    const partes = String(path)
-        .split("/")
-        .map(encodeURIComponent)
-        .join("/");
-
-    return `https://raw.githubusercontent.com/${encodeURIComponent(repositorioAtual.owner)}/${encodeURIComponent(repositorioAtual.repo)}/${encodeURIComponent(branch)}/${partes}`;
-}
-
-function criarArquivo(path, nome, branch) {
-    const tipo = identificarTipo(nome);
-
-    if (!tipo) {
-        return null;
-    }
-
-    return {
-        name: nome,
-        path,
-        type: tipo,
-        url: criarUrlRaw(path, branch),
-        extensao: obterExtensao(nome)
-    };
-}
-
-function localizarPastaUsuario(nomesPastas, usuario) {
-    if (!usuario || !nomesPastas.length) {
+    if (posicao === -1) {
         return "";
     }
 
-    const usuarioNormalizado = normalizarTexto(usuario);
-
-    const exata = nomesPastas.find(
-        nome => String(nome).trim().toLowerCase() === String(usuario).trim().toLowerCase()
-    );
-
-    if (exata) {
-        return exata;
-    }
-
-    const normalizada = nomesPastas.find(
-        nome => normalizarTexto(nome) === usuarioNormalizado
-    );
-
-    return normalizada || "";
+    return base.slice(posicao + 1).toLowerCase();
 }
 
-function processarArvore(tree, branch, usuario) {
-    const raiz = REPOSITORIO.pastaMidia.replace(/^\/+|\/+$/g, "");
-    const prefixo = `${raiz}/`;
+function obterNomeSemExtensao(nome) {
+    const base = String(nome || "").split("/").pop();
+    const posicao = base.lastIndexOf(".");
 
-    const publicos = {
-        fotos: [],
-        audios: [],
-        videos: []
-    };
-
-    const exclusivos = {
-        fotos: [],
-        audios: [],
-        videos: []
-    };
-
-    const pastas = new Set();
-
-    for (const item of tree) {
-        if (item.type !== "blob") {
-            continue;
-        }
-
-        if (!item.path.startsWith(prefixo)) {
-            continue;
-        }
-
-        const relativo = item.path.slice(prefixo.length);
-
-        if (!relativo) {
-            continue;
-        }
-
-        const partes = relativo.split("/");
-        const nome = partes[partes.length - 1];
-
-        if (partes.length > 1) {
-            pastas.add(partes[0]);
-        }
-
-        const arquivo = criarArquivo(item.path, nome, branch);
-
-        if (!arquivo) {
-            continue;
-        }
-
-        if (partes.length === 1) {
-            publicos[arquivo.type].push(arquivo);
-        }
+    if (posicao <= 0) {
+        return base;
     }
 
-    const pastaUsuario = localizarPastaUsuario(
-        [...pastas],
-        usuario
-    );
-
-    if (pastaUsuario) {
-        const prefixoUsuario = `${prefixo}${pastaUsuario}/`;
-
-        for (const item of tree) {
-            if (item.type !== "blob") {
-                continue;
-            }
-
-            if (!item.path.startsWith(prefixoUsuario)) {
-                continue;
-            }
-
-            const partes = item.path.split("/");
-            const nome = partes[partes.length - 1];
-
-            const arquivo = criarArquivo(
-                item.path,
-                nome,
-                branch
-            );
-
-            if (!arquivo) {
-                continue;
-            }
-
-            exclusivos[arquivo.type].push(arquivo);
-        }
-    }
-
-    return {
-        publicos,
-        exclusivos,
-        truncada: false
-    };
+    return base.slice(0, posicao);
 }
 
-async function obterArvore(owner, repo, branch) {
-    const url =
-        `https://api.github.com/repos/` +
-        `${encodeURIComponent(owner)}/` +
-        `${encodeURIComponent(repo)}/git/trees/` +
-        `${encodeURIComponent(branch)}?recursive=1`;
+function classificarArquivo(nome, mime = "") {
+    const extensao = obterExtensao(nome);
+    const tipoMime = String(mime || "").toLowerCase();
 
-    const resposta = await fetch(url, {
-        headers: {
-            "Accept": "application/vnd.github+json",
-            "X-GitHub-Api-Version": "2022-11-28"
-        }
-    });
-
-    if (!resposta.ok) {
-        throw new Error("Falha ao obter árvore");
+    if (tipoMime.startsWith("image/")) {
+        return "fotos";
     }
 
-    return await resposta.json();
+    if (tipoMime.startsWith("audio/")) {
+        return "audios";
+    }
+
+    if (tipoMime.startsWith("video/")) {
+        return "videos";
+    }
+
+    if (EXTENSOES.fotos.has(extensao)) {
+        return "fotos";
+    }
+
+    if (EXTENSOES.audios.has(extensao)) {
+        return "audios";
+    }
+
+    if (EXTENSOES.videos.has(extensao)) {
+        return "videos";
+    }
+
+    return null;
 }
 
-async function obterConteudoPasta(owner, repo, caminho) {
-    const caminhoCodificado = caminho
+function obterCaminhoRaw(caminho, configuracao) {
+    const partes = String(caminho)
         .split("/")
         .map(encodeURIComponent)
         .join("/");
 
-    const url =
-        `https://api.github.com/repos/` +
-        `${encodeURIComponent(owner)}/` +
-        `${encodeURIComponent(repo)}/contents/${caminhoCodificado}` +
-        `?ref=${encodeURIComponent(branchAtual)}`;
+    const branch = configuracao.branch || "main";
 
+    return `https://raw.githubusercontent.com/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/${encodeURIComponent(branch)}/${partes}`;
+}
+
+function detectarRepositorio() {
+    const configuracao = {
+        ...REPOSITORIO
+    };
+
+    const host = window.location.hostname;
+    const caminho = window.location.pathname
+        .split("/")
+        .filter(Boolean);
+
+    if (
+        !configuracao.owner &&
+        host.endsWith(".github.io")
+    ) {
+        configuracao.owner = host.split(".")[0];
+    }
+
+    if (
+        !configuracao.repo &&
+        host.endsWith(".github.io") &&
+        caminho.length > 0 &&
+        !caminho[0].includes(".")
+    ) {
+        configuracao.repo = caminho[0];
+    }
+
+    if (
+        !configuracao.repo &&
+        host.endsWith(".github.io") &&
+        configuracao.owner
+    ) {
+        configuracao.repo = `${configuracao.owner}.github.io`;
+    }
+
+    return configuracao;
+}
+
+async function githubFetch(url) {
     const resposta = await fetch(url, {
+        method: "GET",
         headers: {
             "Accept": "application/vnd.github+json",
             "X-GitHub-Api-Version": "2022-11-28"
-        }
+        },
+        cache: "no-store"
     });
 
     if (!resposta.ok) {
-        throw new Error("Falha ao obter pasta");
-    }
+        let mensagem = "";
 
-    return await resposta.json();
-}
+        try {
+            const dados = await resposta.json();
 
-async function buscarArquivosRecursivamente(owner, repo, itens) {
-    const arquivos = [];
-
-    for (const item of itens) {
-        if (item.type === "file") {
-            const tipo = identificarTipo(item.name);
-
-            if (!tipo) {
-                continue;
+            if (dados && dados.message) {
+                mensagem = dados.message;
             }
+        } catch (_) {}
 
-            arquivos.push({
-                name: item.name,
-                path: item.path,
-                type: tipo,
-                url: item.download_url || criarUrlRaw(item.path, branchAtual),
-                extensao: obterExtensao(item.name)
-            });
-
-            continue;
-        }
-
-        if (item.type === "dir") {
-            try {
-                const filhos = await obterConteudoPasta(
-                    owner,
-                    repo,
-                    item.path
-                );
-
-                const encontrados =
-                    await buscarArquivosRecursivamente(
-                        owner,
-                        repo,
-                        filhos
-                    );
-
-                arquivos.push(...encontrados);
-            } catch (_) {}
-        }
+        throw new Error(
+            `GitHub HTTP ${resposta.status}${mensagem ? `: ${mensagem}` : ""}`
+        );
     }
 
-    return arquivos;
+    return resposta.json();
 }
 
-async function obterCatalogoPorContents(owner, repo, usuario) {
-    const raiz = REPOSITORIO.pastaMidia.replace(/^\/+|\/+$/g, "");
+async function obterConfiguracao() {
+    const configuracao = detectarRepositorio();
 
-    const itens = await obterConteudoPasta(
-        owner,
-        repo,
-        raiz
-    );
+    if (!configuracao.owner || !configuracao.repo) {
+        throw new Error("Repositorio não identificado.");
+    }
 
-    const publicos = {
+    if (!configuracao.branch) {
+        const url =
+            `https://api.github.com/repos/` +
+            `${encodeURIComponent(configuracao.owner)}/` +
+            `${encodeURIComponent(configuracao.repo)}`;
+
+        const dados = await githubFetch(url);
+
+        configuracao.branch =
+            dados.default_branch || "main";
+    }
+
+    return configuracao;
+}
+
+function separarCatalogo(tree, configuracao) {
+    const publico = {
         fotos: [],
         audios: [],
         videos: []
@@ -1039,495 +1380,1137 @@ async function obterCatalogoPorContents(owner, repo, usuario) {
         videos: []
     };
 
-    const nomesPastas = [];
+    const prefixo = `${configuracao.pastaMidia}/`;
 
-    for (const item of itens) {
-        if (item.type === "file") {
-            const tipo = identificarTipo(item.name);
+    for (const item of tree) {
+        if (
+            !item ||
+            item.type !== "blob" ||
+            !item.path ||
+            !item.path.startsWith(prefixo)
+        ) {
+            continue;
+        }
+
+        const caminhoRelativo =
+            item.path.slice(prefixo.length);
+
+        const partes = caminhoRelativo.split("/");
+
+        if (partes.length === 1) {
+            const nome = partes[0];
+            const tipo = classificarArquivo(nome);
 
             if (!tipo) {
                 continue;
             }
 
-            publicos[tipo].push({
-                name: item.name,
-                path: item.path,
-                type: tipo,
-                url: item.download_url || criarUrlRaw(item.path, branchAtual),
-                extensao: obterExtensao(item.name)
+            publico[tipo].push({
+                nome,
+                caminho: item.path,
+                url: obterCaminhoRaw(item.path, configuracao),
+                tamanho: Number(item.size || 0),
+                mime: MIME_POR_EXTENSAO[
+                    obterExtensao(nome)
+                ] || "",
+                tipo
             });
 
             continue;
         }
 
-        if (item.type === "dir") {
-            nomesPastas.push(item.name);
+        if (partes.length < 2 || !estado.usuario) {
+            continue;
+        }
+
+        const pasta = partes[0];
+        const pastaNormalizada =
+            normalizarNomeUsuario(pasta);
+
+        const usuarioNormalizado =
+            normalizarNomeUsuario(estado.usuario);
+
+        if (
+            pastaNormalizada !== usuarioNormalizado
+        ) {
+            continue;
+        }
+
+        const nome = partes[partes.length - 1];
+        const tipo = classificarArquivo(nome);
+
+        if (!tipo) {
+            continue;
+        }
+
+        exclusivos[tipo].push({
+            nome,
+            caminho: item.path,
+            url: obterCaminhoRaw(item.path, configuracao),
+            tamanho: Number(item.size || 0),
+            mime: MIME_POR_EXTENSAO[
+                obterExtensao(nome)
+            ] || "",
+            tipo
+        });
+
+        if (!estado.pastaUsuario) {
+            estado.pastaUsuario = pasta;
         }
     }
 
-    const pastaUsuario = localizarPastaUsuario(
-        nomesPastas,
-        usuario
-    );
-
-    if (pastaUsuario) {
-        const caminhoUsuario = `${raiz}/${pastaUsuario}`;
-
-        try {
-            const itensUsuario = await obterConteudoPasta(
-                owner,
-                repo,
-                caminhoUsuario
-            );
-
-            const arquivos =
-                await buscarArquivosRecursivamente(
-                    owner,
-                    repo,
-                    itensUsuario
-                );
-
-            for (const arquivo of arquivos) {
-                exclusivos[arquivo.type].push(arquivo);
-            }
-        } catch (_) {}
-    }
-
     return {
-        publicos,
+        publico,
         exclusivos
     };
 }
 
-function limparCatalogos() {
-    catalogoPublico = {
-        fotos: [],
-        audios: [],
-        videos: []
-    };
+async function listarTree(configuracao) {
+    const url =
+        `https://api.github.com/repos/` +
+        `${encodeURIComponent(configuracao.owner)}/` +
+        `${encodeURIComponent(configuracao.repo)}` +
+        `/git/trees/` +
+        `${encodeURIComponent(configuracao.branch)}` +
+        `?recursive=1`;
 
-    catalogoExclusivo = {
-        fotos: [],
-        audios: [],
-        videos: []
-    };
+    const dados = await githubFetch(url);
+
+    if (
+        !dados ||
+        !Array.isArray(dados.tree)
+    ) {
+        throw new Error("Árvore do repositório inválida.");
+    }
+
+    if (dados.truncated) {
+        return null;
+    }
+
+    return dados.tree;
 }
 
-function carregarVazios() {
-    limparCatalogos();
-    atualizarInterface();
+async function listarPasta(caminho, configuracao) {
+    const url =
+        `https://api.github.com/repos/` +
+        `${encodeURIComponent(configuracao.owner)}/` +
+        `${encodeURIComponent(configuracao.repo)}` +
+        `/contents/` +
+        caminho
+            .split("/")
+            .map(encodeURIComponent)
+            .join("/") +
+        `?ref=${encodeURIComponent(configuracao.branch)}`;
+
+    const dados = await githubFetch(url);
+
+    if (!Array.isArray(dados)) {
+        return [];
+    }
+
+    return dados;
 }
 
-function carregarCatalogos(publicos, exclusivos) {
-    catalogoPublico = {
-        fotos: ordenarArquivos(publicos.fotos || []),
-        audios: ordenarArquivos(publicos.audios || []),
-        videos: ordenarArquivos(publicos.videos || [])
-    };
+async function listarArquivosDaPasta(
+    caminho,
+    configuracao
+) {
+    const itens = await listarPasta(
+        caminho,
+        configuracao
+    );
 
-    catalogoExclusivo = {
-        fotos: ordenarArquivos(exclusivos.fotos || []),
-        audios: ordenarArquivos(exclusivos.audios || []),
-        videos: ordenarArquivos(exclusivos.videos || [])
-    };
+    const resultado = [];
+
+    for (const item of itens) {
+        if (!item) {
+            continue;
+        }
+
+        if (item.type === "file") {
+            const tipo = classificarArquivo(
+                item.name,
+                item.mime_type || ""
+            );
+
+            if (!tipo) {
+                continue;
+            }
+
+            resultado.push({
+                nome: item.name,
+                caminho: item.path,
+                url:
+                    item.download_url ||
+                    obterCaminhoRaw(
+                        item.path,
+                        configuracao
+                    ),
+                tamanho: Number(item.size || 0),
+                mime:
+                    item.mime_type ||
+                    MIME_POR_EXTENSAO[
+                        obterExtensao(item.name)
+                    ] ||
+                    "",
+                tipo
+            });
+
+            continue;
+        }
+
+        if (item.type === "dir") {
+            const subarquivos =
+                await listarArquivosDaPasta(
+                    item.path,
+                    configuracao
+                );
+
+            resultado.push(...subarquivos);
+        }
+    }
+
+    return resultado;
+}
+
+function adicionarAoCatalogo(
+    catalogo,
+    arquivo
+) {
+    if (!catalogo[arquivo.tipo]) {
+        return;
+    }
+
+    catalogo[arquivo.tipo].push(arquivo);
 }
 
 async function carregarCatalogo() {
-    limparCatalogos();
+    estado.usuario = obterUsuarioAtual();
 
-    const repositorio = await descobrirRepositorio();
+    document.getElementById(
+        "exclusiveUser"
+    ).textContent =
+        estado.usuario || "Visitante";
 
-    repositorioAtual = {
-        owner: repositorio.owner,
-        repo: repositorio.repo
-    };
+    const configuracao =
+        await obterConfiguracao();
 
-    REPOSITORIO.owner = repositorio.owner;
-    REPOSITORIO.repo = repositorio.repo;
+    estado.configuracao = configuracao;
 
-    if (!repositorioAtual.owner || !repositorioAtual.repo) {
-        atualizarInterface();
-        return;
-    }
+    const tree =
+        await listarTree(configuracao);
 
-    try {
-        branchAtual = await obterBranch(
-            repositorioAtual.owner,
-            repositorioAtual.repo
-        );
+    if (tree) {
+        const catalogo =
+            separarCatalogo(
+                tree,
+                configuracao
+            );
 
-        const usuario = obterUsuarioAtual();
+        estado.arquivos =
+            catalogo.publico;
 
-        const arvore = await obterArvore(
-            repositorioAtual.owner,
-            repositorioAtual.repo,
-            branchAtual
-        );
+        estado.exclusivos =
+            catalogo.exclusivos;
+    } else {
+        const publico =
+            await listarArquivosDaPasta(
+                configuracao.pastaMidia,
+                configuracao
+            );
 
-        if (arvore.truncated) {
-            throw new Error("Árvore truncada");
-        }
+        const catalogoPublico = {
+            fotos: [],
+            audios: [],
+            videos: []
+        };
 
-        const resultado = processarArvore(
-            arvore.tree || [],
-            branchAtual,
-            usuario
-        );
+        const catalogoExclusivo = {
+            fotos: [],
+            audios: [],
+            videos: []
+        };
 
-        carregarCatalogos(
-            resultado.publicos,
-            resultado.exclusivos
-        );
+        for (const arquivo of publico) {
+            const relativo =
+                arquivo.caminho
+                    .slice(
+                        `${configuracao.pastaMidia}/`
+                            .length
+                    )
+                    .split("/");
 
-        atualizarInterface();
-    } catch (_) {
-        try {
-            const usuario = obterUsuarioAtual();
-
-            const resultado =
-                await obterCatalogoPorContents(
-                    repositorioAtual.owner,
-                    repositorioAtual.repo,
-                    usuario
+            if (relativo.length === 1) {
+                adicionarAoCatalogo(
+                    catalogoPublico,
+                    arquivo
                 );
-
-            carregarCatalogos(
-                resultado.publicos,
-                resultado.exclusivos
-            );
-
-            atualizarInterface();
-        } catch (_) {
-            carregarVazios();
+            }
         }
+
+        if (estado.usuario) {
+            const raizUsuario =
+                `${configuracao.pastaMidia}/${estado.usuario}`;
+
+            try {
+                const exclusivos =
+                    await listarArquivosDaPasta(
+                        raizUsuario,
+                        configuracao
+                    );
+
+                for (const arquivo of exclusivos) {
+                    adicionarAoCatalogo(
+                        catalogoExclusivo,
+                        arquivo
+                    );
+                }
+
+                estado.pastaUsuario =
+                    estado.usuario;
+            } catch (erro) {
+                const raizAlternativa =
+                    `${configuracao.pastaMidia}`;
+
+                const todos =
+                    await listarPasta(
+                        raizAlternativa,
+                        configuracao
+                    );
+
+                const pastaEncontrada =
+                    todos.find(
+                        item =>
+                            item &&
+                            item.type === "dir" &&
+                            normalizarNomeUsuario(
+                                item.name
+                            ) ===
+                            normalizarNomeUsuario(
+                                estado.usuario
+                            )
+                    );
+
+                if (pastaEncontrada) {
+                    const exclusivos =
+                        await listarArquivosDaPasta(
+                            pastaEncontrada.path,
+                            configuracao
+                        );
+
+                    for (const arquivo of exclusivos) {
+                        adicionarAoCatalogo(
+                            catalogoExclusivo,
+                            arquivo
+                        );
+                    }
+
+                    estado.pastaUsuario =
+                        pastaEncontrada.name;
+                }
+            }
+        }
+
+        estado.arquivos =
+            catalogoPublico;
+
+        estado.exclusivos =
+            catalogoExclusivo;
+    }
+
+    atualizarResumo();
+    renderizarFotos();
+    renderizarAudios();
+    renderizarVideos();
+    renderizarExclusivos();
+}
+
+function atualizarResumo() {
+    const fotos =
+        estado.arquivos.fotos.length;
+
+    const audios =
+        estado.arquivos.audios.length;
+
+    const videos =
+        estado.arquivos.videos.length;
+
+    const total =
+        fotos +
+        audios +
+        videos;
+
+    document.getElementById(
+        "contador"
+    ).textContent =
+        `${total} ${total === 1 ? "mídia" : "mídias"}`;
+
+    document.getElementById(
+        "fotoStatus"
+    ).textContent =
+        `${fotos} ${fotos === 1 ? "foto" : "fotos"}`;
+
+    document.getElementById(
+        "audioStatus"
+    ).textContent =
+        `${audios} ${audios === 1 ? "áudio" : "áudios"}`;
+
+    document.getElementById(
+        "videoStatus"
+    ).textContent =
+        `${videos} ${videos === 1 ? "vídeo" : "vídeos"}`;
+}
+
+function removerLoading(id) {
+    const elemento =
+        document.getElementById(id);
+
+    if (elemento) {
+        elemento.remove();
     }
 }
 
-function criarVazio(texto) {
-    const elemento = document.createElement("div");
-    elemento.className = "empty";
-
-    const titulo = document.createElement("p");
-    titulo.className = "empty-title";
-    titulo.textContent = texto;
-
-    elemento.appendChild(titulo);
-
-    return elemento;
-}
-
-function renderizarFotos(containerId, arquivos, texto) {
-    const container = document.getElementById(containerId);
+function renderizarFotos() {
+    const container =
+        document.getElementById("galeria");
 
     container.innerHTML = "";
+    container.setAttribute(
+        "aria-busy",
+        "false"
+    );
 
-    if (!arquivos.length) {
-        container.appendChild(criarVazio(texto));
-        return;
-    }
+    removerLoading("fotoLoading");
 
-    const grid = document.createElement("div");
-    grid.className = "photo-grid";
+    const vazio =
+        document.getElementById("fotoEmpty");
 
-    for (const arquivo of arquivos) {
-        const card = document.createElement("button");
+    vazio.classList.toggle(
+        "visible",
+        estado.arquivos.fotos.length === 0
+    );
 
-        card.type = "button";
-        card.className = "photo-card";
-        card.setAttribute("aria-label", arquivo.name);
-
-        const imagem = document.createElement("img");
-
-        imagem.src = arquivo.url;
-        imagem.alt = arquivo.name;
-        imagem.loading = "lazy";
-        imagem.decoding = "async";
-
-        imagem.addEventListener("error", () => {
-            card.remove();
-        });
-
-        card.appendChild(imagem);
-
-        card.addEventListener("click", () => {
-            abrirLightbox(
-                arquivo.url,
-                arquivo.name
+    estado.arquivos.fotos.forEach(
+        (arquivo, indice) => {
+            container.appendChild(
+                criarCartaoFoto(
+                    arquivo,
+                    indice
+                )
             );
-        });
-
-        grid.appendChild(card);
-    }
-
-    container.appendChild(grid);
+        }
+    );
 }
 
-function renderizarAudios(containerId, arquivos, texto) {
-    const container = document.getElementById(containerId);
+function criarCartaoFoto(
+    arquivo,
+    indice
+) {
+    const card =
+        document.createElement("article");
+
+    card.className = "media-card";
+    card.tabIndex = 0;
+    card.setAttribute(
+        "role",
+        "button"
+    );
+    card.setAttribute(
+        "aria-label",
+        `Abrir ${arquivo.nome}`
+    );
+
+    const shell =
+        document.createElement("div");
+
+    shell.className =
+        "photo-shell";
+
+    const imagem =
+        document.createElement("img");
+
+    imagem.loading = "lazy";
+    imagem.decoding = "async";
+    imagem.src = arquivo.url;
+    imagem.alt =
+        `Foto: ${arquivo.nome}`;
+
+    imagem.addEventListener(
+        "error",
+        () => {
+            shell.innerHTML = "";
+
+            const fallback =
+                document.createElement("div");
+
+            fallback.className =
+                "empty-state visible";
+
+            const texto =
+                document.createElement("strong");
+
+            texto.textContent =
+                "Imagem indisponível";
+
+            fallback.appendChild(texto);
+            shell.appendChild(fallback);
+        },
+        { once: true }
+    );
+
+    const overlay =
+        document.createElement("div");
+
+    overlay.className =
+        "photo-overlay";
+
+    overlay.textContent =
+        obterNomeSemExtensao(
+            arquivo.nome
+        );
+
+    shell.append(
+        imagem,
+        overlay
+    );
+
+    card.appendChild(shell);
+
+    const abrir = () =>
+        abrirLightbox(
+            arquivo,
+            card
+        );
+
+    card.addEventListener(
+        "click",
+        abrir
+    );
+
+    card.addEventListener(
+        "keydown",
+        evento => {
+            if (
+                evento.key === "Enter" ||
+                evento.key === " "
+            ) {
+                evento.preventDefault();
+                abrir();
+            }
+        }
+    );
+
+    card.style.animationDelay =
+        `${Math.min(indice * .012, .35)}s`;
+
+    return card;
+}
+
+function renderizarAudios() {
+    const container =
+        document.getElementById("audios");
 
     container.innerHTML = "";
 
-    if (!arquivos.length) {
-        container.appendChild(criarVazio(texto));
+    removerLoading("audioLoading");
+
+    const vazio =
+        document.getElementById("audioEmpty");
+
+    vazio.classList.toggle(
+        "visible",
+        estado.arquivos.audios.length === 0
+    );
+
+    if (
+        estado.arquivos.audios.length === 0
+    ) {
         return;
     }
 
-    const lista = document.createElement("div");
-    lista.className = "media-list";
+    const panel =
+        document.createElement("article");
 
-    for (const arquivo of arquivos) {
-        const card = document.createElement("article");
-        card.className = "audio-card";
+    panel.className =
+        "media-panel";
 
-        const nome = document.createElement("p");
-        nome.className = "media-name";
-        nome.textContent = arquivo.name;
+    const titulo =
+        document.createElement("h3");
 
-        const audio = document.createElement("audio");
+    titulo.textContent =
+        "Nossas vozes";
 
-        audio.controls = true;
-        audio.preload = "metadata";
-        audio.src = arquivo.url;
+    const descricao =
+        document.createElement("p");
 
-        card.appendChild(nome);
-        card.appendChild(audio);
+    descricao.textContent =
+        `${estado.arquivos.audios.length} ${estado.arquivos.audios.length === 1 ? "áudio" : "áudios"}`;
 
-        lista.appendChild(card);
-    }
-
-    container.appendChild(lista);
-}
-
-function renderizarVideos(containerId, arquivos, texto) {
-    const container = document.getElementById(containerId);
-
-    container.innerHTML = "";
-
-    if (!arquivos.length) {
-        container.appendChild(criarVazio(texto));
-        return;
-    }
-
-    const lista = document.createElement("div");
-    lista.className = "media-list";
-
-    for (const arquivo of arquivos) {
-        const card = document.createElement("article");
-        card.className = "video-card";
-
-        const nome = document.createElement("p");
-        nome.className = "media-name";
-        nome.textContent = arquivo.name;
-
-        const video = document.createElement("video");
-
-        video.controls = true;
-        video.preload = "metadata";
-        video.playsInline = true;
-        video.src = arquivo.url;
-
-        card.appendChild(nome);
-        card.appendChild(video);
-
-        lista.appendChild(card);
-    }
-
-    container.appendChild(lista);
-}
-
-function atualizarInterface() {
-    const totalPublico =
-        catalogoPublico.fotos.length +
-        catalogoPublico.audios.length +
-        catalogoPublico.videos.length;
-
-    document.getElementById("counter").textContent =
-        `${totalPublico} ${totalPublico === 1 ? "mídia" : "mídias"}`;
-
-    document.getElementById("foto-status").textContent =
-        `${catalogoPublico.fotos.length} ${catalogoPublico.fotos.length === 1 ? "foto" : "fotos"}`;
-
-    document.getElementById("audio-status").textContent =
-        `${catalogoPublico.audios.length} ${catalogoPublico.audios.length === 1 ? "áudio" : "áudios"}`;
-
-    document.getElementById("video-status").textContent =
-        `${catalogoPublico.videos.length} ${catalogoPublico.videos.length === 1 ? "vídeo" : "vídeos"}`;
-
-    renderizarFotos(
-        "fotos-container",
-        catalogoPublico.fotos,
-        "Nenhuma foto encontrada"
+    panel.append(
+        titulo,
+        descricao
     );
 
-    renderizarAudios(
-        "audios-container",
-        catalogoPublico.audios,
-        "Nenhum áudio encontrado"
-    );
-
-    renderizarVideos(
-        "videos-container",
-        catalogoPublico.videos,
-        "Nenhum vídeo encontrado"
-    );
-
-    renderizarFotos(
-        "exclusive-fotos-container",
-        catalogoExclusivo.fotos,
-        "Sem conteúdo exclusivo"
-    );
-
-    renderizarAudios(
-        "exclusive-audios-container",
-        catalogoExclusivo.audios,
-        "Sem conteúdo exclusivo"
-    );
-
-    renderizarVideos(
-        "exclusive-videos-container",
-        catalogoExclusivo.videos,
-        "Sem conteúdo exclusivo"
-    );
-}
-
-function abrirLightbox(url, nome) {
-    const lightbox = document.getElementById("lightbox");
-    const imagem = document.getElementById("lightbox-image");
-
-    imagem.src = url;
-    imagem.alt = nome;
-
-    lightbox.classList.add("active");
-    document.body.style.overflow = "hidden";
-
-    if (!historicoLightbox) {
-        historicoLightbox = true;
-        history.pushState(
-            {
-                lightbox: true
-            },
-            ""
+    for (const arquivo of estado.arquivos.audios) {
+        panel.appendChild(
+            criarItemAudio(arquivo)
         );
     }
+
+    container.appendChild(panel);
+}
+
+function criarItemAudio(arquivo) {
+    const item =
+        document.createElement("div");
+
+    item.className =
+        "audio-item";
+
+    const nome =
+        document.createElement("span");
+
+    nome.className =
+        "media-name";
+
+    nome.textContent =
+        arquivo.nome;
+
+    const player =
+        document.createElement("audio");
+
+    player.controls = true;
+    player.preload = "none";
+    player.playsInline = true;
+    player.src = arquivo.url;
+
+    item.append(
+        nome,
+        player
+    );
+
+    return item;
+}
+
+function renderizarVideos() {
+    const container =
+        document.getElementById("videos");
+
+    container.innerHTML = "";
+
+    removerLoading("videoLoading");
+
+    const vazio =
+        document.getElementById("videoEmpty");
+
+    vazio.classList.toggle(
+        "visible",
+        estado.arquivos.videos.length === 0
+    );
+
+    if (
+        estado.arquivos.videos.length === 0
+    ) {
+        return;
+    }
+
+    const panel =
+        document.createElement("article");
+
+    panel.className =
+        "media-panel";
+
+    const titulo =
+        document.createElement("h3");
+
+    titulo.textContent =
+        "Nossos vídeos";
+
+    const descricao =
+        document.createElement("p");
+
+    descricao.textContent =
+        `${estado.arquivos.videos.length} ${estado.arquivos.videos.length === 1 ? "vídeo" : "vídeos"}`;
+
+    panel.append(
+        titulo,
+        descricao
+    );
+
+    for (const arquivo of estado.arquivos.videos) {
+        panel.appendChild(
+            criarItemVideo(arquivo)
+        );
+    }
+
+    container.appendChild(panel);
+}
+
+function criarItemVideo(arquivo) {
+    const item =
+        document.createElement("div");
+
+    item.className =
+        "video-item";
+
+    const nome =
+        document.createElement("span");
+
+    nome.className =
+        "media-name";
+
+    nome.textContent =
+        arquivo.nome;
+
+    const player =
+        document.createElement("video");
+
+    player.controls = true;
+    player.preload = "metadata";
+    player.playsInline = true;
+    player.src = arquivo.url;
+
+    const tipo =
+        arquivo.mime ||
+        MIME_POR_EXTENSAO[
+            obterExtensao(
+                arquivo.nome
+            )
+        ] ||
+        "";
+
+    if (tipo) {
+        player.setAttribute(
+            "type",
+            tipo
+        );
+    }
+
+    item.append(
+        nome,
+        player
+    );
+
+    return item;
+}
+
+function renderizarExclusivos() {
+    const container =
+        document.getElementById(
+            "exclusiveGrid"
+        );
+
+    container.innerHTML = "";
+
+    const total =
+        estado.exclusivos.fotos.length +
+        estado.exclusivos.audios.length +
+        estado.exclusivos.videos.length;
+
+    const vazio =
+        document.getElementById(
+            "exclusiveEmpty"
+        );
+
+    vazio.classList.toggle(
+        "visible",
+        total === 0
+    );
+
+    if (total === 0) {
+        return;
+    }
+
+    for (const arquivo of estado.exclusivos.fotos) {
+        container.appendChild(
+            criarExclusivoFoto(arquivo)
+        );
+    }
+
+    for (const arquivo of estado.exclusivos.audios) {
+        container.appendChild(
+            criarExclusivoAudio(arquivo)
+        );
+    }
+
+    for (const arquivo of estado.exclusivos.videos) {
+        container.appendChild(
+            criarExclusivoVideo(arquivo)
+        );
+    }
+}
+
+function criarExclusivoFoto(arquivo) {
+    const card =
+        document.createElement("article");
+
+    card.className =
+        "exclusive-card exclusive-photo";
+
+    const imagem =
+        document.createElement("img");
+
+    imagem.loading = "lazy";
+    imagem.decoding = "async";
+    imagem.src = arquivo.url;
+    imagem.alt =
+        `Conteúdo exclusivo: ${arquivo.nome}`;
+
+    card.appendChild(imagem);
+
+    card.addEventListener(
+        "click",
+        () =>
+            abrirLightbox(
+                arquivo,
+                card
+            )
+    );
+
+    return card;
+}
+
+function criarExclusivoAudio(arquivo) {
+    const card =
+        document.createElement("article");
+
+    card.className =
+        "exclusive-card";
+
+    const titulo =
+        document.createElement("h3");
+
+    titulo.textContent =
+        "Áudio";
+
+    const nome =
+        document.createElement("p");
+
+    nome.textContent =
+        arquivo.nome;
+
+    const player =
+        document.createElement("audio");
+
+    player.controls = true;
+    player.preload = "none";
+    player.src = arquivo.url;
+
+    card.append(
+        titulo,
+        nome,
+        player
+    );
+
+    return card;
+}
+
+function criarExclusivoVideo(arquivo) {
+    const card =
+        document.createElement("article");
+
+    card.className =
+        "exclusive-card";
+
+    const titulo =
+        document.createElement("h3");
+
+    titulo.textContent =
+        "Vídeo";
+
+    const nome =
+        document.createElement("p");
+
+    nome.textContent =
+        arquivo.nome;
+
+    const player =
+        document.createElement("video");
+
+    player.controls = true;
+    player.preload = "metadata";
+    player.playsInline = true;
+    player.src = arquivo.url;
+
+    if (arquivo.mime) {
+        player.setAttribute(
+            "type",
+            arquivo.mime
+        );
+    }
+
+    card.append(
+        titulo,
+        nome,
+        player
+    );
+
+    return card;
+}
+
+function abrirLightbox(
+    arquivo,
+    origem
+) {
+    const lightbox =
+        document.getElementById(
+            "lightbox"
+        );
+
+    const content =
+        document.getElementById(
+            "lightboxContent"
+        );
+
+    const caption =
+        document.getElementById(
+            "lightboxCaption"
+        );
+
+    estado.ultimaFocada =
+        origem ||
+        document.activeElement;
+
+    content.innerHTML = "";
+
+    const imagem =
+        document.createElement("img");
+
+    imagem.className =
+        "lightbox-img";
+
+    imagem.src =
+        arquivo.url;
+
+    imagem.alt =
+        `Visualização: ${arquivo.nome}`;
+
+    content.appendChild(imagem);
+
+    caption.textContent =
+        arquivo.nome;
+
+    lightbox.classList.add(
+        "aberto"
+    );
+
+    lightbox.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+    estado.lightboxAberto = true;
+
+    document.body.style.overflow =
+        "hidden";
+
+    requestAnimationFrame(() => {
+        document.getElementById(
+            "lightboxClose"
+        )?.focus();
+    });
 }
 
 function fecharLightbox() {
-    const lightbox = document.getElementById("lightbox");
-
-    if (!lightbox.classList.contains("active")) {
+    if (!estado.lightboxAberto) {
         return;
     }
 
-    lightbox.classList.remove("active");
+    const lightbox =
+        document.getElementById(
+            "lightbox"
+        );
 
-    document.getElementById("lightbox-image").src = "";
+    lightbox.classList.remove(
+        "aberto"
+    );
 
-    document.body.style.overflow = "";
+    lightbox.setAttribute(
+        "aria-hidden",
+        "true"
+    );
 
-    if (historicoLightbox) {
-        historicoLightbox = false;
-        history.back();
+    document.getElementById(
+        "lightboxContent"
+    ).innerHTML = "";
+
+    document.getElementById(
+        "lightboxCaption"
+    ).textContent = "";
+
+    document.body.style.overflow =
+        "";
+
+    estado.lightboxAberto = false;
+
+    const foco =
+        estado.ultimaFocada;
+
+    estado.ultimaFocada =
+        null;
+
+    if (
+        foco &&
+        typeof foco.focus === "function"
+    ) {
+        requestAnimationFrame(
+            () => foco.focus()
+        );
     }
 }
 
-document.getElementById("back-button").addEventListener(
-    "click",
-    () => {
-        window.location.href = "home.html";
-    }
-);
-
-document.getElementById("home-button").addEventListener(
-    "click",
-    () => {
-        window.location.href = "home.html";
-    }
-);
-
-document.querySelectorAll(".tab").forEach(tab => {
-    tab.addEventListener("click", () => {
-        const alvo = tab.dataset.tab;
-
-        document.querySelectorAll(".tab").forEach(item => {
-            item.classList.remove("active");
-        });
-
-        document.querySelectorAll(".section").forEach(section => {
-            section.classList.remove("active");
-        });
-
-        tab.classList.add("active");
-
-        const section = document.getElementById(
-            `section-${alvo}`
-        );
-
-        if (section) {
-            section.classList.add("active");
+document
+    .getElementById("lightbox")
+    .addEventListener(
+        "click",
+        evento => {
+            if (
+                evento.target.id ===
+                "lightbox"
+            ) {
+                fecharLightbox();
+            }
         }
-    });
-});
+    );
 
-document.querySelectorAll(".exclusive-tab").forEach(tab => {
-    tab.addEventListener("click", () => {
-        const alvo = tab.dataset.exclusive;
+document
+    .getElementById("lightboxClose")
+    .addEventListener(
+        "click",
+        fecharLightbox
+    );
 
-        document.querySelectorAll(".exclusive-tab").forEach(item => {
-            item.classList.remove("active");
-        });
-
-        document.querySelectorAll(".exclusive-content").forEach(item => {
-            item.classList.remove("active");
-        });
-
-        tab.classList.add("active");
-
-        const conteudo = document.getElementById(
-            `exclusive-${alvo}`
-        );
-
-        if (conteudo) {
-            conteudo.classList.add("active");
-        }
-    });
-});
-
-document.getElementById("lightbox-close").addEventListener(
-    "click",
-    fecharLightbox
-);
-
-document.getElementById("lightbox").addEventListener(
-    "click",
+document.addEventListener(
+    "keydown",
     evento => {
-        if (evento.target.id === "lightbox") {
+        if (
+            evento.key === "Escape" &&
+            estado.lightboxAberto
+        ) {
             fecharLightbox();
         }
     }
 );
 
-document.addEventListener("keydown", evento => {
-    if (evento.key === "Escape") {
-        fecharLightbox();
+function trocarSecao(nome) {
+    document
+        .querySelectorAll(".media-tab")
+        .forEach(botao => {
+            const ativo =
+                botao.dataset.section ===
+                nome;
+
+            botao.classList.toggle(
+                "active",
+                ativo
+            );
+
+            botao.setAttribute(
+                "aria-selected",
+                String(ativo)
+            );
+        });
+
+    document
+        .querySelectorAll(".section")
+        .forEach(secao => {
+            const ativo =
+                secao.id ===
+                `section-${nome}`;
+
+            secao.classList.toggle(
+                "active",
+                ativo
+            );
+
+            secao.hidden =
+                !ativo;
+        });
+}
+
+document
+    .querySelectorAll(".media-tab")
+    .forEach(botao => {
+        botao.addEventListener(
+            "click",
+            () =>
+                trocarSecao(
+                    botao.dataset.section
+                )
+        );
+    });
+
+function voltarHome() {
+    window.location.href =
+        "home.html";
+}
+
+document
+    .getElementById("btnVoltar")
+    .addEventListener(
+        "click",
+        voltarHome
+    );
+
+document
+    .getElementById("btnVoltarInferior")
+    .addEventListener(
+        "click",
+        voltarHome
+    );
+
+async function iniciar() {
+    try {
+        await carregarCatalogo();
+    } catch (erro) {
+        console.error(
+            "Falha ao carregar galeria:",
+            erro
+        );
+
+        removerLoading(
+            "fotoLoading"
+        );
+
+        removerLoading(
+            "audioLoading"
+        );
+
+        removerLoading(
+            "videoLoading"
+        );
+
+        document
+            .getElementById("fotoEmpty")
+            .classList.add("visible");
+
+        document
+            .getElementById("audioEmpty")
+            .classList.add("visible");
+
+        document
+            .getElementById("videoEmpty")
+            .classList.add("visible");
+
+        document
+            .getElementById("exclusiveEmpty")
+            .classList.add("visible");
+
+        document.getElementById(
+            "fotoStatus"
+        ).textContent = "";
+
+        document.getElementById(
+            "audioStatus"
+        ).textContent = "";
+
+        document.getElementById(
+            "videoStatus"
+        ).textContent = "";
     }
-});
+}
 
-window.addEventListener("popstate", () => {
-    historicoLightbox = false;
-
-    const lightbox =
-        document.getElementById("lightbox");
-
-    lightbox.classList.remove("active");
-
-    document.getElementById(
-        "lightbox-image"
-    ).src = "";
-
-    document.body.style.overflow = "";
-});
-
-carregarCatalogo();
+iniciar();
 </script>
 
 </body>
