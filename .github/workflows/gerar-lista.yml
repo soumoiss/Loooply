@@ -1,1 +1,49 @@
+name: Gerar Lista de Mídias Automática
+
+on:
+  push:
+    paths:
+      - 'midia/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v3
+
+      - name: Criar midias.json
+        run: |
+          python -c "
+          import os, json
+
+          base = 'midia'
+          resultado = {}
+
+          if os.path.exists(base):
+              for root, _, files in os.walk(base):
+                  for file in files:
+                      if not file.startswith('.'):
+                          caminho_completo = os.path.join(root, file)
+                          rel = os.path.relpath(caminho_completo, base)
+                          partes = rel.replace('\\\\', '/').split('/')
+                          
+                          categoria = partes[0].lower()
+                          if categoria not in resultado:
+                              resultado[categoria] = []
+                          resultado[categoria].append(rel.replace('\\\\', '/'))
+
+          with open('midias.json', 'w', encoding='utf-8') as f:
+              json.dump(resultado, f, ensure_ascii=False, indent=2)
+          "
+
+      - name: Salvar alterações no repositório
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add midias.json
+          git status
+          git diff-index --quiet HEAD || git commit -m "auto: atualiza lista de midias"
+          git push
 
