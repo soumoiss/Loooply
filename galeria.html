@@ -893,36 +893,23 @@ const EXTENSOES = {
 };
 
 const MIME_POR_EXTENSAO = {
-    jpg:"image/jpeg", jpeg:"image/jpeg", png:"image/png", webp:"image/webp", gif:"image/gif",
-    avif:"image/avif", bmp:"image/bmp", svg:"image/svg+xml", heic:"image/heic", heif:"image/heif",
-    jfif:"image/jpeg", tif:"image/tiff", tiff:"image/tiff", mp3:"audio/mpeg", m4a:"audio/mp4",
-    wav:"audio/wav", ogg:"audio/ogg", oga:"audio/ogg", aac:"audio/aac", flac:"audio/flac",
-    opus:"audio/opus", mp4:"video/mp4", webm:"video/webm", mov:"video/quicktime", m4v:"video/mp4",
-    ogv:"video/ogg", avi:"video/x-msvideo", mkv:"video/x-matroska"
+    jpg:"image/jpeg", jpeg:"image/jpeg", png:"image/png", webp:"image/webp", gif:"image/gif", avif:"image/avif", bmp:"image/bmp", svg:"image/svg+xml", heic:"image/heic", heif:"image/heif", jfif:"image/jpeg", tif:"image/tiff", tiff:"image/tiff",
+    mp3:"audio/mpeg", m4a:"audio/mp4", wav:"audio/wav", ogg:"audio/ogg", oga:"audio/ogg", aac:"audio/aac", flac:"audio/flac", opus:"audio/opus",
+    mp4:"video/mp4", webm:"video/webm", mov:"video/quicktime", m4v:"video/mp4", ogv:"video/ogg", avi:"video/x-msvideo", mkv:"video/x-matroska"
 };
 
-const REPOSITORIO = {
-    owner: "soumoiss",
-    repo: "Loooply",
-    branch: "",
-    pastaMidia: "midia"
-};
-
-const USUARIOS_VALIDOS = new Set(["patati", "misol", "lilika", "yara"]);
+const REPOSITORIO = { owner:"soumoiss", repo:"Loooply", branch:"", pastaMidia:"midia" };
+const USUARIOS_VALIDOS = new Set(["patati","misol","lilika","yara"]);
 const API_VERSION = "2026-03-10";
+const CATALOG_CACHE_KEY = "loooply_galeria_catalogo_v6";
+const DISCOVERY_TIMEOUT = 10000;
+const MEDIA_TIMEOUT = 12000;
 
 const estado = {
-    arquivos: { fotos: [], audios: [], videos: [] },
-    exclusivo: [],
-    usuario: "",
-    configuracao: null,
-    carregamento: "idle",
-    promessaCatalogo: null,
-    lightboxAberto: false,
-    lightboxUsouHistorico: false,
-    ultimaFocada: null,
-    musicaPausadaManualmente: false,
-    secoesRenderizadas: { fotos: false, audios: false, videos: false, exclusivo: false }
+    arquivos:{fotos:[],audios:[],videos:[]}, exclusivo:[], usuario:"", configuracao:null,
+    carregamento:"idle", promessaCatalogo:null, lightboxAberto:false, lightboxUsouHistorico:false,
+    ultimaFocada:null, musicaPausadaManualmente:false,
+    secoesRenderizadas:{fotos:false,audios:false,videos:false,exclusivo:false}
 };
 
 const audioTema = document.getElementById("temaMusical");
@@ -934,608 +921,243 @@ const galleryErrorTitle = document.getElementById("galleryErrorTitle");
 const galleryErrorText = document.getElementById("galleryErrorText");
 const galleryRetry = document.getElementById("galleryRetry");
 
-function obterUsuario() {
-    const bruto = String(localStorage.getItem("username") || "").trim().toLowerCase();
-    return USUARIOS_VALIDOS.has(bruto) ? bruto : "";
+function obterUsuario(){
+    const bruto=String(localStorage.getItem("username")||"").trim().toLowerCase();
+    return USUARIOS_VALIDOS.has(bruto)?bruto:"";
+}
+function normalizarCaminho(c){return String(c||"").replace(/^\/+|\/+$/g,"");}
+function obterExtensao(n){const b=String(n||"").split("/").pop();const p=b.lastIndexOf(".");return p===-1?"":b.slice(p+1).toLowerCase();}
+function obterNomeSemExtensao(n){const b=String(n||"").split("/").pop();const p=b.lastIndexOf(".");return p<=0?b:b.slice(0,p);}
+function classificarArquivo(n){const e=obterExtensao(n);if(EXTENSOES.fotos.has(e))return"fotos";if(EXTENSOES.audios.has(e))return"audios";if(EXTENSOES.videos.has(e))return"videos";return null;}
+function tipoMimePorArquivo(a){return a.mime||MIME_POR_EXTENSAO[obterExtensao(a.nome)]||"";}
+function compararArquivos(a,b){return String(a.caminho).localeCompare(String(b.caminho),"pt-BR",{numeric:true,sensitivity:"base"});}
+function deduplicarArquivos(lista){const s=new Set();return lista.filter(a=>{const k=String(a?.caminho||"").toLowerCase();if(!k||s.has(k))return false;s.add(k);return true;});}
+function criarErro(codigo,mensagem,detalhes={}){const e=new Error(mensagem);e.codigo=codigo;Object.assign(e,detalhes);return e;}
+
+function detectarRepositorioAutomaticamente(){
+    const c={...REPOSITORIO};
+    const host=window.location.hostname;
+    const partes=window.location.pathname.split("/").filter(Boolean);
+    if(!c.owner&&host.endsWith(".github.io"))c.owner=host.split(".")[0];
+    if(!c.repo&&host.endsWith(".github.io")&&partes[0])c.repo=partes[0];
+    return c;
+}
+function validarRepositorio(c){if(!c.owner||!c.repo||!c.pastaMidia)throw criarErro("CONFIG_INVALIDA","Configuração do repositório incompleta.");}
+
+function construirRawUrl(caminho,c){
+    const partes=normalizarCaminho(caminho).split("/").filter(Boolean).map(encodeURIComponent);
+    if(!c.branch||!partes.length)throw criarErro("URL_INVALIDA","Branch ou caminho de mídia ausente.");
+    return `https://raw.githubusercontent.com/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/${encodeURIComponent(c.branch)}/${partes.join("/")}`;
+}
+function construirJsDelivrUrl(caminho,c,branch=c.branch){
+    const partes=normalizarCaminho(caminho).split("/").filter(Boolean).map(encodeURIComponent);
+    return `https://cdn.jsdelivr.net/gh/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}@${encodeURIComponent(branch)}/${partes.join("/")}`;
+}
+function construirGitHubBlobUrl(caminho,c){return `https://github.com/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/blob/${encodeURIComponent(c.branch)}/${normalizarCaminho(caminho).split("/").map(encodeURIComponent).join("/")}`;}
+
+async function fetchComTimeout(url,opcoes={},timeout=DISCOVERY_TIMEOUT){
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),timeout);
+    try{return await fetch(url,{...opcoes,signal:controller.signal,cache:"no-store"});}
+    catch(e){if(e?.name==="AbortError")throw criarErro("TIMEOUT",`Tempo esgotado ao acessar ${url}`,{url});throw criarErro("REDE",`Falha de rede ao acessar ${url}`,{url,causa:e});}
+    finally{clearTimeout(timer);}
+}
+async function respostaJson(res){
+    const texto=await res.text();
+    if(!texto.trim())return null;
+    try{return JSON.parse(texto);}catch{throw criarErro("JSON_INVALIDO","Resposta JSON inválida.",{status:res.status});}
+}
+async function githubFetch(url){
+    const res=await fetchComTimeout(url,{headers:{Accept:"application/vnd.github+json","X-GitHub-Api-Version":API_VERSION}},DISCOVERY_TIMEOUT);
+    const data=await respostaJson(res);
+    if(!res.ok){const rem=res.headers.get("x-ratelimit-remaining");let codigo="HTTP";if(res.status===404)codigo="HTTP_404";else if(res.status===403&&rem==="0")codigo="RATE_LIMIT";else if(res.status===429)codigo="RATE_LIMIT";else if(res.status===403)codigo="HTTP_403";throw criarErro(codigo,String(data?.message||`GitHub HTTP ${res.status}`),{status:res.status,rateRemaining:rem});}
+    return data;
 }
 
-function normalizarCaminho(caminho) {
-    return String(caminho || "").replace(/^\/+|\/+$/g, "");
+function newArquivo(caminho,c,extra={}){
+    const p=normalizarCaminho(caminho),nome=p.split("/").pop(),tipo=classificarArquivo(nome);
+    if(!p||!nome||!tipo)return null;
+    const raw=construirRawUrl(p,c);
+    const cdn=construirJsDelivrUrl(p,c);
+    return {nome,caminho:p,tipo,mime:extra.mime||MIME_POR_EXTENSAO[obterExtensao(nome)]||"",tamanho:Number(extra.size||0),sha:String(extra.sha||""),url:raw,urls:[raw,cdn],urlIndex:0,apiUrl:String(extra.url||""),origem:extra.origem||"github"};
 }
+function caminhoEhCompartilhado(c,pasta){const r=normalizarCaminho(c).slice(normalizarCaminho(pasta).length+1);return !!r&&!r.includes("/");}
+function caminhoEhDoUsuario(c,pasta,u){if(!u)return false;const p=normalizarCaminho(c).split("/");return p.length>=3&&p[0].toLowerCase()===normalizarCaminho(pasta).toLowerCase()&&p[1].toLowerCase()===u.toLowerCase();}
 
-function obterExtensao(nome) {
-    const base = String(nome || "").split("/").pop();
-    const posicao = base.lastIndexOf(".");
-    return posicao === -1 ? "" : base.slice(posicao + 1).toLowerCase();
-}
-
-function obterNomeSemExtensao(nome) {
-    const base = String(nome || "").split("/").pop();
-    const posicao = base.lastIndexOf(".");
-    return posicao <= 0 ? base : base.slice(0, posicao);
-}
-
-function classificarArquivo(nome) {
-    const extensao = obterExtensao(nome);
-    if (EXTENSOES.fotos.has(extensao)) return "fotos";
-    if (EXTENSOES.audios.has(extensao)) return "audios";
-    if (EXTENSOES.videos.has(extensao)) return "videos";
-    return null;
-}
-
-function tipoMimePorArquivo(arquivo) {
-    return arquivo.mime || MIME_POR_EXTENSAO[obterExtensao(arquivo.nome)] || "";
-}
-
-function compararArquivos(a, b) {
-    return String(a.caminho).localeCompare(String(b.caminho), "pt-BR", {
-        numeric: true,
-        sensitivity: "base"
-    });
-}
-
-function deduplicarArquivos(lista) {
-    const vistos = new Set();
-    return lista.filter(arquivo => {
-        const chave = String(arquivo?.caminho || "");
-        if (!chave || vistos.has(chave)) return false;
-        vistos.add(chave);
-        return true;
-    });
-}
-
-function detectarRepositorioAutomaticamente() {
-    const configuracao = { ...REPOSITORIO };
-    const host = window.location.hostname;
-    const caminho = window.location.pathname.split("/").filter(Boolean);
-
-    if (!configuracao.owner && host.endsWith(".github.io")) {
-        configuracao.owner = host.split(".")[0];
+function montarCatalogo(itens,c,usuario){
+    const out={fotos:[],audios:[],videos:[]},ex=[];const prefix=`${normalizarCaminho(c.pastaMidia)}/`.toLowerCase();
+    const tema=`${prefix}tema.mp3`;
+    for(const raw of itens){
+        const caminho=normalizarCaminho(raw?.path||raw?.name||"");
+        if(!caminho.toLowerCase().startsWith(prefix)||caminho.toLowerCase()===tema)continue;
+        const a=raw.tipo?raw:newArquivo(caminho,c,raw);if(!a)continue;
+        if(caminhoEhCompartilhado(caminho,c.pastaMidia))out[a.tipo].push(a);
+        else if(caminhoEhDoUsuario(caminho,c.pastaMidia,usuario))ex.push(a);
     }
-
-    if (!configuracao.repo && host.endsWith(".github.io") && caminho[0]) {
-        configuracao.repo = caminho[0];
-    }
-
-    return configuracao;
+    for(const k of Object.keys(out))out[k]=deduplicarArquivos(out[k]).sort(compararArquivos);
+    return {compartilhado:out,exclusivo:deduplicarArquivos(ex).sort(compararArquivos)};
 }
 
-function validarRepositorio(configuracao) {
-    if (!configuracao.owner || !configuracao.repo || !configuracao.pastaMidia) {
-        throw criarErro("CONFIG_INVALIDA", "A configuração do repositório está incompleta.");
+async function obterConfiguracaoGitHub(){
+    const c=detectarRepositorioAutomaticamente();validarRepositorio(c);
+    const d=await githubFetch(`https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}`);
+    if(!d?.default_branch)throw criarErro("REPOSITORIO_INVALIDO","GitHub não informou o branch padrão.");
+    c.branch=String(d.default_branch);return c;
+}
+async function estrategiaGitTree(c,u){
+    const d=await githubFetch(`https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/git/trees/${encodeURIComponent(c.branch)}?recursive=1`);
+    if(!Array.isArray(d?.tree))throw criarErro("TREE_INVALIDA","Árvore Git inválida.");
+    if(d.truncated)throw criarErro("TREE_TRUNCADA","Árvore Git truncada.");
+    return montarCatalogo(d.tree,c,u);
+}
+async function listarContents(caminho,c,acumulador=new Map()){
+    const url=`https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/contents/${normalizarCaminho(caminho).split("/").map(encodeURIComponent).join("/")}?ref=${encodeURIComponent(c.branch)}`;
+    const data=await githubFetch(url);if(!Array.isArray(data))throw criarErro("CONTENTS_INVALIDO","GitHub Contents não retornou uma lista.");
+    for(const item of data){
+        if(item.type==="file"){const tipo=classificarArquivo(item.name);if(tipo)acumulador.set(normalizarCaminho(item.path).toLowerCase(),item);}
+        else if(item.type==="dir")await listarContents(item.path,c,acumulador);
     }
+    return [...acumulador.values()];
+}
+async function estrategiaContents(c,u){return montarCatalogo(await listarContents(c.pastaMidia,c),c,u);}
+
+async function obterListaJsDelivr(branch){
+    const url=`https://data.jsdelivr.com/v1/package/gh/${encodeURIComponent(REPOSITORIO.owner)}/${encodeURIComponent(REPOSITORIO.repo)}@${encodeURIComponent(branch)}/flat`;
+    const res=await fetchComTimeout(url,{headers:{Accept:"application/json"}},DISCOVERY_TIMEOUT);if(!res.ok)throw criarErro("JSDELIVR_HTTP",`jsDelivr HTTP ${res.status}`);
+    const data=await respostaJson(res);if(!Array.isArray(data?.files))throw criarErro("JSDELIVR_INVALIDO","jsDelivr não retornou lista de arquivos.");return data.files;
+}
+async function estrategiaJsDelivr(branch,u){
+    const c={...detectarRepositorioAutomaticamente(),branch};const files=await obterListaJsDelivr(branch);
+    const itens=files.map(x=>({path:String(x.name||"").replace(/^\//,""),size:x.size,origem:"jsdelivr"}));
+    const cat=montarCatalogo(itens,c,u);for(const grupo of [cat.compartilhado.fotos,cat.compartilhado.audios,cat.compartilhado.videos,cat.exclusivo])for(const a of grupo){a.url=a.urls[1];a.urls=[a.urls[1],a.urls[0]];}return cat;
 }
 
-function criarErro(codigo, mensagem, detalhes = {}) {
-    const erro = new Error(mensagem);
-    erro.codigo = codigo;
-    Object.assign(erro, detalhes);
-    return erro;
-}
-
-function construirRawUrl(caminho, configuracao) {
-    const partes = normalizarCaminho(caminho).split("/").filter(Boolean).map(encodeURIComponent);
-    const branch = String(configuracao.branch || "").trim();
-    if (!branch || !partes.length) {
-        throw criarErro("URL_INVALIDA", "Não foi possível construir a URL da mídia.");
+async function estrategiaGitHubHtml(branch,u){
+    const c={...detectarRepositorioAutomaticamente(),branch};
+    const url=`https://github.com/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/tree/${encodeURIComponent(branch)}/${normalizarCaminho(c.pastaMidia).split("/").map(encodeURIComponent).join("/")}`;
+    const res=await fetchComTimeout(url,{headers:{Accept:"text/html"}},DISCOVERY_TIMEOUT);if(!res.ok)throw criarErro("GITHUB_HTML_HTTP",`GitHub HTML HTTP ${res.status}`);
+    const html=await res.text();
+    const doc=new DOMParser().parseFromString(html,"text/html");
+    const itens=[];const prefix=normalizarCaminho(c.pastaMidia)+"/";
+    for(const a of doc.querySelectorAll('a[href*="/blob/"],a[href*="/tree/"]')){
+        const href=a.getAttribute("href")||"";const m=href.match(new RegExp(`/blob/${escapeRegExp(branch)}/(.+)$`));
+        if(m){const p=decodeURIComponent(m[1]);if(p.toLowerCase().startsWith(prefix.toLowerCase()))itens.push({path:p,origem:"github-html"});}
     }
-    return `https://raw.githubusercontent.com/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/${encodeURIComponent(branch)}/${partes.join("/")}`;
+    if(!itens.length)throw criarErro("GITHUB_HTML_VAZIO","GitHub HTML não expôs os arquivos.");
+    return montarCatalogo(itens,c,u);
 }
+function escapeRegExp(s){return String(s).replace(/[.*+?^${}()|[\]\\]/g,"\\$&");}
 
-async function lerJsonSeguro(resposta) {
-    const texto = await resposta.text();
-    if (!texto) return null;
-    try {
-        return JSON.parse(texto);
-    } catch {
-        throw criarErro("JSON_INVALIDO", "O GitHub retornou uma resposta que não pôde ser interpretada como JSON.", { status: resposta.status });
-    }
-}
-
-async function githubFetch(url) {
-    let resposta;
-
-    try {
-        resposta = await fetch(url, {
-            method: "GET",
-            cache: "no-store",
-            headers: {
-                Accept: "application/vnd.github+json",
-                "X-GitHub-Api-Version": API_VERSION
-            }
-        });
-    } catch (erro) {
-        throw criarErro("REDE", "Não foi possível conectar à GitHub API.", { causa: erro });
-    }
-
-    const dados = await lerJsonSeguro(resposta);
-
-    if (!resposta.ok) {
-        const restante = resposta.headers.get("x-ratelimit-remaining");
-        const reset = resposta.headers.get("x-ratelimit-reset");
-        const mensagemApi = String(dados?.message || "").trim();
-        let codigo = "HTTP";
-
-        if (resposta.status === 404) codigo = "HTTP_404";
-        else if (resposta.status === 403 && restante === "0") codigo = "RATE_LIMIT";
-        else if (resposta.status === 429) codigo = "RATE_LIMIT";
-        else if (resposta.status === 403) codigo = "HTTP_403";
-
-        throw criarErro(codigo, mensagemApi || `GitHub API respondeu HTTP ${resposta.status}.`, {
-            status: resposta.status,
-            apiMessage: mensagemApi,
-            rateRemaining: restante,
-            rateReset: reset
-        });
-    }
-
-    return dados;
-}
-
-async function obterConfiguracaoEfetiva() {
-    const configuracao = detectarRepositorioAutomaticamente();
-    validarRepositorio(configuracao);
-
-    const url = `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}`;
-    const dados = await githubFetch(url);
-
-    if (!dados || typeof dados !== "object" || !String(dados.default_branch || "").trim()) {
-        throw criarErro("REPOSITORIO_INVALIDO", "A resposta do GitHub não informou um branch padrão válido.");
-    }
-
-    configuracao.branch = String(dados.default_branch).trim();
-
-    console.info("[Galeria] Repositório:", `${configuracao.owner}/${configuracao.repo}`);
-    console.info("[Galeria] Branch:", configuracao.branch);
-    console.info("[Galeria] Pasta de mídia:", configuracao.pastaMidia);
-
-    return configuracao;
-}
-
-function criarObjetoMedia(item, configuracao) {
-    const caminho = normalizarCaminho(item?.path);
-    const nome = caminho.split("/").pop();
-    const tipo = classificarArquivo(nome);
-
-    if (!caminho || !nome || !tipo || item?.type !== "blob") return null;
-
-    return {
-        nome,
-        caminho,
-        url: construirRawUrl(caminho, configuracao),
-        apiUrl: String(item.url || ""),
-        sha: String(item.sha || ""),
-        tamanho: Number(item.size || 0),
-        mime: String(item.mime_type || MIME_POR_EXTENSAO[obterExtensao(nome)] || ""),
-        tipo
-    };
-}
-
-function caminhoEhCompartilhado(caminho, pastaMidia) {
-    const prefixo = `${normalizarCaminho(pastaMidia)}/`;
-    const relativo = normalizarCaminho(caminho).slice(prefixo.length);
-    return relativo.length > 0 && !relativo.includes("/");
-}
-
-function caminhoEhDoUsuario(caminho, pastaMidia, usuario) {
-    if (!usuario) return false;
-
-    const prefixo = `${normalizarCaminho(pastaMidia)}/`;
-    const caminhoNormalizado = normalizarCaminho(caminho);
-    const partes = caminhoNormalizado.split("/");
-
-    if (partes.length < 3 || partes[0].toLowerCase() !== normalizarCaminho(pastaMidia).toLowerCase()) {
-        return false;
-    }
-
-    return partes[1].toLowerCase() === usuario.toLowerCase() && caminhoNormalizado.toLowerCase().startsWith(prefixo.toLowerCase());
-}
-
-function montarCatalogoDaTree(dados, configuracao, usuario) {
-    if (!dados || typeof dados !== "object" || !Array.isArray(dados.tree)) {
-        throw criarErro("TREE_INVALIDA", "A GitHub API não retornou uma árvore válida do repositório.");
-    }
-
-    if (dados.truncated === true) {
-        return null;
-    }
-
-    const pasta = normalizarCaminho(configuracao.pastaMidia);
-    const prefixo = `${pasta}/`;
-    const tema = `${prefixo}tema.mp3`.toLowerCase();
-    const compartilhado = { fotos: [], audios: [], videos: [] };
-    const exclusivo = [];
-
-    for (const item of dados.tree) {
-        if (!item || item.type !== "blob" || !item.path) continue;
-
-        const caminho = normalizarCaminho(item.path);
-        if (!caminho.toLowerCase().startsWith(prefixo.toLowerCase())) continue;
-
-        if (caminho.toLowerCase() === tema) continue;
-
-        const arquivo = criarObjetoMedia(item, configuracao);
-        if (!arquivo) continue;
-
-        if (caminhoEhCompartilhado(caminho, pasta)) {
-            compartilhado[arquivo.tipo].push(arquivo);
-        } else if (caminhoEhDoUsuario(caminho, pasta, usuario)) {
-            exclusivo.push(arquivo);
+async function descobrirCatalogo(){
+    const usuario=estado.usuario;const base=detectarRepositorioAutomaticamente();validarRepositorio(base);const falhas=[];
+    try{
+        const c=await obterConfiguracaoGitHub();
+        for(const estrategia of [()=>estrategiaGitTree(c,usuario),()=>estrategiaContents(c,usuario)]){
+            try{const cat=await estrategia();if(cat&&(cat.compartilhado.fotos.length+cat.compartilhado.audios.length+cat.compartilhado.videos.length+cat.exclusivo.length)>0)return {cat,c,fonte:"github-api"};if(cat)falhas.push(criarErro("FONTE_VAZIA","GitHub respondeu, mas não encontrou mídia em midia/."));}
+            catch(e){falhas.push(e);console.warn("[Galeria] Estratégia GitHub falhou:",e);}
         }
-    }
-
-    return {
-        compartilhado: {
-            fotos: deduplicarArquivos(compartilhado.fotos).sort(compararArquivos),
-            audios: deduplicarArquivos(compartilhado.audios).sort(compararArquivos),
-            videos: deduplicarArquivos(compartilhado.videos).sort(compararArquivos)
-        },
-        exclusivo: deduplicarArquivos(exclusivo).sort(compararArquivos)
-    };
-}
-
-async function listarConteudoRecursivo(caminho, configuracao, resultado = []) {
-    const caminhoSeguro = normalizarCaminho(caminho);
-    const url = `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/contents/${caminhoSeguro.split("/").map(encodeURIComponent).join("/")}?ref=${encodeURIComponent(configuracao.branch)}`;
-    const dados = await githubFetch(url);
-
-    if (!Array.isArray(dados)) {
-        throw criarErro("CONTEUDO_INVALIDO", `O caminho ${caminhoSeguro} não retornou uma lista de conteúdo.`);
-    }
-
-    for (const item of dados) {
-        if (!item || !item.type || !item.path) continue;
-        if (item.type === "dir") {
-            await listarConteudoRecursivo(item.path, configuracao, resultado);
-            continue;
+        for(const b of [c.branch,"main","master"].filter((x,i,a)=>x&&a.indexOf(x)===i)){
+            try{const cat=await estrategiaJsDelivr(b,usuario);if(cat.compartilhado.fotos.length+cat.compartilhado.audios.length+cat.compartilhado.videos.length+cat.exclusivo.length)return {cat,c:{...c,branch:b},fonte:"jsdelivr"};}
+            catch(e){falhas.push(e);}
+            try{const cat=await estrategiaGitHubHtml(b,usuario);if(cat.compartilhado.fotos.length+cat.compartilhado.audios.length+cat.compartilhado.videos.length+cat.exclusivo.length)return {cat,c:{...c,branch:b},fonte:"github-html"};}
+            catch(e){falhas.push(e);}
         }
-        if (item.type === "file") resultado.push(item);
+        throw falhas.at(-1)||criarErro("SEM_RESULTADO","Nenhuma estratégia encontrou a mídia.");
+    }catch(e){
+        for(const b of ["main","master"]){try{const cat=await estrategiaJsDelivr(b,usuario);if(cat.compartilhado.fotos.length+cat.compartilhado.audios.length+cat.compartilhado.videos.length+cat.exclusivo.length)return {cat,c:{...base,branch:b},fonte:"jsdelivr"};}catch(err){falhas.push(err);}}
+        throw criarErro("TODAS_FALHARAM","Todas as estratégias de descoberta falharam.",{causa:e,falhas});
     }
-
-    return resultado;
 }
 
-async function carregarCatalogoViaFallback(configuracao, usuario) {
-    const itensMidia = await listarConteudoRecursivo(configuracao.pastaMidia, configuracao);
-    const dados = { tree: itensMidia.map(item => ({
-        type: "blob",
-        path: item.path,
-        sha: item.sha,
-        size: item.size,
-        url: item.url,
-        mime_type: item.mime_type
-    })) };
-    return montarCatalogoDaTree(dados, configuracao, usuario);
-}
-
-async function carregarCatalogoDoGitHub() {
-    const configuracao = await obterConfiguracaoEfetiva();
-    const treeUrl = `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/git/trees/${encodeURIComponent(configuracao.branch)}?recursive=1`;
-    const dadosTree = await githubFetch(treeUrl);
-    let catalogo = montarCatalogoDaTree(dadosTree, configuracao, estado.usuario);
-
-    if (catalogo === null) {
-        console.warn("[Galeria] A árvore recursiva foi truncada; usando consulta de conteúdo como fallback.");
-        catalogo = await carregarCatalogoViaFallback(configuracao, estado.usuario);
-    }
-
-    if (!catalogo) {
-        throw criarErro("CATALOGO_INVALIDO", "Não foi possível montar o catálogo de mídia.");
-    }
-
-    const total = catalogo.compartilhado.fotos.length + catalogo.compartilhado.audios.length + catalogo.compartilhado.videos.length;
-    console.info("[Galeria] Usuário:", estado.usuario || "não identificado");
-    console.info("[Galeria] Mídia compartilhada:", total);
-    console.info("[Galeria] Fotos:", catalogo.compartilhado.fotos.length);
-    console.info("[Galeria] Áudios:", catalogo.compartilhado.audios.length);
-    console.info("[Galeria] Vídeos:", catalogo.compartilhado.videos.length);
-    console.info("[Galeria] Exclusivos:", catalogo.exclusivo.length);
-
-    return { configuracao, catalogo };
-}
-
-function mensagemDeErro(erro) {
-    if (erro?.codigo === "RATE_LIMIT") {
-        return ["Não foi possível carregar a galeria agora.", "O GitHub limitou temporariamente as consultas. Tente novamente mais tarde."];
-    }
-    if (erro?.codigo === "HTTP_404") {
-        return ["Não foi possível carregar a galeria.", "O repositório ou o branch configurado não foi encontrado no GitHub."];
-    }
-    if (erro?.codigo === "HTTP_403") {
-        return ["Não foi possível carregar a galeria.", "O GitHub recusou a consulta à API."];
-    }
-    if (erro?.codigo === "REDE") {
-        return ["Não foi possível carregar a galeria.", "Não foi possível conectar à GitHub API. Verifique a conexão e tente novamente."];
-    }
-    if (erro?.codigo === "JSON_INVALIDO") {
-        return ["Não foi possível carregar a galeria.", "O GitHub enviou uma resposta inesperada."];
-    }
-    return ["Não foi possível carregar a galeria.", "Falha ao consultar o GitHub API."];
-}
-
-function mostrarEstadoErro(erro) {
-    const [titulo, texto] = mensagemDeErro(erro);
-    galleryErrorTitle.textContent = titulo;
-    galleryErrorText.textContent = texto;
-    galleryError.hidden = false;
-    console.error("[Galeria] Falha no carregamento:", erro);
-}
-
-function esconderEstadoErro() {
-    galleryError.hidden = true;
-}
-
-function definirCarregando(ativo) {
-    document.getElementById("fotoLoading").style.display = ativo ? "flex" : "none";
-    document.getElementById("audioLoading").style.display = ativo ? "flex" : "none";
-    document.getElementById("videoLoading").style.display = ativo ? "flex" : "none";
-    document.getElementById("exclusiveLoading").style.display = ativo ? "flex" : "none";
-}
-
-function limparEstadosVazios() {
-    ["fotoEmpty", "audioEmpty", "videoEmpty", "exclusiveEmpty"].forEach(id => {
-        document.getElementById(id).classList.remove("visible");
+function aplicarCatalogo(resultado){
+    const cat=resultado.cat;estado.arquivos=cat.compartilhado;estado.exclusivo=cat.exclusivo;estado.configuracao=resultado.c;estado.carregamento="success";
+    console.info("[Galeria] Catálogo carregado:",resultado.fonte,estado.configuracao,{
+        fotos:estado.arquivos.fotos.length,audios:estado.arquivos.audios.length,videos:estado.arquivos.videos.length,exclusivo:estado.exclusivo.length
     });
 }
+function salvarCache(){try{localStorage.setItem(CATALOG_CACHE_KEY,JSON.stringify({timestamp:Date.now(),usuario:estado.usuario,configuracao:estado.configuracao,arquivos:estado.arquivos,exclusivo:estado.exclusivo}));}catch(e){console.warn("[Galeria] Cache não pôde ser salvo",e);}}
+function carregarCache(){try{const x=JSON.parse(localStorage.getItem(CATALOG_CACHE_KEY)||"null");if(!x||x.usuario!==estado.usuario||!x.configuracao||!x.arquivos)return false;estado.arquivos=x.arquivos;estado.exclusivo=x.exclusivo||[];estado.configuracao=x.configuracao;estado.carregamento="success-cache";console.warn("[Galeria] Usando catálogo em cache de",new Date(x.timestamp||0).toLocaleString());return true;}catch{return false;}}
 
-function aplicarCatalogo(resultado) {
-    estado.configuracao = resultado.configuracao;
-    estado.arquivos = resultado.catalogo.compartilhado;
-    estado.exclusivo = resultado.catalogo.exclusivo;
-    estado.carregamento = "success";
-    estado.secoesRenderizadas = { fotos: false, audios: false, videos: false, exclusivo: false };
-
-    atualizarResumo();
-    limparEstadosVazios();
-    definirCarregando(false);
-    renderizarFotos();
-    configurarMusica(estado.configuracao);
+function mostrarErroGaleria(e){
+    estado.carregamento="error";
+    const codigo=e?.codigo||"ERRO";
+    galleryErrorTitle.textContent="Não foi possível carregar a galeria.";
+    let msg="A galeria tentou várias fontes e não conseguiu localizar os arquivos agora.";
+    if(codigo==="RATE_LIMIT")msg="O GitHub atingiu o limite de requisições. A galeria também tentou fontes alternativas. Tente novamente em alguns segundos.";
+    else if(codigo==="HTTP_404")msg="O repositório ou a pasta de mídia não foram encontrados.";
+    else if(codigo==="TIMEOUT"||codigo==="REDE")msg="A conexão com uma das fontes demorou ou falhou. Outra tentativa pode funcionar.";
+    else if(codigo==="TODAS_FALHARAM")msg="As fontes GitHub API, GitHub Contents, jsDelivr e GitHub HTML foram tentadas sem sucesso.";
+    galleryErrorText.textContent=msg;
+    galleryError.hidden=false;
+    document.querySelectorAll(".loading-state").forEach(x=>x.classList.remove("visible"));
+    console.error("[Galeria] FALHA DEFINITIVA",e);
 }
+function limparErro(){galleryError.hidden=true;}
+function atualizarStatus(){
+    const map={fotoStatus:estado.arquivos.fotos.length,audioStatus:estado.arquivos.audios.length,videoStatus:estado.arquivos.videos.length,exclusiveStatus:estado.exclusivo.length};
+    for(const [id,n] of Object.entries(map)){const el=document.getElementById(id);if(el)el.textContent=n?`${n} ${n===1?"item":"itens"}`:"";}
+}
+function mostrarLoading(){galleryError.hidden=true;document.querySelectorAll(".loading-state").forEach(x=>x.classList.add("visible"));}
+function removerLoading(id){const x=document.getElementById(id);if(x)x.classList.remove("visible");}
+function renderizarTudoInicial(){renderizarFotos();renderizarAudios();renderizarVideos();renderizarExclusivo();atualizarStatus();}
 
-async function carregarCatalogo({ forcar = false } = {}) {
-    if (!forcar && estado.carregamento === "success") return;
-    if (!forcar && estado.promessaCatalogo) return estado.promessaCatalogo;
-
-    estado.carregamento = "loading";
-    esconderEstadoErro();
-    limparEstadosVazios();
-    definirCarregando(true);
-    document.getElementById("galeria").replaceChildren();
-
-    estado.promessaCatalogo = carregarCatalogoDoGitHub()
-        .then(aplicarCatalogo)
-        .catch(erro => {
-            estado.carregamento = "error";
-            estado.arquivos = { fotos: [], audios: [], videos: [] };
-            estado.exclusivo = [];
-            estado.configuracao = null;
-            definirCarregando(false);
-            atualizarResumo();
-            mostrarEstadoErro(erro);
-            atualizarBotaoMusica(false);
-            throw erro;
-        })
-        .finally(() => {
-            estado.promessaCatalogo = null;
-        });
-
+async function carregarCatalogo(opcoes={}){
+    if(estado.promessaCatalogo&&!opcoes.forcar)return estado.promessaCatalogo;
+    if(!opcoes.forcar&&carregarCache()){renderizarTudoInicial();configurarMusica(estado.configuracao);return estado.arquivos;}
+    estado.carregamento="loading";mostrarLoading();estado.secoesRenderizadas={fotos:false,audios:false,videos:false,exclusivo:false};
+    estado.promessaCatalogo=(async()=>{
+        try{
+            const resultado=await descobrirCatalogo();
+            aplicarCatalogo(resultado);limparErro();salvarCache();renderizarTudoInicial();configurarMusica(estado.configuracao);return estado.arquivos;
+        }catch(e){
+            estado.arquivos={fotos:[],audios:[],videos:[]};estado.exclusivo=[];
+            if(carregarCache()){renderizarTudoInicial();configurarMusica(estado.configuracao);return estado.arquivos;}
+            mostrarErroGaleria(e);throw e;
+        }finally{estado.promessaCatalogo=null;}
+    })();
     return estado.promessaCatalogo;
 }
 
-function atualizarResumo() {
-    const total = estado.arquivos.fotos.length + estado.arquivos.audios.length + estado.arquivos.videos.length;
-    document.getElementById("contador").textContent = `${total} ${total === 1 ? "mídia" : "mídias"}`;
-    document.getElementById("fotoStatus").textContent = `${estado.arquivos.fotos.length} ${estado.arquivos.fotos.length === 1 ? "foto" : "fotos"}`;
-    document.getElementById("audioStatus").textContent = `${estado.arquivos.audios.length} ${estado.arquivos.audios.length === 1 ? "áudio" : "áudios"}`;
-    document.getElementById("videoStatus").textContent = `${estado.arquivos.videos.length} ${estado.arquivos.videos.length === 1 ? "vídeo" : "vídeos"}`;
-    document.getElementById("exclusiveStatus").textContent = `${estado.exclusivo.length} ${estado.exclusivo.length === 1 ? "arquivo" : "arquivos"}`;
+function proximoUrl(arquivo){
+    if(!Array.isArray(arquivo.urls)||arquivo.urlIndex>=arquivo.urls.length-1)return null;
+    arquivo.urlIndex++;arquivo.url=arquivo.urls[arquivo.urlIndex];return arquivo.url;
 }
-
-function removerLoading(id) {
-    document.getElementById(id)?.remove();
+function ligarFallbackDeMidia(elemento,arquivo,onFinal){
+    const falha=()=>{const proximo=proximoUrl(arquivo);if(proximo){console.warn("[Galeria] Tentando segunda fonte:",arquivo.caminho,proximo);elemento.src=proximo;if(typeof elemento.load==="function")elemento.load();}else if(onFinal)onFinal();};
+    elemento.addEventListener("error",falha);
 }
 
 function renderizarFotos() {
-    const container = document.getElementById("galeria");
-    container.replaceChildren();
-    removerLoading("fotoLoading");
-    estado.secoesRenderizadas.fotos = true;
-
-    const fotos = estado.arquivos.fotos;
-    const vazio = document.getElementById("fotoEmpty");
-    vazio.classList.toggle("visible", estado.carregamento === "success" && fotos.length === 0);
-
-    if (!fotos.length) return;
-
-    fotos.slice(0, 12).forEach((arquivo, index) => container.appendChild(criarCartaoFoto(arquivo, fotos, index)));
-
-    let proximo = 12;
-    const carregarLote = () => {
-        const limite = Math.min(proximo + 12, fotos.length);
-        for (let index = proximo; index < limite; index++) {
-            container.appendChild(criarCartaoFoto(fotos[index], fotos, index));
-        }
-        proximo = limite;
-        if (proximo < fotos.length) requestAnimationFrame(carregarLote);
-    };
-    if (proximo < fotos.length) requestAnimationFrame(carregarLote);
+    const container=document.getElementById("galeria"); container.replaceChildren(); removerLoading("fotoLoading"); estado.secoesRenderizadas.fotos=true;
+    const fotos=estado.arquivos.fotos; const vazio=document.getElementById("fotoEmpty"); vazio.classList.toggle("visible",estado.carregamento.startsWith("success")&&fotos.length===0);
+    if(!fotos.length)return;
+    fotos.slice(0,12).forEach((a,i)=>container.appendChild(criarCartaoFoto(a,fotos,i)));
+    let proximo=12; const lote=()=>{const fim=Math.min(proximo+12,fotos.length);for(let i=proximo;i<fim;i++)container.appendChild(criarCartaoFoto(fotos[i],fotos,i));proximo=fim;if(proximo<fotos.length)requestAnimationFrame(lote);}; if(proximo<fotos.length)requestAnimationFrame(lote);
 }
-
-function criarCartaoFoto(arquivo, lista, index) {
-    const card = document.createElement("article");
-    card.className = "media-card";
-    card.tabIndex = 0;
-    card.setAttribute("role", "button");
-    card.setAttribute("aria-label", `Abrir ${arquivo.nome}`);
-
-    const shell = document.createElement("div");
-    shell.className = "photo-shell";
-
-    const imagem = document.createElement("img");
-    imagem.loading = index < 8 ? "eager" : "lazy";
-    imagem.decoding = "async";
-    imagem.alt = arquivo.nome;
-    imagem.src = arquivo.url;
-
-    const overlay = document.createElement("div");
-    overlay.className = "photo-overlay";
-    overlay.textContent = obterNomeSemExtensao(arquivo.nome);
-
-    imagem.addEventListener("error", () => {
-        shell.classList.add("media-load-error");
-        overlay.textContent = `${obterNomeSemExtensao(arquivo.nome)} • não foi possível exibir`;
-    }, { once: true });
-
-    shell.append(imagem, overlay);
-    card.appendChild(shell);
-
-    const abrir = () => abrirLightbox(arquivo, card);
-    card.addEventListener("click", abrir);
-    card.addEventListener("keydown", event => {
-        if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            abrir();
-        }
-    });
-
-    return card;
+function criarCartaoFoto(arquivo,lista,index){
+    const card=document.createElement("article");card.className="media-card";card.tabIndex=0;card.setAttribute("role","button");card.setAttribute("aria-label",`Abrir ${arquivo.nome}`);
+    const shell=document.createElement("div");shell.className="photo-shell";const imagem=document.createElement("img");imagem.loading=index<8?"eager":"lazy";imagem.decoding="async";imagem.alt=arquivo.nome;imagem.src=arquivo.url;
+    const overlay=document.createElement("div");overlay.className="photo-overlay";overlay.textContent=obterNomeSemExtensao(arquivo.nome);
+    ligarFallbackDeMidia(imagem,arquivo,()=>{shell.classList.add("media-load-error");overlay.textContent=`${obterNomeSemExtensao(arquivo.nome)} • não foi possível exibir`;});
+    shell.append(imagem,overlay);card.appendChild(shell);const abrir=()=>abrirLightbox(arquivo,card);card.addEventListener("click",abrir);card.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();abrir();}});return card;
 }
-
-function renderizarAudios() {
-    estado.secoesRenderizadas.audios = true;
-    const container = document.getElementById("audios");
-    container.replaceChildren();
-    removerLoading("audioLoading");
-
-    const vazio = document.getElementById("audioEmpty");
-    vazio.classList.toggle("visible", estado.carregamento === "success" && estado.arquivos.audios.length === 0);
-    if (!estado.arquivos.audios.length) return;
-
-    const panel = document.createElement("article");
-    panel.className = "media-panel";
-    const titulo = document.createElement("h3");
-    titulo.textContent = "Áudios";
-    panel.appendChild(titulo);
-
-    estado.arquivos.audios.forEach(arquivo => {
-        const item = document.createElement("div");
-        item.className = "audio-item";
-        const nome = document.createElement("span");
-        nome.className = "media-name";
-        nome.textContent = arquivo.nome;
-        const player = document.createElement("audio");
-        player.controls = true;
-        player.preload = "none";
-        player.playsInline = true;
-        player.src = arquivo.url;
-        const falha = document.createElement("span");
-        falha.className = "media-name";
-        falha.hidden = true;
-        falha.textContent = "Não foi possível reproduzir este áudio.";
-        player.addEventListener("error", () => {
-            falha.hidden = false;
-            console.warn("[Galeria] Falha ao carregar áudio:", arquivo.caminho);
-        }, { once: true });
-        item.append(nome, player, falha);
-        panel.appendChild(item);
-    });
-    container.appendChild(panel);
+function renderizarAudios(){
+    estado.secoesRenderizadas.audios=true;const c=document.getElementById("audios");c.replaceChildren();removerLoading("audioLoading");const v=document.getElementById("audioEmpty");v.classList.toggle("visible",estado.carregamento.startsWith("success")&&estado.arquivos.audios.length===0);if(!estado.arquivos.audios.length)return;
+    const panel=document.createElement("article");panel.className="media-panel";const titulo=document.createElement("h3");titulo.textContent="Áudios";panel.appendChild(titulo);
+    estado.arquivos.audios.forEach(a=>{const item=document.createElement("div");item.className="audio-item";const nome=document.createElement("span");nome.className="media-name";nome.textContent=a.nome;const player=document.createElement("audio");player.controls=true;player.preload="none";player.playsInline=true;player.src=a.url;const falha=document.createElement("span");falha.className="media-name";falha.hidden=true;falha.textContent="Não foi possível reproduzir este áudio.";ligarFallbackDeMidia(player,a,()=>{falha.hidden=false;console.warn("[Galeria] Áudio indisponível:",a.caminho);});item.append(nome,player,falha);panel.appendChild(item);});c.appendChild(panel);
 }
-
-function renderizarVideos() {
-    estado.secoesRenderizadas.videos = true;
-    const container = document.getElementById("videos");
-    container.replaceChildren();
-    removerLoading("videoLoading");
-
-    const vazio = document.getElementById("videoEmpty");
-    vazio.classList.toggle("visible", estado.carregamento === "success" && estado.arquivos.videos.length === 0);
-    if (!estado.arquivos.videos.length) return;
-
-    const panel = document.createElement("article");
-    panel.className = "media-panel";
-    const titulo = document.createElement("h3");
-    titulo.textContent = "Vídeos";
-    panel.appendChild(titulo);
-
-    estado.arquivos.videos.forEach(arquivo => {
-        const item = document.createElement("div");
-        item.className = "video-item";
-        const nome = document.createElement("span");
-        nome.className = "media-name";
-        nome.textContent = arquivo.nome;
-        const player = document.createElement("video");
-        player.controls = true;
-        player.preload = "metadata";
-        player.playsInline = true;
-        player.src = arquivo.url;
-        const mime = tipoMimePorArquivo(arquivo);
-        if (mime) player.setAttribute("type", mime);
-        const falha = document.createElement("span");
-        falha.className = "media-name";
-        falha.hidden = true;
-        falha.textContent = "Não foi possível reproduzir este vídeo.";
-        player.addEventListener("error", () => {
-            falha.hidden = false;
-            console.warn("[Galeria] Falha ao carregar vídeo:", arquivo.caminho);
-        }, { once: true });
-        item.append(nome, player, falha);
-        panel.appendChild(item);
-    });
-    container.appendChild(panel);
+function renderizarVideos(){
+    estado.secoesRenderizadas.videos=true;const c=document.getElementById("videos");c.replaceChildren();removerLoading("videoLoading");const v=document.getElementById("videoEmpty");v.classList.toggle("visible",estado.carregamento.startsWith("success")&&estado.arquivos.videos.length===0);if(!estado.arquivos.videos.length)return;
+    const panel=document.createElement("article");panel.className="media-panel";const titulo=document.createElement("h3");titulo.textContent="Vídeos";panel.appendChild(titulo);
+    estado.arquivos.videos.forEach(a=>{const item=document.createElement("div");item.className="video-item";const nome=document.createElement("span");nome.className="media-name";nome.textContent=a.nome;const player=document.createElement("video");player.controls=true;player.preload="metadata";player.playsInline=true;player.src=a.url;const mime=tipoMimePorArquivo(a);if(mime)player.setAttribute("type",mime);const falha=document.createElement("span");falha.className="media-name";falha.hidden=true;falha.textContent="Não foi possível reproduzir este vídeo.";ligarFallbackDeMidia(player,a,()=>{falha.hidden=false;console.warn("[Galeria] Vídeo indisponível:",a.caminho);});item.append(nome,player,falha);panel.appendChild(item);});c.appendChild(panel);
 }
-
-function renderizarExclusivo() {
-    estado.secoesRenderizadas.exclusivo = true;
-    const container = document.getElementById("exclusivo");
-    container.replaceChildren();
-    removerLoading("exclusiveLoading");
-
-    const vazio = document.getElementById("exclusiveEmpty");
-    vazio.classList.toggle("visible", estado.carregamento === "success" && estado.exclusivo.length === 0);
-    if (!estado.exclusivo.length) return;
-
-    estado.exclusivo.forEach(arquivo => {
-        const item = document.createElement("article");
-        item.className = "exclusive-item";
-        const nome = document.createElement("span");
-        nome.className = "media-name";
-        nome.textContent = arquivo.nome;
-        item.appendChild(nome);
-
-        if (arquivo.tipo === "fotos") {
-            const imagem = document.createElement("img");
-            imagem.loading = "lazy";
-            imagem.decoding = "async";
-            imagem.src = arquivo.url;
-            imagem.alt = arquivo.nome;
-            imagem.addEventListener("error", () => {
-                imagem.remove();
-                const falha = document.createElement("span");
-                falha.className = "media-name";
-                falha.textContent = "Não foi possível exibir esta imagem.";
-                item.appendChild(falha);
-            }, { once: true });
-            item.appendChild(imagem);
-        } else if (arquivo.tipo === "audios") {
-            const audio = document.createElement("audio");
-            audio.controls = true;
-            audio.preload = "none";
-            audio.src = arquivo.url;
-            audio.addEventListener("error", () => console.warn("[Galeria] Falha ao carregar áudio exclusivo:", arquivo.caminho), { once: true });
-            item.appendChild(audio);
-        } else {
-            const video = document.createElement("video");
-            video.controls = true;
-            video.preload = "metadata";
-            video.playsInline = true;
-            video.src = arquivo.url;
-            const mime = tipoMimePorArquivo(arquivo);
-            if (mime) video.setAttribute("type", mime);
-            video.addEventListener("error", () => console.warn("[Galeria] Falha ao carregar vídeo exclusivo:", arquivo.caminho), { once: true });
-            item.appendChild(video);
-        }
-        container.appendChild(item);
+function renderizarExclusivo(){
+    estado.secoesRenderizadas.exclusivo=true;const c=document.getElementById("exclusivo");c.replaceChildren();removerLoading("exclusiveLoading");const v=document.getElementById("exclusiveEmpty");v.classList.toggle("visible",estado.carregamento.startsWith("success")&&estado.exclusivo.length===0);if(!estado.exclusivo.length)return;
+    estado.exclusivo.forEach(a=>{const item=document.createElement("article");item.className="exclusive-item";const nome=document.createElement("span");nome.className="media-name";nome.textContent=a.nome;item.appendChild(nome);
+        if(a.tipo==="fotos"){const img=document.createElement("img");img.loading="lazy";img.decoding="async";img.src=a.url;img.alt=a.nome;ligarFallbackDeMidia(img,a,()=>{img.remove();const f=document.createElement("span");f.className="media-name";f.textContent="Não foi possível exibir esta imagem.";item.appendChild(f);});item.appendChild(img);}
+        else if(a.tipo==="audios"){const au=document.createElement("audio");au.controls=true;au.preload="none";au.src=a.url;ligarFallbackDeMidia(au,a,()=>console.warn("[Galeria] Áudio exclusivo indisponível:",a.caminho));item.appendChild(au);}
+        else{const vi=document.createElement("video");vi.controls=true;vi.preload="metadata";vi.playsInline=true;vi.src=a.url;const mime=tipoMimePorArquivo(a);if(mime)vi.setAttribute("type",mime);ligarFallbackDeMidia(vi,a,()=>console.warn("[Galeria] Vídeo exclusivo indisponível:",a.caminho));item.appendChild(vi);}
+        c.appendChild(item);
     });
 }
 
@@ -1666,7 +1288,7 @@ window.addEventListener("popstate", () => {
 });
 
 function renderizarSecao(nome) {
-    if (estado.carregamento !== "success") return;
+    if (!String(estado.carregamento).startsWith("success")) return;
     if (estado.secoesRenderizadas[nome]) return;
     if (nome === "audios") renderizarAudios();
     else if (nome === "videos") renderizarVideos();
