@@ -1,0 +1,279 @@
+name: Atualizar Índice da Galeria
+
+on:
+  push:
+    paths:
+      - "midia/**"
+      - ".github/workflows/atualizar-galeria.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: atualizar-indice-galeria
+  cancel-in-progress: true
+
+jobs:
+  update-index:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Instalar Pillow
+        run: |
+          python -m pip install --disable-pip-version-check --no-input Pillow
+
+      - name: Gerar midia-index.json
+        env:
+          PYTHONUTF8: "1"
+        run: |
+          python <<'PY'
+          import os
+          import json
+          from datetime import datetime, timezone
+
+          try:
+              from PIL import Image
+          except Exception:
+              Image = None
+
+          EXT_FOTOS = {
+              ".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif",
+              ".bmp", ".svg", ".heic", ".heif", ".jfif", ".tif", ".tiff"
+          }
+
+          EXT_AUDIOS = {
+              ".mp3", ".m4a", ".wav", ".ogg", ".oga", ".aac",
+              ".flac", ".opus"
+          }
+
+          EXT_VIDEOS = {
+              ".mp4", ".webm", ".mov", ".m4v", ".ogv", ".avi", ".mkv"
+          }
+
+          EXCLUSIVITY_USERS = [
+              "Patati",
+              "Misol",
+              "Lilika",
+              "YARA"
+          ]
+
+          def is_ignored_file(filename):
+              lower = filename.lower()
+              return lower == "01" or lower.startswith("01.")
+
+          def get_dimensions(path):
+              if Image is None:
+                  return 0, 0
+
+              try:
+                  with Image.open(path) as image:
+                      return int(image.width), int(image.height)
+              except Exception:
+                  return 0, 0
+
+          def get_metadata(path):
+              try:
+                  stat = os.stat(path)
+                  return int(stat.st_size), float(stat.st_mtime)
+              except Exception:
+                  return 0, 0
+
+          def make_item(rel_path, filename, ext):
+              absolute = os.path.join(".", rel_path)
+              width, height = get_dimensions(absolute) if ext in EXT_FOTOS else (0, 0)
+              size, mtime = get_metadata(absolute)
+
+              ratio = 0
+              if width > 0 and height > 0:
+                  ratio = round(width / height, 6)
+
+              if ext in EXT_FOTOS:
+                  media_type = "foto"
+              elif ext in EXT_AUDIOS:
+                  media_type = "audio"
+              elif ext in EXT_VIDEOS:
+                  media_type = "video"
+              else:
+                  media_type = "arquivo"
+
+              modified = datetime.fromtimestamp(
+                  mtime,
+                  tz=timezone.utc
+              ).isoformat() if mtime else None
+
+              return {
+                  "path": rel_path,
+                  "name": filename,
+                  "extension": ext,
+                  "type": media_type,
+                  "width": width,
+                  "height": height,
+                  "ratio": ratio,
+                  "bytes": size,
+                  "mtime": mtime,
+                  "modified": modified
+              }
+
+          data = {
+              "generatedAt": datetime.now(timezone.utc).isoformat(),
+              "repository": {
+                  "owner": "soumoiss",
+                  "repo": "Loooply",
+                  "branch": "main"
+              },
+              "schemaVersion": 3,
+              "fotos": [],
+              "audios": [],
+              "videos": [],
+              "exclusivo": {
+                  user: []
+                  for user in EXCLUSIVITY_USERS
+              }
+          }
+
+          midia_dir = "midia"
+
+          if os.path.isdir(midia_dir):
+              for root, dirs, files in os.walk(midia_dir):
+                  dirs[:] = sorted(
+                      d for d in dirs
+                      if not d.startswith(".")
+                  )
+
+                  for filename in sorted(
+                      files,
+                      key=lambda value: value.casefold()
+                  ):
+                      if filename.startswith("."):
+                          continue
+
+                      if is_ignored_file(filename):
+                          continue
+
+                      rel_path = os.path.relpath(
+                          os.path.join(root, filename),
+                          "."
+                      ).replace("\\", "/")
+
+                      if rel_path.lower() == "midia/tema.mp3":
+                          continue
+
+                      ext = os.path.splitext(filename)[1].lower()
+
+                      if ext not in (
+                          EXT_FOTOS |
+                          EXT_AUDIOS |
+                          EXT_VIDEOS
+                      ):
+                          continue
+
+                      item = make_item(
+                          rel_path,
+                          filename,
+                          ext
+                      )
+
+                      segments = rel_path.split("/")
+
+                      # Estrutura exclusiva:
+                      # midia/Patati/arquivo.jpg
+                      # midia/Misol/arquivo.jpg
+                      # etc.
+                      if len(segments) >= 3:
+                          folder_user = segments[1]
+
+                          matched_user = next(
+                              (
+                                  user
+                                  for user in EXCLUSIVITY_USERS
+                                  if user.lower() == folder_user.lower()
+                              ),
+                              None
+                          )
+
+                          if matched_user:
+                              data["exclusivo"][matched_user].append(item)
+                              continue
+
+                      if ext in EXT_FOTOS:
+                          data["fotos"].append(item)
+                      elif ext in EXT_AUDIOS:
+                          data["audios"].append(item)
+                      elif ext in EXT_VIDEOS:
+                          data["videos"].append(item)
+
+          def sort_key(item):
+              return (
+                  item.get("name", "").casefold(),
+                  item.get("path", "").casefold()
+              )
+
+          data["fotos"].sort(key=sort_key)
+          data["audios"].sort(key=sort_key)
+          data["videos"].sort(key=sort_key)
+
+          for user in data["exclusivo"]:
+              data["exclusivo"][user].sort(key=sort_key)
+
+          with open(
+              "midia-index.json",
+              "w",
+              encoding="utf-8",
+              newline="\n"
+          ) as file:
+              json.dump(
+                  data,
+                  file,
+                  ensure_ascii=False,
+                  indent=2
+              )
+              file.write("\n")
+
+          print(
+              "Índice criado:",
+              len(data["fotos"]),
+              "fotos,",
+              len(data["audios"]),
+              "áudios,",
+              len(data["videos"]),
+              "vídeos."
+          )
+
+          for user in EXCLUSIVITY_USERS:
+              print(
+                  "Exclusivo",
+                  user + ":",
+                  len(data["exclusivo"][user])
+              )
+          PY
+
+      - name: Verificar índice
+        run: |
+          python -m json.tool midia-index.json > /dev/null
+          test -f midia-index.json
+
+      - name: Commit e Push das alterações
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add midia-index.json
+
+          if git diff --staged --quiet; then
+            echo "Nenhuma alteração no índice."
+            exit 0
+          fi
+
+          git commit -m "chore: atualizar midia-index.json [skip ci]"
+          git push
