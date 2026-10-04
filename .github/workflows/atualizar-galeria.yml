@@ -1,0 +1,112 @@
+name: Atualizar Indice da Galeria
+
+on:
+  push:
+    paths:
+      - 'midia/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-index:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Gerar midia-index.json
+        run: |
+          python -c '
+          import os
+          import json
+          from datetime import datetime, timezone
+
+          EXT_FOTOS = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif", ".bmp", ".svg", ".heic", ".heif", ".jfif", ".tif", ".tiff"}
+          EXT_AUDIOS = {".mp3", ".m4a", ".wav", ".ogg", ".oga", ".aac", ".flac", ".opus"}
+          EXT_VIDEOS = {".mp4", ".webm", ".mov", ".m4v", ".ogv", ".avi", ".mkv"}
+
+          EXCLUSIVITY_USERS = ["Patati", "Misol", "Lilika", "YARA"]
+
+          data = {
+              "generatedAt": datetime.now(timezone.utc).isoformat(),
+              "repository": {
+                  "owner": "soumoiss",
+                  "repo": "Loooply",
+                  "branch": "main"
+              },
+              "fotos": [],
+              "audios": [],
+              "videos": [],
+              "exclusivo": {user: [] for user in EXCLUSIVITY_USERS}
+          }
+
+          midia_dir = "midia"
+          if os.path.exists(midia_dir):
+              for root, dirs, files in os.walk(midia_dir):
+                  for file in files:
+                      rel_path = os.path.relpath(os.path.join(root, file), ".").replace("\\", "/")
+                      
+                      # Ignora tema.mp3 da lista publica
+                      if rel_path.lower() == "midia/tema.mp3":
+                          continue
+
+                      ext = os.path.splitext(file)[1].lower()
+                      if ext not in (EXT_FOTOS | EXT_AUDIOS | EXT_VIDEOS):
+                          continue
+
+                      segments = rel_path.split("/")
+                      item = {
+                          "path": rel_path,
+                          "name": file,
+                          "type": "image" if ext in EXT_FOTOS else ("audio" if ext in EXT_AUDIOS else "video"),
+                          "extension": ext
+                      }
+
+                      # Verifica se esta numa pasta exclusiva de usuario: midia/{User}/...
+                      if len(segments) >= 3:
+                          folder_user = segments[1]
+                          matched_user = next((u for u in EXCLUSIVITY_USERS if u.lower() == folder_user.lower()), None)
+                          if matched_user:
+                              data["exclusivo"][matched_user].append(item)
+                              continue
+
+                      # Se estiver na pasta publica midia/
+                      if len(segments) == 2:
+                          if ext in EXT_FOTOS:
+                              data["fotos"].append(item)
+                          elif ext in EXT_AUDIOS:
+                              data["audios"].append(item)
+                          elif ext in EXT_VIDEOS:
+                              data["videos"].append(item)
+
+          # Ordenacao deterministica
+          data["fotos"].sort(key=lambda x: x["path"].lower())
+          data["audios"].sort(key=lambda x: x["path"].lower())
+          data["videos"].sort(key=lambda x: x["path"].lower())
+          for user in data["exclusivo"]:
+              data["exclusivo"][user].sort(key=lambda x: x["path"].lower())
+
+          with open("midia-index.json", "w", encoding="utf-8") as f:
+              json.dump(data, f, ensure_ascii=False, indent=2)
+          '
+
+      - name: Commit e Push das alteracoes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add midia-index.json
+          if git diff --staged --quiet; then
+            echo "Nenhuma alteracao no indice."
+          else
+            git commit -m "chore: atualizar midia-index.json [skip ci]"
+            git push
+          fi
