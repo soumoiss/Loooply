@@ -7,7 +7,6 @@
 <meta name="color-scheme" content="light">
 <title>Momentos - Loooply</title>
 <link rel="preconnect" href="https://raw.githubusercontent.com">
-<link rel="preconnect" href="https://api.github.com">
 
 <style>
 @font-face {
@@ -508,6 +507,30 @@ video {
     font-weight: 400;
 }
 
+.status-banner {
+    display: none;
+    padding: 10px 14px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.status-banner.error {
+    display: block;
+    background: #ffe8e8;
+    color: #c53030;
+    border: 1px solid rgba(197, 48, 48, 0.2);
+}
+
+.status-banner.cached {
+    display: block;
+    background: #fff8e6;
+    color: #b7791f;
+    border: 1px solid rgba(183, 121, 31, 0.2);
+}
+
 .lightbox {
     position: fixed;
     inset: 0;
@@ -716,6 +739,8 @@ video {
             <h1>Momentos</h1>
         </header>
 
+        <div id="statusBanner" class="status-banner"></div>
+
         <div class="overview">
             <div class="contador" id="contador">0 mídias</div>
         </div>
@@ -827,10 +852,10 @@ video {
 (function() {
     "use strict";
 
-    // CONFIGURAÇÃO DO REPOSITÓRIO
     const CONFIG = {
         owner: "soumoiss",
         repo: "Loooply",
+        branch: "main",
         validUsers: ["Patati", "Misol", "Lilika", "YARA"],
         extensions: {
             fotos: [".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif", ".bmp", ".svg", ".heic", ".heif", ".jfif", ".tif", ".tiff"],
@@ -839,20 +864,19 @@ video {
         }
     };
 
-    // ESTADO INTERNO
     const state = {
         username: null,
-        defaultBranch: null,
+        branch: CONFIG.branch,
         cache: {
             fotos: [],
             audios: [],
             videos: [],
             exclusivo: []
         },
-        hasLoadedSuccessfully: false
+        hasLoadedSuccessfully: false,
+        isUsingLocalCache: false
     };
 
-    // 1. OBTENÇÃO E VALIDAÇÃO DO USUÁRIO LOGADO
     function setupUser() {
         const stored = localStorage.getItem("username") || "";
         const cleanStored = stored.trim().toLowerCase();
@@ -864,105 +888,75 @@ video {
         state.username = matchedUser || stored.trim();
     }
 
-    // 2. CONSTRUÇÃO DA URL RAW SEGURA
     function buildRawUrl(filePath, branch) {
         const encodedPath = filePath
             .split('/')
             .map(segment => encodeURIComponent(segment))
             .join('/');
-        return `https://raw.githubusercontent.com/${CONFIG.owner}/${CONFIG.repo}/${branch}/${encodedPath}`;
+        return `https://raw.githubusercontent.com/${CONFIG.owner}/${CONFIG.repo}/${branch || CONFIG.branch}/${encodedPath}`;
     }
 
-    // 3. OBTENÇÃO DA BRANCH PADRÃO DO GITHUB
-    async function fetchDefaultBranch() {
-        try {
-            const res = await fetch(`https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}`);
-            if (!res.ok) return "main";
-            const data = await res.json();
-            return data.default_branch || "main";
-        } catch (e) {
-            return "main";
-        }
-    }
+    async function fetchIndex() {
+        const cacheBuster = `?t=${Date.now()}`;
+        const indexUrl = `midia-index.json${cacheBuster}`;
 
-    // 4. LEITURA RECURSIVA DA ÁRVORE DE ARQUIVOS (GIT TREE API)
-    async function fetchRepositoryTree(branch) {
         try {
-            const url = `https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/git/trees/${branch}?recursive=1`;
-            const res = await fetch(url);
-            if (!res.ok) return null;
+            const res = await fetch(indexUrl);
+            if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
             const data = await res.json();
-            if (!data.tree || !Array.isArray(data.tree)) return null;
-            return data.tree;
+
+            localStorage.setItem("loooply_midia_index_cache", JSON.stringify(data));
+            state.isUsingLocalCache = false;
+            return data;
         } catch (e) {
+            console.warn("Falha ao carregar o índice remoto. Tentando cache local...", e);
+            const cachedData = localStorage.getItem("loooply_midia_index_cache");
+            if (cachedData) {
+                try {
+                    state.isUsingLocalCache = true;
+                    return JSON.parse(cachedData);
+                } catch (parseErr) {
+                    console.error("Erro ao ler cache local:", parseErr);
+                }
+            }
             return null;
         }
     }
 
-    // 5. CLASSIFICAÇÃO DA MÍDIA COM BASE NA ESTRUTURA DE PASTAS E EXTENSÃO
-    function processAndClassifyMedia(tree, branch) {
-        const fotos = [];
-        const audios = [];
-        const videos = [];
-        const exclusivo = [];
-        const pathSet = new Set();
+    function processIndexData(indexData) {
+        if (!indexData) return;
+
+        if (indexData.repository && indexData.repository.branch) {
+            state.branch = indexData.repository.branch;
+        }
 
         const currentUserLower = state.username ? state.username.toLowerCase() : "";
 
-        // Ordenação determinística por caminho para evitar reordenações visuais
-        const sortedTree = tree.filter(item => item.type === "blob").sort((a, b) => a.path.localeCompare(b.path));
+        const mapItem = (item) => ({
+            path: item.path,
+            name: item.name,
+            url: buildRawUrl(item.path, state.branch),
+            extension: item.extension || ("." + item.path.split('.').pop().toLowerCase())
+        });
 
-        for (const item of sortedTree) {
-            const path = item.path;
-            
-            // Ignora itens fora de "midia/" ou o áudio de fundo
-            if (!path.toLowerCase().startsWith("midia/")) continue;
-            if (path.toLowerCase() === "midia/tema.mp3") continue;
-            if (pathSet.has(path)) continue;
-            
-            pathSet.add(path);
+        state.cache.fotos = (indexData.fotos || []).map(mapItem);
+        state.cache.audios = (indexData.audios || []).map(mapItem);
+        state.cache.videos = (indexData.videos || []).map(mapItem);
 
-            const rawUrl = buildRawUrl(path, branch);
-            const ext = "." + path.split('.').pop().toLowerCase();
-            const segments = path.split('/');
-            const filename = segments[segments.length - 1];
-
-            const mediaItem = {
-                path: path,
-                name: filename,
-                url: rawUrl,
-                extension: ext
-            };
-
-            // VERIFICAÇÃO DE CONTEÚDO EXCLUSIVO (midia/{username}/...)
-            if (segments.length >= 3) {
-                const folderUserLower = segments[1].toLowerCase();
-                if (currentUserLower && folderUserLower === currentUserLower) {
-                    exclusivo.push(mediaItem);
-                    continue; // Exclusivos pertencem unicamente à sua aba
+        const exclusivasUsuario = [];
+        if (indexData.exclusivo && typeof indexData.exclusivo === "object") {
+            Object.keys(indexData.exclusivo).forEach(key => {
+                if (currentUserLower && key.toLowerCase() === currentUserLower) {
+                    const userFiles = indexData.exclusivo[key] || [];
+                    exclusivasUsuario.push(...userFiles.map(mapItem));
                 }
-            }
-
-            // VERIFICAÇÃO DE CONTEÚDO COMPARTILHADO (diretamente em midia/)
-            if (segments.length === 2) {
-                if (CONFIG.extensions.fotos.includes(ext)) {
-                    fotos.push(mediaItem);
-                } else if (CONFIG.extensions.audios.includes(ext)) {
-                    audios.push(mediaItem);
-                } else if (CONFIG.extensions.videos.includes(ext)) {
-                    videos.push(mediaItem);
-                }
-            }
+            });
         }
 
-        state.cache.fotos = fotos;
-        state.cache.audios = audios;
-        state.cache.videos = videos;
-        state.cache.exclusivo = exclusivo;
+        state.cache.exclusivo = exclusivasUsuario;
         state.hasLoadedSuccessfully = true;
     }
 
-    // 6. RENDERIZAÇÃO DA INTERFACE
     function renderCategory(containerId, emptyId, items, type) {
         const container = document.getElementById(containerId);
         const emptyState = document.getElementById(emptyId);
@@ -970,7 +964,6 @@ video {
 
         container.innerHTML = "";
 
-        // Só exibe "Não há..." se a API tiver respondido com sucesso e a lista for realmente vazia
         if (state.hasLoadedSuccessfully && (!items || items.length === 0)) {
             if (emptyState) emptyState.classList.add("visible");
             return;
@@ -985,17 +978,26 @@ video {
         if (type === "audio") {
             const panel = document.createElement("article");
             panel.className = "media-panel";
-            panel.innerHTML = `<h3>Áudios</h3>`;
+            
+            const h3 = document.createElement("h3");
+            h3.textContent = "Áudios";
+            panel.appendChild(h3);
 
             items.forEach(item => {
                 const div = document.createElement("div");
                 div.className = "audio-item";
-                div.innerHTML = `
-                    <span class="media-name">${item.name}</span>
-                    <audio controls preload="none">
-                        <source src="${item.url}">
-                    </audio>
-                `;
+
+                const span = document.createElement("span");
+                span.className = "media-name";
+                span.textContent = item.name;
+
+                const audio = document.createElement("audio");
+                audio.controls = true;
+                audio.preload = "none";
+                audio.src = item.url;
+
+                div.appendChild(span);
+                div.appendChild(audio);
                 panel.appendChild(div);
             });
             fragment.appendChild(panel);
@@ -1004,15 +1006,27 @@ video {
         } else if (type === "video") {
             const panel = document.createElement("article");
             panel.className = "media-panel";
-            panel.innerHTML = `<h3>Vídeos</h3>`;
+
+            const h3 = document.createElement("h3");
+            h3.textContent = "Vídeos";
+            panel.appendChild(h3);
 
             items.forEach(item => {
                 const div = document.createElement("div");
                 div.className = "video-item";
-                div.innerHTML = `
-                    <span class="media-name">${item.name}</span>
-                    <video controls preload="metadata" playsinline src="${item.url}"></video>
-                `;
+
+                const span = document.createElement("span");
+                span.className = "media-name";
+                span.textContent = item.name;
+
+                const video = document.createElement("video");
+                video.controls = true;
+                video.preload = "metadata";
+                video.playsInline = true;
+                video.src = item.url;
+
+                div.appendChild(span);
+                div.appendChild(video);
                 panel.appendChild(div);
             });
             fragment.appendChild(panel);
@@ -1024,25 +1038,39 @@ video {
                 const article = document.createElement("article");
                 article.className = "exclusive-item";
 
-                let mediaHtml = "";
+                const span = document.createElement("span");
+                span.className = "media-name";
+                span.textContent = item.name;
+                article.appendChild(span);
+
                 if (CONFIG.extensions.fotos.includes(ext)) {
-                    mediaHtml = `<img src="${item.url}" alt="${item.name}" loading="lazy" decoding="async" onerror="this.parentElement.remove()">`;
+                    const img = document.createElement("img");
+                    img.src = item.url;
+                    img.alt = item.name;
+                    img.loading = "lazy";
+                    img.decoding = "async";
+                    img.onerror = () => article.remove();
+                    article.appendChild(img);
                 } else if (CONFIG.extensions.audios.includes(ext)) {
-                    mediaHtml = `<audio controls preload="none" src="${item.url}"></audio>`;
+                    const audio = document.createElement("audio");
+                    audio.controls = true;
+                    audio.preload = "none";
+                    audio.src = item.url;
+                    article.appendChild(audio);
                 } else if (CONFIG.extensions.videos.includes(ext)) {
-                    mediaHtml = `<video controls preload="metadata" playsinline src="${item.url}"></video>`;
+                    const video = document.createElement("video");
+                    video.controls = true;
+                    video.preload = "metadata";
+                    video.playsInline = true;
+                    video.src = item.url;
+                    article.appendChild(video);
                 }
 
-                article.innerHTML = `
-                    <span class="media-name">${item.name}</span>
-                    ${mediaHtml}
-                `;
                 fragment.appendChild(article);
             });
             container.appendChild(fragment);
 
         } else {
-            // Renderização das Fotos
             items.forEach(item => {
                 const card = document.createElement("article");
                 card.className = "media-card";
@@ -1050,12 +1078,23 @@ video {
                 card.setAttribute("role", "button");
                 card.setAttribute("aria-label", `Abrir ${item.name}`);
 
-                card.innerHTML = `
-                    <div class="photo-shell">
-                        <img src="${item.url}" alt="${item.name}" loading="lazy" decoding="async" onerror="this.parentElement.parentElement.remove()">
-                        <div class="photo-overlay">${item.name}</div>
-                    </div>
-                `;
+                const shell = document.createElement("div");
+                shell.className = "photo-shell";
+
+                const img = document.createElement("img");
+                img.src = item.url;
+                img.alt = item.name;
+                img.loading = "lazy";
+                img.decoding = "async";
+                img.onerror = () => card.remove();
+
+                const overlay = document.createElement("div");
+                overlay.className = "photo-overlay";
+                overlay.textContent = item.name;
+
+                shell.appendChild(img);
+                shell.appendChild(overlay);
+                card.appendChild(shell);
 
                 card.addEventListener("click", () => openLightbox(item.url, item.name));
                 card.addEventListener("keydown", (e) => {
@@ -1080,7 +1119,24 @@ video {
         document.getElementById("exclusiveStatus").textContent = `${state.cache.exclusivo.length} ${state.cache.exclusivo.length === 1 ? "arquivo" : "arquivos"}`;
     }
 
+    function renderStatusBanner() {
+        const banner = document.getElementById("statusBanner");
+        if (!banner) return;
+
+        if (!state.hasLoadedSuccessfully) {
+            banner.textContent = "Erro ao carregar os arquivos da galeria. Tente novamente mais tarde.";
+            banner.className = "status-banner error";
+        } else if (state.isUsingLocalCache) {
+            banner.textContent = "Você está visualizando dados salvos offline. Algumas mídias recentes podem não aparecer.";
+            banner.className = "status-banner cached";
+        } else {
+            banner.className = "status-banner";
+            banner.textContent = "";
+        }
+    }
+
     function renderAll() {
+        renderStatusBanner();
         updateCounters();
         renderCategory("galeria", "fotoEmpty", state.cache.fotos, "foto");
         renderCategory("audios", "audioEmpty", state.cache.audios, "audio");
@@ -1088,7 +1144,6 @@ video {
         renderCategory("exclusivo", "exclusiveEmpty", state.cache.exclusivo, "exclusivo");
     }
 
-    // 7. GERENCIAMENTO DAS ABAS
     function setupTabs() {
         const tabButtons = document.querySelectorAll(".media-tab");
         const sections = document.querySelectorAll(".section");
@@ -1119,7 +1174,6 @@ video {
         });
     }
 
-    // 8. GERENCIAMENTO DO LIGHTBOX
     function setupLightbox() {
         const lightbox = document.getElementById("lightbox");
         const lightboxImg = document.getElementById("lightboxImg");
@@ -1157,14 +1211,13 @@ video {
         });
     }
 
-    // 9. CONTROLE DA MÚSICA DE FUNDO (midia/tema.mp3)
-    function setupBackgroundAudio(branch) {
+    function setupBackgroundAudio() {
         const bgAudio = document.getElementById("bgAudio");
         const btnMusica = document.getElementById("btnMusica");
         const iconeMusica = document.getElementById("iconeMusica");
         if (!bgAudio || !btnMusica) return;
 
-        bgAudio.src = buildRawUrl("midia/tema.mp3", branch);
+        bgAudio.src = buildRawUrl("midia/tema.mp3", state.branch);
 
         btnMusica.addEventListener("click", () => {
             if (bgAudio.paused) {
@@ -1186,25 +1239,18 @@ video {
         });
     }
 
-    // 10. INICIALIZAÇÃO SILENCIOSA E ROBUSTA
     async function init() {
         setupUser();
         setupTabs();
         setupLightbox();
 
-        // Obtém Branch padrão
-        state.defaultBranch = await fetchDefaultBranch();
-
-        // Configura música de fundo
-        setupBackgroundAudio(state.defaultBranch);
-
-        // Busca árvore do repositório via GitHub API
-        const tree = await fetchRepositoryTree(state.defaultBranch);
-
-        if (tree) {
-            processAndClassifyMedia(tree, state.defaultBranch);
-            renderAll();
+        const indexData = await fetchIndex();
+        if (indexData) {
+            processIndexData(indexData);
         }
+
+        setupBackgroundAudio();
+        renderAll();
     }
 
     document.addEventListener("DOMContentLoaded", init);
