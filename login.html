@@ -1,208 +1,90 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#7010B0">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="mobile-web-app-capable" content="yes">
-<title>Looply</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch&display=swap" rel="stylesheet">
-
-<style>
-
-:root {
-  --primary: #7010B0;
-  --primary-dark: #6010A0;
-  --primary-deep: #503090;
-  --deep-purple: #302050;
-
-  --white: #FFFFFF;
-
-  --surface: #F5F0FA;
-  --surface-lilac: #F0E0F0;
-
-  --text-primary: #403050;
-  --text-secondary: #7010B0;
-  --text-muted: #AAA2B0;
-
-  --border: #DED6E5;
-
-  --success: #35C878;
-  --error: #E63232;
-
-  --logo-color: #7010B0;
-  --logo-glow: rgba(112,16,176,.70);
-  --logo-glow-soft: rgba(112,16,176,.35);
-
-  --radius-sm: 12px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
-  --radius-xl: 32px;
-  --radius-pill: 999px;
-
-  --shadow-soft: 0 8px 24px rgba(70,30,100,.10);
-  --shadow-logo: 0 0 12px rgba(112,16,176,.45);
-}
-
-
-html, body {
-  margin: 0;
-  width: 100%;
-  min-height: 100%;
-  background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 48%, var(--surface) 48%, var(--surface) 100%);
-  font-family: 'Cabin Sketch', cursive, sans-serif;
-  color: var(--text-primary);
-  overflow: hidden;
-}
-
-body {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  text-align: center;
-}
-
-body::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 52%;
-  transform: translate(-50%, -50%);
-  width: min(46vw, 560px);
-  height: min(46vw, 560px);
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,255,0.18), rgba(255,255,255,0.02) 58%, transparent 72%);
-  filter: blur(12px);
-}
-
-.logo-wrap {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  animation: logoFloat 1.6s ease-out forwards;
-}
-
-.logo-ring {
-  position: relative;
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: rgba(255,255,255,0.04);
-  border: 8px solid var(--primary);
-  box-shadow: var(--shadow-logo), 0 0 18px rgba(112,16,176,.2);
-}
-
-.logo-ring::before,
-.logo-ring::after {
-  content: "";
-  position: absolute;
-  inset: -12px;
-  border-radius: 50%;
-  border: 1px solid rgba(112,16,176,.35);
-}
-
-.logo-ring::after {
-  inset: -24px;
-  border-color: rgba(112,16,176,.15);
-}
-
-.logo-ring .mark {
-  width: 62px;
-  height: 62px;
-  position: relative;
-  display: block;
-}
-
-.logo-ring .mark::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  border: 5px solid var(--primary);
-  border-top-color: transparent;
-  border-right-color: transparent;
-  transform: translate(-50%, -50%) rotate(30deg);
-  box-shadow: 0 0 10px rgba(112,16,176,.4);
-}
-
-.brand {
-  font-size: clamp(2.7rem, 7vw, 5rem);
-  color: var(--white);
-  letter-spacing: 0.04em;
-  text-shadow: 0 0 24px rgba(112,16,176,.60);
-  font-weight: 700;
-}
-
-.subtitle {
-  position: absolute;
-  bottom: 76px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: var(--text-secondary);
-  font-size: clamp(1.1rem, 4vw, 1.7rem);
-  text-align: center;
-  width: min(80vw, 520px);
-  opacity: 0;
-  animation: fadeUp 0.7s ease 0.7s forwards;
-}
-
-.footer-tag {
-  position: absolute;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: var(--text-secondary);
-  font-size: clamp(.8rem, 2.5vw, 1.1rem);
-  letter-spacing: 0.08em;
-  opacity: 0.9;
-}
-
-@keyframes logoFloat {
-  0% { opacity: 0; transform: translateY(15px) scale(0.96); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translate(-50%, 10px); }
-  to { opacity: 1; transform: translate(-50%, 0); }
-}
-
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#F5F0FA">
+  <link rel="stylesheet" href="assets/css/app.css">
+  <title>Looply — Login</title>
 </head>
 <body>
-  <div class="logo-wrap" aria-label="Looply logo">
-    <div class="logo-ring" aria-hidden="true">
-      <span class="mark"></span>
-    </div>
-    <div class="brand">Looply</div>
-  </div>
+  <main class="login-page">
+    <section class="login-card" aria-labelledby="loginTitle">
+      <div class="login-brand">
+        <div class="login-logo" aria-hidden="true">
+          <div class="circle">
+            <svg viewBox="0 0 100 100" fill="none"><path d="M50 15A35 35 0 0 1 85 50" stroke="currentColor" stroke-width="5"/></svg>
+          </div>
+        </div>
+        <div class="login-brand-name" id="loginTitle">Looply</div>
+        <div class="login-brand-subtitle">Cartas aos amigos ;)</div>
+      </div>
 
-  <div class="subtitle">Cartas aos amigos ;)</div>
-  <div class="footer-tag">MoissWorld</div>
+      <form id="loginForm" novalidate>
+        <div class="form-field">
+          <label class="form-label" for="username">Usuário</label>
+          <div class="input-wrap"><input class="input" id="username" name="username" type="text" placeholder="Digite seu usuário" autocomplete="username" required></div>
+        </div>
 
-  <script>
-    const loginPage = 'login.html';
-    const homePage = 'home.html';
+        <div class="form-field">
+          <label class="form-label" for="password">Senha</label>
+          <div class="input-wrap">
+            <input class="input password-input" id="password" name="password" type="password" placeholder="Digite sua senha" autocomplete="current-password" required>
+            <button class="toggle-password" id="togglePassword" type="button" aria-label="Mostrar senha">
+              <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></svg>
+            </button>
+          </div>
+        </div>
 
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        <div class="forgot"><a href="https://wa.me/558589069191?text=esqueci%20minha%20senha" target="_blank" rel="noopener noreferrer">Esqueci minha senha</a></div>
+        <button class="login-button" id="loginButton" type="submit">Entrar</button>
+        <div class="form-message" id="message" role="alert">Usuários alterados, bebê! Solicite novo usuário e nova senha ao ADM Moiss hehe.</div>
+      </form>
 
-    setTimeout(() => {
-      window.location.href = isLoggedIn ? homePage : loginPage;
-    }, 1800);
+      <div class="login-footer"><strong>Looply</strong> · MoissWorld</div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { authenticate, createSession, redirectIfAuthenticated } from "./assets/js/session.js";
+
+    const form = document.getElementById("loginForm");
+    const username = document.getElementById("username");
+    const password = document.getElementById("password");
+    const button = document.getElementById("loginButton");
+    const message = document.getElementById("message");
+    const toggle = document.getElementById("togglePassword");
+    const eye = document.getElementById("eyeIcon");
+
+    redirectIfAuthenticated();
+
+    toggle.addEventListener("click", () => {
+      const showing = password.type === "text";
+      password.type = showing ? "password" : "text";
+      toggle.setAttribute("aria-label", showing ? "Mostrar senha" : "Ocultar senha");
+      eye.innerHTML = showing
+        ? '<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path><circle cx="12" cy="12" r="2.5"></circle>'
+        : '<path d="M3 3l18 18"></path><path d="M10.6 6.2A10.8 10.8 0 0 1 12 6c6.5 0 10 6 10 6a18.6 18.6 0 0 1-3.1 3.7"></path><path d="M6.6 6.7C3.7 8.4 2 12 2 12s3.5 6 10 6a10.8 10.8 0 0 0 4-.8"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path>';
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      message.classList.remove("show");
+      button.disabled = true;
+      button.textContent = "Entrando…";
+      try {
+        const user = await authenticate(username.value, password.value);
+        if (!user || !createSession(user.username)) throw new Error("invalid");
+        window.location.replace("home.html");
+      } catch {
+        message.classList.add("show");
+        password.focus();
+        setTimeout(() => message.classList.remove("show"), 3200);
+      } finally {
+        button.disabled = false;
+        button.textContent = "Entrar";
+      }
+    });
   </script>
 </body>
 </html>

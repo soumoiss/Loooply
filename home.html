@@ -1,422 +1,112 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Looply — Login</title>
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cabin+Sketch:wght@400;700&display=swap');
-
-        :root {
-            --primary: #7010B0;
-            --primary-dark: #6010A0;
-            --secondary: #503090;
-            --deep-purple: #302050;
-            --white: #FFFFFF;
-            --surface: #F5F0FA;
-            --lilac: #F0E0F0;
-            --muted-surface: #E8E0EC;
-            --text: #403050;
-            --secondary-text: #8A8195;
-            --placeholder: #AAA2B0;
-            --border: #DED6E5;
-            --success: #35C878;
-            --error: #E63232;
-            --radius-sm: 12px;
-            --radius-md: 16px;
-            --radius-lg: 24px;
-            --radius-xl: 32px;
-            --radius-pill: 999px;
-            --shadow: 0 8px 24px rgba(70, 30, 100, 0.10);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html,
-        body {
-            width: 100%;
-            min-height: 100%;
-        }
-
-        body {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-            background: var(--surface);
-            color: var(--text);
-            font-family: Arial, Helvetica, sans-serif;
-        }
-
-        .login-page {
-            width: 100%;
-            max-width: 430px;
-        }
-
-        .login-card {
-            width: 100%;
-            padding: 34px 28px 30px;
-            background: var(--white);
-            border: 1px solid rgba(222, 214, 229, 0.85);
-            border-radius: var(--radius-xl);
-            box-shadow: var(--shadow);
-        }
-
-        .brand {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .logo-wrapper {
-            width: 82px;
-            height: 82px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 12px;
-            border-radius: 50%;
-            background: var(--surface);
-            animation: logoAnimation 1.2s ease-out;
-        }
-
-        .logo-circle {
-            width: 64px;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 5px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 3s linear infinite;
-        }
-
-        .logo-circle .mark {
-            width: 28px;
-            height: 28px;
-            display: block;
-            border-radius: 50%;
-            border: 5px solid var(--primary);
-            border-top-color: transparent;
-            border-right-color: transparent;
-            transform: rotate(25deg);
-        }
-
-        .brand-name {
-            color: var(--primary);
-            font-family: 'Cabin Sketch', cursive;
-            font-size: 34px;
-            font-weight: 700;
-            line-height: 1;
-            letter-spacing: 0.5px;
-        }
-
-        .brand-subtitle {
-            margin-top: 7px;
-            color: var(--secondary-text);
-            font-family: 'Cabin Sketch', cursive;
-            font-size: 16px;
-            line-height: 1.2;
-        }
-
-        .form {
-            width: 100%;
-        }
-
-        .field {
-            margin-bottom: 17px;
-        }
-
-        .field-label {
-            display: block;
-            margin: 0 0 8px 5px;
-            color: var(--text);
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .input-wrapper {
-            position: relative;
-            width: 100%;
-        }
-
-        .input {
-            width: 100%;
-            height: 54px;
-            padding: 0 17px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-pill);
-            outline: none;
-            background: var(--surface);
-            color: var(--text);
-            font-size: 16px;
-            transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .input::placeholder {
-            color: var(--placeholder);
-        }
-
-        .input:focus {
-            border-color: var(--primary);
-            background: var(--white);
-            box-shadow: 0 0 0 4px rgba(112, 16, 176, 0.10);
-        }
-
-        .password-input {
-            padding-right: 54px;
-        }
-
-        .toggle-password {
-            position: absolute;
-            top: 50%;
-            right: 8px;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transform: translateY(-50%);
-            border: 0;
-            border-radius: 50%;
-            background: transparent;
-            color: var(--secondary-text);
-            cursor: pointer;
-            transition: color 0.2s ease, background 0.2s ease;
-        }
-
-        .toggle-password:hover {
-            color: var(--primary);
-            background: var(--lilac);
-        }
-
-        .toggle-password svg {
-            width: 21px;
-            height: 21px;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .forgot-password {
-            display: flex;
-            justify-content: flex-end;
-            margin: -3px 5px 22px 0;
-        }
-
-        .forgot-password a {
-            color: var(--primary);
-            font-size: 14px;
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-
-        .forgot-password a:hover {
-            color: var(--primary-dark);
-            text-decoration: underline;
-        }
-
-        .login-button {
-            width: 100%;
-            height: 54px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 0;
-            border-radius: var(--radius-pill);
-            background: var(--primary);
-            color: var(--white);
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 7px 18px rgba(112, 16, 176, 0.20);
-            transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .login-button:hover {
-            background: var(--primary-dark);
-            box-shadow: 0 9px 22px rgba(112, 16, 176, 0.25);
-        }
-
-        .login-button:active {
-            transform: translateY(1px);
-        }
-
-        .message {
-            display: none;
-            margin-top: 16px;
-            padding: 13px 15px;
-            border-radius: var(--radius-md);
-            background: rgba(230, 50, 50, 0.08);
-            color: var(--error);
-            font-size: 13px;
-            line-height: 1.45;
-            text-align: center;
-        }
-
-        .message.show {
-            display: block;
-        }
-
-        .footer {
-            margin-top: 23px;
-            color: var(--secondary-text);
-            font-family: 'Cabin Sketch', cursive;
-            font-size: 14px;
-            text-align: center;
-        }
-
-        .footer strong {
-            color: var(--primary);
-        }
-
-        @keyframes logoAnimation {
-            0% {
-                transform: scale(0);
-                opacity: 0;
-            }
-            50% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(1.2);
-                opacity: 1;
-            }
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 16px;
-            }
-
-            .login-card {
-                padding: 30px 21px 26px;
-                border-radius: 28px;
-            }
-
-            .brand {
-                margin-bottom: 27px;
-            }
-
-            .brand-name {
-                font-size: 32px;
-            }
-
-            .input,
-            .login-button {
-                height: 52px;
-            }
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#F5F0FA">
+  <meta name="color-scheme" content="light">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="assets/css/app.css">
+  <title>Home — Looply</title>
 </head>
 <body>
-    <main class="login-page">
-        <section class="login-card">
-            <div class="brand">
-                <div class="logo-wrapper">
-                    <div class="logo-circle">
-                        <span class="mark"></span>
-                    </div>
-                </div>
-                <div class="brand-name">Looply</div>
-                <div class="brand-subtitle">Cartas aos amigos ;)</div>
+  <main class="home-shell">
+    <div class="home-topbar">
+      <nav class="navigation-stack" aria-label="Navegação complementar">
+        <button class="navigation-button" type="button" data-route="gallery" aria-label="Abrir galeria">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9" r="1.5"/><path d="m5.5 17 4.5-4.5 3.5 3.5 2.5-2.5 2.5 3.5"/></svg>
+          <span class="navigation-label">Galeria</span>
+        </button>
+        <button class="navigation-button" type="button" data-route="music" aria-label="Abrir músicas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>
+          <span class="navigation-label">Músicas</span>
+        </button>
+      </nav>
+      <a class="profile-link" id="profileLink" data-route="profile" href="perfil.html" aria-label="Abrir meu perfil">
+        <img class="profile-avatar" id="profileTopAvatar" src="" alt="" aria-hidden="true">
+        <span class="profile-fallback" aria-hidden="true">EU</span>
+      </a>
+    </div>
+
+    <section class="home-intro" aria-labelledby="welcomeMessage">
+      <div class="profile-wrap">
+        <a class="profile-link" data-route="profile" href="perfil.html" aria-label="Abrir meu perfil">
+          <img class="profile-avatar" id="profilePic" src="" alt="Foto de perfil">
+          <span class="profile-fallback" id="profileFallback" aria-hidden="true">EU</span>
+        </a>
+      </div>
+      <div class="eyebrow">MoissWorld</div>
+      <h1 class="welcome" id="welcomeMessage">Carregando…</h1>
+      <p class="subtitulo">Tá aí tuas cartas, best(a)</p>
+    </section>
+
+    <section class="panel home-card" aria-label="Minhas cartas">
+      <div class="overview">
+        <div class="overview-card">
+          <div class="overview-label">Coleção</div>
+          <div class="lista-titulo">Minhas Cartas</div>
+          <div class="collection-note" id="collectionNote">50 cartas para guardar</div>
+        </div>
+        <div class="contador" id="contador">0/50 lidas</div>
+      </div>
+
+      <div class="filters" aria-label="Filtros das cartas">
+        <button class="filter-button active" id="btnTodas" type="button" aria-pressed="true">Todas</button>
+        <button class="filter-button" id="btnCalendario" type="button" aria-controls="calendarPanel" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="3"/><path d="M8 2.8v4M16 2.8v4M3 9h18"/></svg>
+          Filtrar por data
+        </button>
+        <button class="filter-button" id="btnSemData" type="button" hidden aria-pressed="false">Sem data</button>
+        <span class="filter-status" id="filterStatus">Mostrando todas as cartas</span>
+      </div>
+
+      <div class="calendar-panel" id="calendarPanel" aria-hidden="true">
+        <div class="calendar-card">
+          <div class="calendar-head">
+            <div class="calendar-month" id="calendarMonth">Calendário</div>
+            <div class="calendar-nav">
+              <button type="button" data-calendar="previous" aria-label="Mês anterior">‹</button>
+              <button type="button" data-calendar="next" aria-label="Próximo mês">›</button>
             </div>
+          </div>
+          <div class="weekdays" aria-hidden="true">
+            <span class="weekday">Dom</span><span class="weekday">Seg</span><span class="weekday">Ter</span><span class="weekday">Qua</span><span class="weekday">Qui</span><span class="weekday">Sex</span><span class="weekday">Sáb</span>
+          </div>
+          <div class="calendar-grid" id="calendarGrid" aria-label="Calendário das cartas"></div>
+          <div class="calendar-foot"><span><strong>•</strong> dia com cartas</span><span id="calendarInfo">Aguardando datas…</span></div>
+        </div>
+      </div>
 
-            <form class="form" id="loginForm" novalidate>
-                <div class="field">
-                    <label class="field-label" for="username">Usuário</label>
-                    <div class="input-wrapper">
-                        <input class="input" type="text" id="username" name="username" placeholder="Digite seu usuário" autocomplete="username" required>
-                    </div>
-                </div>
+      <div class="cartas-container" id="cartasContainer" aria-live="polite">
+        <div class="loading-state" id="loadingState"><span class="loader-dot" aria-hidden="true"></span>Carregando cartas…</div>
+      </div>
+      <p class="loading-summary" id="loadingSummary">Preparando coleção…</p>
+      <div class="empty-state" id="emptyState"><strong>Nenhuma carta encontrada</strong>Não há cartas correspondentes ao filtro selecionado.</div>
+      <div class="actions"><button class="secondary-button" id="logoutButton" type="button">Sair</button></div>
+    </section>
+  </main>
 
-                <div class="field">
-                    <label class="field-label" for="password">Senha</label>
-                    <div class="input-wrapper">
-                        <input class="input password-input" type="password" id="password" name="password" placeholder="Digite sua senha" autocomplete="current-password" required>
-                        <button type="button" class="toggle-password" id="togglePassword" aria-label="Mostrar senha">
-                            <svg id="eyeIcon" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path>
-                                <circle cx="12" cy="12" r="2.5"></circle>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
+  <div class="modal" id="modal" aria-hidden="true" role="presentation" inert>
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalTitulo" aria-describedby="modalTexto">
+      <article class="modal-sheet">
+        <header class="modal-header">
+          <div>
+            <div class="modal-label">Carta</div>
+            <h2 id="modalTitulo">Carregando…</h2>
+            <div class="modal-date" id="modalData"></div>
+          </div>
+          <div class="modal-tools">
+            <button id="modalPrevious" type="button" aria-label="Carta anterior">‹</button>
+            <button id="modalNext" type="button" aria-label="Próxima carta">›</button>
+            <button class="modal-close" id="modalClose" type="button" aria-label="Fechar carta">×</button>
+          </div>
+        </header>
+        <div class="modal-text" id="modalTexto" tabindex="0" aria-live="polite">Carregando carta…</div>
+        <footer class="modal-footer"><button id="modalCloseFooter" type="button">Fechar carta</button></footer>
+      </article>
+    </div>
+  </div>
 
-                <div class="forgot-password">
-                    <a href="https://wa.me/558589069191?text=esqueci%20minha%20senha" target="_blank" rel="noopener noreferrer">Esqueci minha senha</a>
-                </div>
-
-                <button type="submit" class="login-button" id="loginButton">Entrar</button>
-                <div class="message" id="message" role="alert">Usuários alterados, bebê! Solicite novo usuário e nova senha ao ADM Moiss hehe.</div>
-            </form>
-
-            <div class="footer"><strong>Looply</strong> · MoissWorld</div>
-        </section>
-    </main>
-
-    <script>
-        const loginForm = document.getElementById('loginForm');
-        const usernameInput = document.getElementById('username');
-        const passwordInput = document.getElementById('password');
-        const togglePassword = document.getElementById('togglePassword');
-        const message = document.getElementById('message');
-
-        const validUsers = {
-            Patati: 'patati@123',
-            Lilik: 'lilik@123',
-            Misol: 'misol@123',
-            Yara: 'yara@123',
-            Moiss: 'moiss@123'
-        };
-
-        if (localStorage.getItem('isLoggedIn') === 'true') {
-            window.location.href = 'home.html';
-        }
-
-        togglePassword.addEventListener('click', () => {
-            const isPasswordVisible = passwordInput.type === 'text';
-            passwordInput.type = isPasswordVisible ? 'password' : 'text';
-            togglePassword.setAttribute('aria-label', isPasswordVisible ? 'Mostrar senha' : 'Ocultar senha');
-            eyeIcon.innerHTML = isPasswordVisible
-                ? '<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path><circle cx="12" cy="12" r="2.5"></circle>'
-                : '<path d="M3 3l18 18"></path><path d="M10.6 6.2A10.8 10.8 0 0 1 12 6c6.5 0 10 6 10 6a18.6 18.6 0 0 1-3.1 3.7"></path><path d="M6.6 6.7C3.7 8.4 2 12 2 12s3.5 6 10 6a10.8 10.8 0 0 0 4-.8"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path>';
-        });
-
-        loginForm.addEventListener('submit', (event) => {
-            event.preventDefault();
-            const username = usernameInput.value.trim();
-            const password = passwordInput.value.trim();
-
-            if (validUsers[username] && validUsers[username] === password) {
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('username', username);
-                window.location.href = 'home.html';
-                return;
-            }
-
-            message.classList.add('show');
-            setTimeout(() => message.classList.remove('show'), 3000);
-        });
-    </script>
+  <script type="module" src="assets/js/home.js"></script>
 </body>
 </html>

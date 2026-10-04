@@ -1,0 +1,11 @@
+{
+  "name": "Looply",
+  "short_name": "Looply",
+  "description": "Cartas aos amigos ;)",
+  "lang": "pt-BR",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#F5F0FA",
+  "theme_color": "#7010B0",
+  "icons": []
+}
