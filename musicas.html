@@ -1,1087 +1,299 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#f4f0ff">
-<title>Nossas Músicas</title>
-<style>
-@font-face{
-    font-family:"Quillen";
-    src:local("Quillen"),url("Quillen.otf") format("opentype");
-    font-display:swap;
-    font-style:normal;
-    font-weight:400;
-}
-
-:root{
-    --bg:#f4f0ff;
-    --bg-2:#eee8ff;
-    --surface:rgba(255,255,255,.92);
-    --surface-solid:#fff;
-    --surface-soft:#f8f5ff;
-    --surface-lilac:#f1eaff;
-    --primary:#9b5de5;
-    --primary-strong:#8750cf;
-    --primary-soft:#eadcff;
-    --primary-pale:#f4edff;
-    --text:#29252f;
-    --muted:#817b89;
-    --muted-2:#aaa4b0;
-    --line:rgba(102,82,126,.12);
-    --line-strong:rgba(125,91,164,.20);
-    --danger:#9d5f71;
-    --shadow-sm:0 5px 18px rgba(80,56,115,.07);
-    --shadow-md:0 16px 38px rgba(80,56,115,.11);
-    --shadow-lg:0 28px 80px rgba(65,45,94,.18);
-    --radius-lg:28px;
-    --radius-md:20px;
-    --radius-sm:16px;
-}
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-html{
-    min-height:100%;
-    scroll-behavior:smooth;
-}
-
-body{
-    min-height:100vh;
-    min-height:100dvh;
-    overflow-x:hidden;
-    color:var(--text);
-    font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:
-        radial-gradient(circle at 10% -8%,rgba(177,131,255,.22),transparent 31%),
-        radial-gradient(circle at 94% 8%,rgba(220,204,255,.48),transparent 28%),
-        linear-gradient(135deg,var(--bg),var(--bg-2));
-    padding:
-        max(18px,env(safe-area-inset-top))
-        max(14px,env(safe-area-inset-right))
-        max(30px,env(safe-area-inset-bottom))
-        max(14px,env(safe-area-inset-left));
-}
-
-body::before{
-    content:"";
-    position:fixed;
-    inset:0;
-    pointer-events:none;
-    z-index:-1;
-    opacity:.34;
-    background-image:
-        linear-gradient(rgba(255,255,255,.35) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(255,255,255,.25) 1px,transparent 1px);
-    background-size:38px 38px;
-    mask-image:linear-gradient(to bottom,black,transparent 76%);
-}
-
-button{
-    font:inherit;
-    -webkit-tap-highlight-color:transparent;
-}
-
-button:focus-visible,
-a:focus-visible{
-    outline:3px solid rgba(155,93,229,.30);
-    outline-offset:3px;
-}
-
-.app-shell{
-    width:min(100%,780px);
-    margin:0 auto;
-    animation:pageIn .45s ease both;
-}
-
-@keyframes pageIn{
-    from{opacity:0;transform:translateY(12px)}
-    to{opacity:1;transform:translateY(0)}
-}
-
-.topbar{
-    display:flex;
-    align-items:flex-start;
-    justify-content:space-between;
-    gap:12px;
-    margin-bottom:14px;
-}
-
-.navigation-stack{
-    display:flex;
-    flex-direction:column;
-    align-items:flex-start;
-    gap:7px;
-}
-
-.icon-button{
-    width:46px;
-    height:46px;
-    flex:0 0 46px;
-    display:grid;
-    place-items:center;
-    border:1px solid var(--line);
-    border-radius:16px;
-    background:rgba(255,255,255,.78);
-    color:var(--primary-strong);
-    cursor:pointer;
-    box-shadow:var(--shadow-sm);
-    transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
-    text-decoration:none;
-}
-
-.icon-button:hover{
-    transform:translateY(-2px);
-    background:#fff;
-    box-shadow:var(--shadow-md);
-}
-
-.icon-button:active{
-    transform:scale(.96);
-}
-
-.icon-button svg{
-    width:21px;
-    height:21px;
-}
-
-.navigation-button{
-    width:auto;
-    min-width:46px;
-    min-height:42px;
-    height:auto;
-    padding:7px 10px;
-    display:inline-flex;
-    align-items:center;
-    justify-content:flex-start;
-    gap:7px;
-    border-radius:14px;
-}
-
-.navigation-label{
-    max-width:70px;
-    overflow:hidden;
-    opacity:1;
-    white-space:nowrap;
-    font-size:11px;
-    font-weight:800;
-}
-
-.container{
-    width:100%;
-    padding:clamp(20px,5vw,34px);
-    border:1px solid rgba(120,92,155,.10);
-    border-radius:var(--radius-lg);
-    background:var(--surface);
-    box-shadow:var(--shadow-lg);
-    backdrop-filter:blur(16px);
-    -webkit-backdrop-filter:blur(16px);
-}
-
-.eyebrow{
-    text-align:center;
-    color:var(--primary-strong);
-    font-size:11px;
-    font-weight:800;
-    letter-spacing:.18em;
-    text-transform:uppercase;
-    margin-bottom:7px;
-}
-
-h1{
-    text-align:center;
-    font-family:"Quillen",Georgia,"Times New Roman",serif;
-    font-size:clamp(34px,7vw,48px);
-    line-height:1.05;
-    font-weight:400;
-    letter-spacing:-.025em;
-    color:var(--text);
-}
-
-.subtitulo{
-    margin:9px auto 0;
-    max-width:58ch;
-    text-align:center;
-    font-family:"Quillen",Georgia,"Times New Roman",serif;
-    font-size:16px;
-    line-height:1.55;
-    color:#776f7e;
-}
-
-.overview{
-    display:grid;
-    grid-template-columns:minmax(0,1fr) auto;
-    align-items:stretch;
-    gap:10px;
-    margin-top:24px;
-}
-
-.overview-card{
-    min-width:0;
-    padding:17px;
-    border:1px solid var(--line);
-    border-radius:20px;
-    background:linear-gradient(135deg,rgba(255,255,255,.92),rgba(248,245,255,.88));
-    box-shadow:var(--shadow-sm);
-}
-
-.overview-label{
-    color:var(--muted);
-    font-size:11px;
-    font-weight:850;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-}
-
-.lista-titulo{
-    margin-top:3px;
-    font-family:"Quillen",Georgia,serif;
-    font-size:24px;
-    line-height:1.1;
-}
-
-.collection-note{
-    margin-top:5px;
-    color:var(--muted);
-    font-size:12px;
-}
-
-.contador{
-    align-self:center;
-    padding:10px 13px;
-    border:1px solid var(--line);
-    border-radius:14px;
-    background:var(--primary-pale);
-    color:var(--primary-strong);
-    font-size:12px;
-    font-weight:850;
-    white-space:nowrap;
-}
-
-.status{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    min-height:22px;
-    margin:18px 0 10px;
-    color:var(--muted);
-    font-size:12px;
-    font-weight:700;
-    text-align:center;
-}
-
-.status-dot{
-    width:7px;
-    height:7px;
-    flex:0 0 7px;
-    border-radius:50%;
-    background:var(--primary);
-    box-shadow:0 0 0 5px rgba(155,93,229,.10);
-}
-
-.music-grid{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:12px;
-    margin-top:14px;
-}
-
-.music-card{
-    position:relative;
-    min-width:0;
-    overflow:hidden;
-    border:1px solid var(--line);
-    border-radius:20px;
-    background:rgba(255,255,255,.86);
-    box-shadow:var(--shadow-sm);
-    cursor:pointer;
-    transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
-}
-
-.music-card:hover{
-    transform:translateY(-3px);
-    border-color:rgba(155,93,229,.20);
-    box-shadow:var(--shadow-md);
-}
-
-.music-card:active{
-    transform:scale(.985);
-}
-
-.thumbnail-wrap{
-    position:relative;
-    aspect-ratio:16/9;
-    overflow:hidden;
-    background:
-        linear-gradient(135deg,#eee8ff,#f8f5ff);
-}
-
-.thumbnail{
-    display:block;
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    opacity:0;
-    transition:opacity .25s ease,transform .35s ease;
-}
-
-.music-card:hover .thumbnail{
-    transform:scale(1.025);
-}
-
-.thumbnail.loaded{
-    opacity:1;
-}
-
-.thumbnail-fallback{
-    position:absolute;
-    inset:0;
-    display:grid;
-    place-items:center;
-    color:var(--primary-strong);
-}
-
-.thumbnail-fallback svg{
-    width:42px;
-    height:42px;
-}
-
-.play-badge{
-    position:absolute;
-    left:10px;
-    bottom:10px;
-    width:38px;
-    height:38px;
-    display:grid;
-    place-items:center;
-    border:1px solid rgba(255,255,255,.65);
-    border-radius:13px;
-    background:rgba(72,47,99,.78);
-    color:#fff;
-    box-shadow:0 8px 22px rgba(49,33,68,.25);
-    backdrop-filter:blur(8px);
-    -webkit-backdrop-filter:blur(8px);
-}
-
-.play-badge svg{
-    width:17px;
-    height:17px;
-    margin-left:2px;
-}
-
-.music-position{
-    position:absolute;
-    top:10px;
-    right:10px;
-    padding:5px 8px;
-    border:1px solid rgba(255,255,255,.62);
-    border-radius:10px;
-    background:rgba(72,47,99,.72);
-    color:#fff;
-    font-size:10px;
-    font-weight:850;
-    backdrop-filter:blur(8px);
-    -webkit-backdrop-filter:blur(8px);
-}
-
-.music-info{
-    min-height:91px;
-    padding:13px 14px 14px;
-}
-
-.music-label{
-    color:var(--primary-strong);
-    font-size:10px;
-    font-weight:850;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-}
-
-.music-title{
-    display:-webkit-box;
-    overflow:hidden;
-    margin-top:5px;
-    color:var(--text);
-    font-family:"Quillen",Georgia,"Times New Roman",serif;
-    font-size:19px;
-    line-height:1.18;
-    font-weight:400;
-    -webkit-line-clamp:2;
-    -webkit-box-orient:vertical;
-}
-
-.empty-state,
-.error-state{
-    display:none;
-    margin-top:14px;
-    padding:26px 16px;
-    border:1px dashed rgba(117,101,132,.16);
-    border-radius:18px;
-    background:rgba(255,255,255,.48);
-    color:var(--muted);
-    line-height:1.6;
-    text-align:center;
-}
-
-.empty-state.visible,
-.error-state.visible{
-    display:block;
-}
-
-.empty-state strong,
-.error-state strong{
-    display:block;
-    margin-bottom:4px;
-    color:var(--text);
-    font-family:"Quillen",Georgia,serif;
-    font-size:21px;
-    font-weight:400;
-}
-
-.error-state{
-    border-style:solid;
-    background:#fff4f6;
-    color:var(--danger);
-}
-
-.error-state strong{
-    color:#704353;
-}
-
-.skeleton{
-    overflow:hidden;
-    border:1px solid var(--line);
-    border-radius:20px;
-    background:rgba(255,255,255,.78);
-    box-shadow:var(--shadow-sm);
-}
-
-.skeleton-thumb,
-.skeleton-line{
-    position:relative;
-    overflow:hidden;
-    background:#eee8f7;
-}
-
-.skeleton-thumb{
-    aspect-ratio:16/9;
-}
-
-.skeleton-info{
-    padding:13px 14px 16px;
-}
-
-.skeleton-line{
-    height:9px;
-    margin-top:8px;
-    border-radius:999px;
-}
-
-.skeleton-line.short{
-    width:55%;
-    margin-top:0;
-}
-
-.skeleton-line.long{
-    width:84%;
-}
-
-.skeleton-thumb::after,
-.skeleton-line::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    transform:translateX(-100%);
-    background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);
-    animation:shimmer 1.25s infinite;
-}
-
-@keyframes shimmer{
-    100%{transform:translateX(100%)}
-}
-
-.footer-actions{
-    display:flex;
-    justify-content:center;
-    margin-top:20px;
-}
-
-.back-button{
-    min-height:44px;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    padding:0 16px;
-    border:1px solid var(--line);
-    border-radius:15px;
-    background:#fff;
-    color:#6f6876;
-    text-decoration:none;
-    font-size:13px;
-    font-weight:850;
-    box-shadow:var(--shadow-sm);
-    transition:transform .18s ease,background .18s ease,color .18s ease,box-shadow .18s ease;
-}
-
-.back-button:hover{
-    transform:translateY(-1px);
-    color:var(--primary-strong);
-    background:var(--primary-pale);
-    box-shadow:var(--shadow-md);
-}
-
-.back-button svg{
-    width:17px;
-    height:17px;
-}
-
-.hidden{
-    display:none!important;
-}
-
-@media (max-width:560px){
-    body{
-        padding-top:max(12px,env(safe-area-inset-top));
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#f4f0ff" />
+  <meta name="description" content="Galeria de momentos do Loooply." />
+  <title>Momentos - Loooply</title>
+  <link rel="icon" href="icon.png" type="image/png" />
+  <style>
+    :root {
+      --bg: #f4f0ff;
+      --bg-2: #eee8ff;
+      --surface: rgba(255,255,255,.94);
+      --surface-soft: #f8f5ff;
+      --primary: #9b5de5;
+      --primary-strong: #8750cf;
+      --text: #29252f;
+      --muted: #817b89;
+      --line: rgba(102,82,126,.12);
+      --shadow-sm: 0 5px 18px rgba(80,56,115,.07);
+      --shadow-md: 0 16px 38px rgba(80,56,115,.11);
+      --shadow-lg: 0 28px 80px rgba(65,45,94,.18);
+      --radius: 20px;
+      --gap: 14px;
+      --columns: 4;
     }
 
-    .container{
-        padding:19px 13px 16px;
-        border-radius:24px;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { min-height: 100%; scroll-behavior: smooth; }
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, sans-serif;
+      background:
+        radial-gradient(circle at 10% -8%, rgba(177,131,255,.22), transparent 31%),
+        radial-gradient(circle at 94% 8%, rgba(220,204,255,.48), transparent 28%),
+        linear-gradient(135deg, var(--bg), var(--bg-2));
+      padding: max(18px, env(safe-area-inset-top)) 14px max(30px, env(safe-area-inset-bottom)) 14px;
     }
 
-    .topbar{
-        margin-bottom:9px;
+    button, input, a { font: inherit; }
+    img { max-width: 100%; display: block; }
+    .app-shell { width: min(100%, 1240px); margin: 0 auto; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+    .topbar-right { display: flex; align-items: center; gap: 8px; }
+
+    .navigation-button, .music-button, .action-btn, .sort-btn {
+      min-height: 46px; border: 1px solid var(--line); border-radius: 16px; background: rgba(255,255,255,.86); color: var(--primary-strong); cursor: pointer; box-shadow: var(--shadow-sm); text-decoration: none; display: inline-flex; align-items: center; justify-content: center; transition: all .2s ease;
+    }
+    .navigation-button { padding: 7px 14px; gap: 8px; }
+    .navigation-button:hover, .music-button:hover, .action-btn:hover, .sort-btn:hover { transform: translateY(-2px); background: #fff; box-shadow: var(--shadow-md); }
+    .navigation-button svg, .music-button svg, .action-btn svg, .sort-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+    .navigation-label { font-size: 13px; font-weight: 800; }
+
+    .container {
+      width: 100%; padding: clamp(20px, 4vw, 36px); border: 1px solid rgba(120,92,155,.12); border-radius: 32px; background: var(--surface); box-shadow: var(--shadow-lg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
     }
 
-    .icon-button{
-        width:43px;
-        height:43px;
-        flex-basis:43px;
-        border-radius:14px;
+    .hero { text-align: center; margin-bottom: 22px; }
+    .hero h1 {
+      font-size: clamp(40px, 8vw, 68px); font-weight: 400; line-height: 1.05; background: linear-gradient(135deg, var(--text), var(--primary-strong)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero-subtitle { margin-top: 8px; color: var(--muted); font-size: 12px; font-weight: 650; }
+
+    .toolbar {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px;
+    }
+    .search-box { position: relative; flex: 1 1 260px; max-width: 440px; }
+    .search-box input {
+      width: 100%; height: 44px; padding: 0 16px 0 42px; border-radius: 14px; border: 1px solid var(--line); background: rgba(255,255,255,.9); font-size: 13px; color: var(--text); transition: all .2s ease;
+    }
+    .search-box input:focus { background: #fff; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(155,93,229,.15); }
+    .search-box svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--muted); pointer-events: none; }
+    .controls-right { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+    .contador {
+      display: inline-flex; align-items: center; justify-content: center; padding: 10px 14px; border-radius: 14px; background: var(--primary-pale); border: 1px solid rgba(155,93,229,.18); color: var(--primary-strong); font-size: 13px; font-weight: 800; white-space: nowrap;
     }
 
-    .navigation-label{
-        max-width:64px;
+    .galeria {
+      column-count: var(--columns); column-gap: var(--gap); width: 100%; max-width: 100%; margin: 0 auto;
     }
+    .media-card {
+      position: relative; cursor: pointer; border-radius: var(--radius); overflow: hidden; background: linear-gradient(135deg, #f1eaff, #fff); border: 1px solid rgba(102,82,126,.12); box-shadow: 0 8px 22px rgba(80,56,115,.08); transition: transform .25s ease, box-shadow .25s ease; margin: 0 0 var(--gap); display: block; break-inside: avoid; -webkit-column-break-inside: avoid;
+    }
+    .media-card:hover { transform: translateY(-3px) scale(1.006); box-shadow: 0 16px 36px rgba(80,56,115,.16); }
+    .photo-shell { position: relative; width: 100%; overflow: hidden; background: #f0ebfa; }
+    .photo-shell img { width: 100%; display: block; object-fit: cover; transition: transform .4s ease, opacity .2s ease; }
+    .photo-overlay {
+      position: absolute; inset: auto 0 0 0; padding: 38px 14px 14px; background: linear-gradient(transparent, rgba(25,18,35,.76)); color: #fff; font-size: 12px; font-weight: 700; opacity: 0; transform: translateY(8px); transition: all .25s ease; pointer-events: none; text-shadow: 0 2px 4px rgba(0,0,0,.4);
+    }
+    .media-card:hover .photo-overlay { opacity: 1; transform: translateY(0); }
 
-    .music-grid{
-        grid-template-columns:1fr;
-        gap:11px;
+    .empty-state {
+      display: none; padding: 40px 20px; text-align: center; color: var(--muted); border: 2px dashed rgba(117,101,132,.18); border-radius: 24px; background: rgba(255,255,255,.5);
     }
+    .empty-state.visible { display: block; }
 
-    .music-info{
-        min-height:84px;
+    .lightbox {
+      position: fixed; inset: 0; z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px; background: rgba(18,14,24,.96); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .25s ease, visibility .25s ease;
     }
+    .lightbox.aberto { opacity: 1; visibility: visible; pointer-events: auto; }
+    .lightbox-header { width: 100%; display: flex; align-items: center; justify-content: space-between; color: #fff; z-index: 10; }
+    .lightbox-counter { font-size: 14px; font-weight: 800; background: rgba(255,255,255,.15); padding: 6px 14px; border-radius: 999px; }
+    .lightbox-actions { display: flex; align-items: center; gap: 10px; }
+    .lightbox-btn {
+      width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,.15); color: #fff; display: grid; place-items: center; cursor: pointer; transition: background .2s ease, transform .2s ease; text-decoration: none; border: none;
+    }
+    .lightbox-btn:hover { background: rgba(255,255,255,.3); transform: scale(1.05); }
+    .lightbox-stage { position: relative; width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; margin: 10px 0; }
+    .lightbox-media-container { max-width: 95vw; max-height: 80vh; display: flex; align-items: center; justify-content: center; transition: transform .2s ease-out; }
+    .lightbox-img { max-width: 95vw; max-height: 80vh; width: auto; height: auto; object-fit: contain; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.6); }
+    .lightbox-nav-btn {
+      position: absolute; top: 50%; transform: translateY(-50%); width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,.15); color: #fff; display: grid; place-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,.2); transition: all .2s ease; z-index: 5; font-size: 36px; line-height: 1;
+    }
+    .lightbox-nav-btn.prev { left: 10px; }
+    .lightbox-nav-btn.next { right: 10px; }
+    .lightbox-caption { color: rgba(255,255,255,.9); font-size: 13px; font-weight: 700; text-align: center; padding: 8px 20px; background: rgba(255,255,255,.1); border-radius: 999px; max-width: 90vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .music-title{
-        font-size:20px;
-    }
-}
-
-@media (max-width:380px){
-    .overview{
-        grid-template-columns:1fr;
-    }
-
-    .contador{
-        justify-self:start;
-    }
-
-    h1{
-        font-size:34px;
-    }
-}
-
-@media (prefers-reduced-motion:reduce){
-    *,
-    *::before,
-    *::after{
-        scroll-behavior:auto!important;
-        animation-duration:.01ms!important;
-        animation-iteration-count:1!important;
-        transition-duration:.01ms!important;
-    }
-}
-</style>
+    @media (max-width: 1100px) { :root { --columns: 3; } }
+    @media (max-width: 768px) { :root { --columns: 2; --gap: 10px; } }
+    @media (max-width: 440px) { :root { --columns: 1; } }
+  </style>
 </head>
 <body>
-<main class="app-shell">
-    <div class="topbar">
-        <nav class="navigation-stack" aria-label="Navegação">
-            <a class="icon-button navigation-button" href="home.html" aria-label="Voltar para o início" title="Início">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="m3 10 9-7 9 7"></path>
-                    <path d="M5 9.5V21h14V9.5"></path>
-                    <path d="M9 21v-6h6v6"></path>
-                </svg>
-                <span class="navigation-label">Início</span>
-            </a>
-        </nav>
-        <div class="icon-button" aria-hidden="true" style="visibility:hidden"></div>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="navigation-button" href="home.html" aria-label="Voltar para home">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="navigation-label">Home</span>
+      </a>
+      <div class="topbar-right">
+        <a class="music-button" href="musicas.html" aria-label="Ir para músicas">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 18V6l11-2v12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="18" r="3" stroke="currentColor" stroke-width="1.8"/><circle cx="17" cy="16" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+          <span>Músicas</span>
+        </a>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <h1>Momentos</h1>
+        <p class="hero-subtitle">Lembranças que ficaram no coração.</p>
+      </section>
+
+      <div class="toolbar">
+        <label class="search-box" aria-label="Buscar fotos">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="1.8"/><path d="M16 16l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <input id="searchInput" type="search" placeholder="Buscar por nome ou frase..." />
+        </label>
+
+        <div class="controls-right">
+          <div class="contador" id="galleryCount">0 fotos</div>
+        </div>
+      </div>
+
+      <section id="gallery" class="galeria" aria-live="polite"></section>
+      <div id="emptyGallery" class="empty-state">
+        <strong>Nenhuma foto encontrada</strong>
+        Tente outra busca ou volte mais tarde.
+      </div>
+    </main>
+  </div>
+
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <div class="lightbox-header">
+      <div class="lightbox-counter" id="lightboxCounter">1 / 1</div>
+      <div class="lightbox-actions">
+        <button class="lightbox-btn" id="closeLightbox" aria-label="Fechar">✕</button>
+      </div>
     </div>
+    <div class="lightbox-stage">
+      <button class="lightbox-nav-btn prev" id="prevPhoto" aria-label="Anterior">‹</button>
+      <div class="lightbox-media-container" id="lightboxMedia"></div>
+      <button class="lightbox-nav-btn next" id="nextPhoto" aria-label="Próxima">›</button>
+    </div>
+    <div class="lightbox-caption" id="lightboxCaption"></div>
+  </div>
 
-    <section class="container" aria-label="Músicas">
-        <div class="eyebrow">Looply</div>
-        <h1>Músicas 4u</h1>
-        <p class="subtitulo">Playlist.</p>
-
-        <div class="overview">
-            <div class="overview-card">
-                <div class="overview-label">Coleção</div>
-                <div class="lista-titulo">Músicas</div>
-                <div class="collection-note" id="collectionNote">Carregando a playlist...</div>
-            </div>
-            <div class="contador" id="contador">0 músicas</div>
-        </div>
-
-        <div class="status" id="status" aria-live="polite">
-            <span class="status-dot"></span>
-            <span id="statusText">Carregando músicas...</span>
-        </div>
-
-        <div class="music-grid" id="musicGrid" aria-live="polite" aria-busy="true">
-            <div class="skeleton">
-                <div class="skeleton-thumb"></div>
-                <div class="skeleton-info">
-                    <div class="skeleton-line short"></div>
-                    <div class="skeleton-line long"></div>
-                    <div class="skeleton-line long"></div>
-                </div>
-            </div>
-            <div class="skeleton">
-                <div class="skeleton-thumb"></div>
-                <div class="skeleton-info">
-                    <div class="skeleton-line short"></div>
-                    <div class="skeleton-line long"></div>
-                    <div class="skeleton-line long"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="empty-state" id="emptyState">
-            <strong>Nenhuma música encontrada</strong>
-            <span>A playlist não possui vídeos disponíveis para exibição.</span>
-        </div>
-
-        <div class="error-state" id="errorState">
-            <strong>Não foi possível carregar as músicas</strong>
-            <span id="errorText">Tente novamente.</span>
-        </div>
-
-        <div class="footer-actions">
-            <a class="back-button" href="home.html">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="m15 18-6-6 6-6"></path>
-                </svg>
-                Voltar para o início
-            </a>
-        </div>
-    </section>
-</main>
-
-<script>
-"use strict";
-
-const YOUTUBE_API_KEY = "AIzaSyDrJdOQ9y5SxLR_1_nNt8fY5DGNIg8pskU";
-const PLAYLIST_URL = "https://youtube.com/playlist?list=PLMeQ_QyqhY7s&si=uPKgxxgFpAnX2xIP";
-const PLAYLIST_ID = "PLMeQ_QyqhY7s";
-const YOUTUBE_API_URL = "https://www.googleapis.com/youtube/v3/playlistItems";
-const MAX_RESULTS = 50;
-
-const musicGrid = document.getElementById("musicGrid");
-const emptyState = document.getElementById("emptyState");
-const errorState = document.getElementById("errorState");
-const errorText = document.getElementById("errorText");
-const statusText = document.getElementById("statusText");
-const contador = document.getElementById("contador");
-const collectionNote = document.getElementById("collectionNote");
-
-function extrairPlaylistId(valor){
-    const texto = String(valor || "").trim();
-
-    if(!texto){
-        return "";
+  <script src="config.js"></script>
+  <script src="utils.js"></script>
+  <script>
+    if (!Utils.Auth.isLoggedIn()) {
+      window.location.href = LOOOPLY_CONFIG.ROUTES.LOGIN;
     }
 
-    if(!texto.includes("youtube.com") && !texto.includes("youtu.be")){
-        return texto;
-    }
+    const photoList = [
+      { name: '20260921_123850.jpg', title: 'Primeiro encontro' },
+      { name: '20260921_150554.jpg', title: 'Noite especial' },
+      { name: '20260925_170903.jpg', title: 'A viagem' },
+      { name: '20260925_180500.jpg', title: 'Risos e paz' },
+      { name: 'IMG-20260930-WA0017.jpg', title: 'Momentos em família' },
+      { name: 'Screenshot_20260907_220115_Instagram.jpg', title: 'Registro do nosso mundo' }
+    ];
 
-    try{
-        const url = new URL(texto);
-        const id = url.searchParams.get("list");
-        return id ? id.trim() : "";
-    }catch{
-        const match = texto.match(/[?&]list=([^&#]+)/i);
-        return match ? decodeURIComponent(match[1]).trim() : "";
-    }
-}
+    const galleryEl = document.getElementById('gallery');
+    const searchInput = document.getElementById('searchInput');
+    const galleryCount = document.getElementById('galleryCount');
+    const emptyGallery = document.getElementById('emptyGallery');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxMedia = document.getElementById('lightboxMedia');
+    const lightboxCaption = document.getElementById('lightboxCaption');
+    const lightboxCounter = document.getElementById('lightboxCounter');
 
-function escaparTexto(valor){
-    return String(valor || "").replace(/\s+/g," ").trim();
-}
+    let currentIndex = 0;
+    const filteredPhotos = [...photoList];
 
-function thumbnailDaMusica(item,videoId){
-    const thumbnails = item?.snippet?.thumbnails || {};
+    function renderGallery(list = filteredPhotos) {
+      galleryEl.innerHTML = '';
+      galleryCount.textContent = `${list.length} foto${list.length === 1 ? '' : 's'}`;
 
-    return (
-        thumbnails.maxres?.url ||
-        thumbnails.standard?.url ||
-        thumbnails.high?.url ||
-        thumbnails.medium?.url ||
-        thumbnails.default?.url ||
-        `https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg`
-    );
-}
+      if (!list.length) {
+        emptyGallery.classList.add('visible');
+        return;
+      }
 
-function ehItemInvalido(item){
-    const videoId = item?.snippet?.resourceId?.videoId || "";
-    const privacy = item?.status?.privacyStatus || "";
+      emptyGallery.classList.remove('visible');
 
-    if(!videoId){
-        return true;
-    }
+      list.forEach((photo, index) => {
+        const card = document.createElement('article');
+        card.className = 'media-card';
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-label', photo.title);
+        card.innerHTML = `
+          <div class="photo-shell">
+            <img src="${photo.name}" alt="${photo.title}" loading="lazy" />
+            <div class="photo-overlay">${photo.title}</div>
+          </div>
+        `;
 
-    if(privacy === "private"){
-        return true;
-    }
-
-    const titulo = escaparTexto(item?.snippet?.title || "").toLowerCase();
-
-    return (
-        titulo === "deleted video" ||
-        titulo === "private video" ||
-        titulo === "[deleted video]" ||
-        titulo === "[private video]"
-    );
-}
-
-function transformarItem(item){
-    if(ehItemInvalido(item)){
-        return null;
-    }
-
-    const snippet = item.snippet;
-    const videoId = snippet.resourceId.videoId;
-
-    return {
-        videoId,
-        title: escaparTexto(snippet.title) || "Vídeo sem título",
-        thumbnail: thumbnailDaMusica(item,videoId),
-        position: Number.isFinite(Number(snippet.position))
-            ? Number(snippet.position)
-            : Number.MAX_SAFE_INTEGER,
-        url: `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}&list=${encodeURIComponent(PLAYLIST_ID)}`
-    };
-}
-
-async function consultarPaginaPlaylist(playlistId,pageToken=""){
-    const params = new URLSearchParams({
-        part:"snippet,status",
-        playlistId,
-        maxResults:String(MAX_RESULTS),
-        key:YOUTUBE_API_KEY
-    });
-
-    if(pageToken){
-        params.set("pageToken",pageToken);
-    }
-
-    const resposta = await fetch(`${YOUTUBE_API_URL}?${params.toString()}`,{
-        method:"GET",
-        cache:"no-store",
-        headers:{
-            "Accept":"application/json"
-        }
-    });
-
-    let dados = null;
-
-    try{
-        dados = await resposta.json();
-    }catch{
-        throw new Error(`Resposta inválida da API (${resposta.status}).`);
-    }
-
-    if(!resposta.ok || dados?.error){
-        const apiError = dados?.error;
-        const motivo = apiError?.errors?.[0]?.reason || "";
-        const mensagem = apiError?.message || `HTTP ${resposta.status}`;
-
-        const erro = new Error(mensagem);
-        erro.status = resposta.status;
-        erro.reason = motivo;
-        erro.apiMessage = mensagem;
-        throw erro;
-    }
-
-    return dados;
-}
-
-async function obterTodosOsVideos(playlistId){
-    const itens = [];
-    let pageToken = "";
-    let paginas = 0;
-
-    do{
-        paginas += 1;
-
-        if(paginas > 200){
-            throw new Error("Número inesperado de páginas da playlist.");
-        }
-
-        const dados = await consultarPaginaPlaylist(playlistId,pageToken);
-
-        if(Array.isArray(dados.items)){
-            itens.push(...dados.items);
-        }
-
-        pageToken = dados.nextPageToken || "";
-
-        statusText.textContent =
-            pageToken
-                ? `Carregando playlist... ${itens.length} itens`
-                : "Organizando músicas...";
-    }while(pageToken);
-
-    return itens;
-}
-
-function criarIconePlay(){
-    const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
-    svg.setAttribute("viewBox","0 0 24 24");
-    svg.setAttribute("fill","currentColor");
-    svg.setAttribute("aria-hidden","true");
-
-    const path = document.createElementNS("http://www.w3.org/2000/svg","path");
-    path.setAttribute("d","M8 5.5v13l10-6.5z");
-
-    svg.appendChild(path);
-    return svg;
-}
-
-function criarIconeNota(){
-    const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
-    svg.setAttribute("viewBox","0 0 24 24");
-    svg.setAttribute("fill","none");
-    svg.setAttribute("stroke","currentColor");
-    svg.setAttribute("stroke-width","1.7");
-    svg.setAttribute("stroke-linecap","round");
-    svg.setAttribute("stroke-linejoin","round");
-    svg.setAttribute("aria-hidden","true");
-
-    const path = document.createElementNS("http://www.w3.org/2000/svg","path");
-    path.setAttribute("d","M9 18V5l11-2v13");
-
-    const c1 = document.createElementNS("http://www.w3.org/2000/svg","circle");
-    c1.setAttribute("cx","6");
-    c1.setAttribute("cy","18");
-    c1.setAttribute("r","3");
-
-    const c2 = document.createElementNS("http://www.w3.org/2000/svg","circle");
-    c2.setAttribute("cx","17");
-    c2.setAttribute("cy","16");
-    c2.setAttribute("r","3");
-
-    svg.append(path,c1,c2);
-    return svg;
-}
-
-function criarCard(musica){
-    const card = document.createElement("article");
-    card.className = "music-card";
-    card.tabIndex = 0;
-    card.setAttribute("role","link");
-    card.setAttribute("aria-label",`Abrir ${musica.title} no YouTube`);
-
-    const thumbWrap = document.createElement("div");
-    thumbWrap.className = "thumbnail-wrap";
-
-    const fallback = document.createElement("div");
-    fallback.className = "thumbnail-fallback";
-    fallback.appendChild(criarIconeNota());
-
-    const img = document.createElement("img");
-    img.className = "thumbnail";
-    img.alt = `Capa de ${musica.title}`;
-    img.loading = "lazy";
-    img.decoding = "async";
-    img.src = musica.thumbnail;
-
-    img.addEventListener("load",()=>{
-        img.classList.add("loaded");
-        fallback.remove();
-    },{once:true});
-
-    img.addEventListener("error",()=>{
-        img.remove();
-    },{once:true});
-
-    const playBadge = document.createElement("span");
-    playBadge.className = "play-badge";
-    playBadge.appendChild(criarIconePlay());
-
-    const position = document.createElement("span");
-    position.className = "music-position";
-    position.textContent = `#${musica.position + 1}`;
-
-    thumbWrap.append(fallback,img,playBadge,position);
-
-    const info = document.createElement("div");
-    info.className = "music-info";
-
-    const label = document.createElement("div");
-    label.className = "music-label";
-    label.textContent = "Música • Vídeo";
-
-    const title = document.createElement("div");
-    title.className = "music-title";
-    title.textContent = musica.title;
-
-    info.append(label,title);
-    card.append(thumbWrap,info);
-
-    const abrir = ()=>{
-        window.open(musica.url,"_blank","noopener,noreferrer");
-    };
-
-    card.addEventListener("click",abrir);
-
-    card.addEventListener("keydown",(event)=>{
-        if(event.key === "Enter" || event.key === " "){
+        card.addEventListener('click', () => openLightbox(index, list));
+        card.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
-            abrir();
-        }
+            openLightbox(index, list);
+          }
+        });
+
+        galleryEl.appendChild(card);
+      });
+    }
+
+    function openLightbox(index, list) {
+      currentIndex = index;
+      const item = list[index];
+      lightboxMedia.innerHTML = `<img class="lightbox-img" src="${item.name}" alt="${item.title}" />`;
+      lightboxCaption.textContent = item.title;
+      lightboxCounter.textContent = `${index + 1} / ${list.length}`;
+      lightbox.classList.add('aberto');
+      lightbox.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('aberto');
+      lightbox.setAttribute('aria-hidden', 'true');
+    }
+
+    function updateLightbox(step) {
+      const visibleItems = filteredPhotos.filter((photo) => {
+        const query = searchInput.value.trim().toLowerCase();
+        if (!query) return true;
+        return photo.title.toLowerCase().includes(query) || photo.name.toLowerCase().includes(query);
+      });
+
+      if (!visibleItems.length) return;
+      currentIndex = (currentIndex + step + visibleItems.length) % visibleItems.length;
+      const item = visibleItems[currentIndex];
+      const globalIndex = filteredPhotos.findIndex((photo) => photo.name === item.name && photo.title === item.title);
+      lightboxMedia.innerHTML = `<img class="lightbox-img" src="${item.name}" alt="${item.title}" />`;
+      lightboxCaption.textContent = item.title;
+      lightboxCounter.textContent = `${globalIndex + 1} / ${filteredPhotos.length}`;
+    }
+
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.trim().toLowerCase();
+      const filtered = filteredPhotos.filter((photo) => {
+        return photo.title.toLowerCase().includes(query) || photo.name.toLowerCase().includes(query);
+      });
+      renderGallery(filtered);
     });
 
-    return card;
-}
+    document.getElementById('closeLightbox').addEventListener('click', closeLightbox);
+    document.getElementById('prevPhoto').addEventListener('click', () => updateLightbox(-1));
+    document.getElementById('nextPhoto').addEventListener('click', () => updateLightbox(1));
 
-function renderizarMusicas(musicas){
-    musicGrid.replaceChildren();
+    document.addEventListener('keydown', (event) => {
+      if (!lightbox.classList.contains('aberto')) return;
+      if (event.key === 'Escape') closeLightbox();
+      if (event.key === 'ArrowRight') updateLightbox(1);
+      if (event.key === 'ArrowLeft') updateLightbox(-1);
+    });
 
-    const fragment = document.createDocumentFragment();
-
-    for(const musica of musicas){
-        fragment.appendChild(criarCard(musica));
-    }
-
-    musicGrid.appendChild(fragment);
-    musicGrid.setAttribute("aria-busy","false");
-
-    contador.textContent =
-        `${musicas.length} ${musicas.length === 1 ? "música" : "músicas"}`;
-
-    collectionNote.textContent =
-        `${musicas.length} ${musicas.length === 1 ? "item disponível" : "itens disponíveis"}`;
-
-    emptyState.classList.toggle("visible",musicas.length === 0);
-}
-
-function normalizarErro(erro){
-    const status = Number(erro?.status || 0);
-    const reason = String(erro?.reason || "").toLowerCase();
-    const mensagem = String(erro?.apiMessage || erro?.message || "").toLowerCase();
-
-    if(reason.includes("quota") || mensagem.includes("quota")){
-        return "A cota diária da YouTube Data API foi atingida.";
-    }
-
-    if(
-        reason.includes("keyinvalid") ||
-        reason.includes("keyinvalid") ||
-        mensagem.includes("api key not valid")
-    ){
-        return "A chave da YouTube Data API não foi aceita pelo Google Cloud.";
-    }
-
-    if(
-        reason.includes("iprefererblocked") ||
-        reason.includes("refererblocked") ||
-        mensagem.includes("referer")
-    ){
-        return "A chave da API está bloqueada pela restrição de aplicativo.";
-    }
-
-    if(
-        reason.includes("playlistnotfound") ||
-        status === 404 ||
-        mensagem.includes("playlist not found")
-    ){
-        return "A playlist não foi encontrada ou não está acessível.";
-    }
-
-    if(
-        reason.includes("playlistitemsnotaccessible") ||
-        mensagem.includes("playlist items")
-    ){
-        return "Os itens dessa playlist não estão acessíveis pela API.";
-    }
-
-    if(status === 403){
-        return "O Google recusou a consulta à YouTube Data API.";
-    }
-
-    if(status === 400){
-        return "A consulta enviada para a YouTube Data API foi recusada.";
-    }
-
-    if(mensagem.includes("failed to fetch")){
-        return "Não foi possível conectar à YouTube Data API. Verifique a conexão e o acesso da página à internet.";
-    }
-
-    return "Não foi possível consultar a playlist agora.";
-}
-
-async function iniciar(){
-    const playlistId = extrairPlaylistId(PLAYLIST_URL) || PLAYLIST_ID;
-
-    if(!playlistId){
-        throw new Error("ID da playlist ausente.");
-    }
-
-    const itens = await obterTodosOsVideos(playlistId);
-
-    const musicas = itens
-        .map(transformarItem)
-        .filter(Boolean)
-        .sort((a,b)=>a.position-b.position);
-
-    renderizarMusicas(musicas);
-
-    statusText.textContent =
-        musicas.length
-            ? `${musicas.length} ${musicas.length === 1 ? "música carregada" : "músicas carregadas"}`
-            : "Playlist consultada";
-}
-
-async function carregar(){
-    errorState.classList.remove("visible");
-    emptyState.classList.remove("visible");
-    musicGrid.setAttribute("aria-busy","true");
-    statusText.textContent = "Carregando músicas...";
-
-    try{
-        await iniciar();
-    }catch(erro){
-        console.error("Erro ao carregar a playlist do YouTube:",erro);
-        musicGrid.replaceChildren();
-        musicGrid.setAttribute("aria-busy","false");
-        contador.textContent = "—";
-        collectionNote.textContent = "Não foi possível carregar";
-        statusText.textContent = "Não foi possível carregar a playlist";
-        errorText.textContent = normalizarErro(erro);
-        errorState.classList.add("visible");
-    }
-}
-
-document.addEventListener("DOMContentLoaded",carregar);
-</script>
+    renderGallery(filteredPhotos);
+  </script>
 </body>
 </html>
