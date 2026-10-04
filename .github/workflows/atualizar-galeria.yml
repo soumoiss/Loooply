@@ -51,11 +51,19 @@ jobs:
           midia_dir = "midia"
           if os.path.exists(midia_dir):
               for root, dirs, files in os.walk(midia_dir):
-                  for file in files:
+                  for file in sorted(files):
+                      if file.startswith("."):
+                          continue
+
                       rel_path = os.path.relpath(os.path.join(root, file), ".").replace("\\", "/")
                       
                       # Ignora tema.mp3 da lista publica
                       if rel_path.lower() == "midia/tema.mp3":
+                          continue
+
+                      # Ignora arquivos "01" ou "01.*" conforme solicitado
+                      file_lower = file.lower()
+                      if file_lower == "01" or file_lower.startswith("01."):
                           continue
 
                       ext = os.path.splitext(file)[1].lower()
@@ -66,7 +74,6 @@ jobs:
                       item = {
                           "path": rel_path,
                           "name": file,
-                          "type": "image" if ext in EXT_FOTOS else ("audio" if ext in EXT_AUDIOS else "video"),
                           "extension": ext
                       }
 
@@ -78,21 +85,20 @@ jobs:
                               data["exclusivo"][matched_user].append(item)
                               continue
 
-                      # Se estiver na pasta publica midia/
-                      if len(segments) == 2:
-                          if ext in EXT_FOTOS:
-                              data["fotos"].append(item)
-                          elif ext in EXT_AUDIOS:
-                              data["audios"].append(item)
-                          elif ext in EXT_VIDEOS:
-                              data["videos"].append(item)
+                      # Se estiver diretamente em midia/ ou subpastas publicas
+                      if ext in EXT_FOTOS:
+                          data["fotos"].append(item)
+                      elif ext in EXT_AUDIOS:
+                          data["audios"].append(item)
+                      elif ext in EXT_VIDEOS:
+                          data["videos"].append(item)
 
-          # Ordenacao deterministica
-          data["fotos"].sort(key=lambda x: x["path"].lower())
-          data["audios"].sort(key=lambda x: x["path"].lower())
-          data["videos"].sort(key=lambda x: x["path"].lower())
+          # Ordenacao deterministica por nome
+          data["fotos"].sort(key=lambda x: x["name"].lower())
+          data["audios"].sort(key=lambda x: x["name"].lower())
+          data["videos"].sort(key=lambda x: x["name"].lower())
           for user in data["exclusivo"]:
-              data["exclusivo"][user].sort(key=lambda x: x["path"].lower())
+              data["exclusivo"][user].sort(key=lambda x: x["name"].lower())
 
           with open("midia-index.json", "w", encoding="utf-8") as f:
               json.dump(data, f, ensure_ascii=False, indent=2)
