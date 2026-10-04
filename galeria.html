@@ -8,64 +8,294 @@
   <link rel="stylesheet" href="assets/css/app.css">
   <title>Galeria — Looply</title>
 </head>
+
 <body>
   <main class="container-page">
+
     <header class="page-header">
-      <a class="brand-inline" href="home.html" aria-label="Voltar para a Home">
-        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none"><path d="M50 15A35 35 0 0 1 85 50" stroke="currentColor" stroke-width="7"/></svg></span>
-        <span><strong>Looply</strong><span>MoissWorld</span></span>
+
+      <a
+        class="brand-inline"
+        href="home.html"
+        aria-label="Voltar para a Home"
+      >
+        <span
+          class="brand-mark"
+          aria-hidden="true"
+        >
+          <svg
+            viewBox="0 0 100 100"
+            fill="none"
+          >
+            <path
+              d="M50 15A35 35 0 0 1 85 50"
+              stroke="currentColor"
+              stroke-width="7"
+            />
+          </svg>
+        </span>
+
+        <span>
+          <strong>Looply</strong>
+          <span>MoissWorld</span>
+        </span>
       </a>
+
       <div class="header-actions">
-        <a class="header-action" href="musicas.html"><span>♫ Músicas</span></a>
-        <a class="header-action" href="perfil.html"><span>Perfil</span></a>
+        <a
+          class="header-action"
+          href="musicas.html"
+        >
+          <span>♫ Músicas</span>
+        </a>
+
+        <a
+          class="header-action"
+          href="perfil.html"
+        >
+          <span>Perfil</span>
+        </a>
       </div>
+
     </header>
 
+
     <section class="hero-panel">
-      <div class="eyebrow">MoissWorld</div>
-      <h1 class="hero-title">Galeria</h1>
-      <p class="hero-subtitle">Memórias visuais e mídia organizada em um único catálogo, com busca, filtros, ordenação, visualização e abertura em destaque.</p>
+      <div class="eyebrow">
+        MoissWorld
+      </div>
+
+      <h1 class="hero-title">
+        Galeria
+      </h1>
+
+      <p class="hero-subtitle">
+        Memórias visuais e mídia organizada em um único catálogo.
+      </p>
     </section>
 
-    <section class="panel page-panel" style="margin-top:14px">
+
+    <section
+      class="panel page-panel"
+      style="margin-top:14px"
+    >
+
       <div class="toolbar">
-        <div class="search-wrap"><input class="input" id="gallerySearch" type="search" placeholder="Buscar por título, descrição ou tag" autocomplete="off"></div>
-        <select class="select" id="galleryType" aria-label="Filtrar por tipo"><option value="all">Todos os tipos</option><option value="image">Fotos</option><option value="video">Vídeos</option><option value="audio">Áudios</option></select>
-        <select class="select" id="gallerySort" aria-label="Ordenar"><option value="newest">Mais recentes</option><option value="oldest">Mais antigas</option><option value="title">Título</option></select>
-      </div>
-      <div class="control-row">
-        <label class="check-control"><input id="galleryExclusive" type="checkbox"> Somente conteúdo exclusivo</label>
-        <div class="header-actions" style="margin-left:auto">
-          <button class="icon-action" id="galleryGridView" type="button" aria-label="Visualização em grade">▦</button>
-          <button class="icon-action" id="galleryListView" type="button" aria-label="Visualização em lista">☷</button>
+
+        <div class="search-wrap">
+          <input
+            class="input"
+            id="gallerySearch"
+            type="search"
+            placeholder="Buscar por título, descrição ou tag"
+            autocomplete="off"
+          >
         </div>
-        <span class="filter-status" id="galleryStatus">Carregando galeria…</span>
-        <span class="contador" id="galleryCount">0/0</span>
+
+        <select
+          class="select"
+          id="galleryType"
+          aria-label="Filtrar por tipo"
+        >
+          <option value="all">
+            Todos os tipos
+          </option>
+
+          <option value="image">
+            Fotos
+          </option>
+
+          <option value="video">
+            Vídeos
+          </option>
+
+          <option value="audio">
+            Áudios
+          </option>
+        </select>
+
+
+        <select
+          class="select"
+          id="gallerySort"
+          aria-label="Ordenar"
+        >
+          <option value="newest">
+            Mais recentes
+          </option>
+
+          <option value="oldest">
+            Mais antigas
+          </option>
+
+          <option value="title">
+            Título
+          </option>
+        </select>
+
       </div>
-      <div class="gallery-grid" id="galleryGrid" style="margin-top:14px"></div>
-      <div class="gallery-empty" id="galleryEmpty"><strong>Nenhuma mídia disponível.</strong><br>O índice está funcional e pronto para receber os arquivos da pasta <code>midia/</code>.</div>
+
+
+      <div class="control-row">
+
+        <label class="check-control">
+          <input
+            id="galleryExclusive"
+            type="checkbox"
+          >
+
+          Somente conteúdo exclusivo
+        </label>
+
+
+        <div
+          class="header-actions"
+          style="margin-left:auto"
+        >
+
+          <button
+            class="icon-action"
+            id="galleryGridView"
+            type="button"
+            aria-label="Visualização em grade"
+          >
+            ▦
+          </button>
+
+          <button
+            class="icon-action"
+            id="galleryListView"
+            type="button"
+            aria-label="Visualização em lista"
+          >
+            ☷
+          </button>
+
+        </div>
+
+
+        <span
+          class="filter-status"
+          id="galleryStatus"
+        >
+          Carregando galeria…
+        </span>
+
+        <span
+          class="contador"
+          id="galleryCount"
+        >
+          0/0
+        </span>
+
+      </div>
+
+
+      <div
+        class="gallery-grid"
+        id="galleryGrid"
+        style="margin-top:14px"
+      ></div>
+
+
+      <div
+        class="gallery-empty"
+        id="galleryEmpty"
+      >
+        <strong>
+          Nenhuma mídia encontrada.
+        </strong>
+      </div>
+
     </section>
+
   </main>
 
-  <div class="lightbox" id="lightbox" aria-hidden="true">
-    <div class="lightbox-panel" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle">
+
+  <div
+    class="lightbox"
+    id="lightbox"
+    aria-hidden="true"
+  >
+
+    <div
+      class="lightbox-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="lightboxTitle"
+    >
+
       <header class="lightbox-head">
-        <div><h2 id="lightboxTitle">Mídia</h2><p id="lightboxMeta"></p></div>
-        <div class="lightbox-head-actions">
-          <a id="lightboxDownload" href="#" hidden>↓</a>
-          <button id="lightboxPrev" type="button" aria-label="Mídia anterior">‹</button>
-          <button id="lightboxNext" type="button" aria-label="Próxima mídia">›</button>
-          <button id="lightboxClose" type="button" aria-label="Fechar">×</button>
+
+        <div>
+          <h2 id="lightboxTitle">
+            Mídia
+          </h2>
+
+          <p id="lightboxMeta"></p>
         </div>
+
+
+        <div class="lightbox-head-actions">
+
+          <a
+            id="lightboxDownload"
+            href="#"
+            hidden
+          >
+            ↓
+          </a>
+
+          <button
+            id="lightboxPrev"
+            type="button"
+            aria-label="Mídia anterior"
+          >
+            ‹
+          </button>
+
+          <button
+            id="lightboxNext"
+            type="button"
+            aria-label="Próxima mídia"
+          >
+            ›
+          </button>
+
+          <button
+            id="lightboxClose"
+            type="button"
+            aria-label="Fechar"
+          >
+            ×
+          </button>
+
+        </div>
+
       </header>
-      <div class="lightbox-body" id="lightboxBody"></div>
+
+
+      <div
+        class="lightbox-body"
+        id="lightboxBody"
+      ></div>
+
     </div>
+
   </div>
 
+
   <script type="module">
-    import { requireAuth } from "./assets/js/session.js";
-    import { initGallery } from "./assets/js/gallery.js";
-    if (requireAuth()) initGallery();
+    import { requireAuth }
+      from "./assets/js/session.js";
+
+    import { initGallery }
+      from "./assets/js/gallery.js";
+
+    if (requireAuth()) {
+      initGallery();
+    }
   </script>
+
 </body>
 </html>
