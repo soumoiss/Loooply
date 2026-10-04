@@ -6,6 +6,8 @@
 <meta name="theme-color" content="#f4f0ff">
 <meta name="color-scheme" content="light">
 <title>Momentos</title>
+<link rel="preconnect" href="https://raw.githubusercontent.com">
+<link rel="preconnect" href="https://api.github.com">
 
 <style>
 @font-face {
@@ -867,7 +869,13 @@ const estado = {
     lightboxAberto: false,
     lightboxUsouHistorico: false,
     ultimaFocada: null,
-    musicaPausadaManualmente: false
+    musicaPausadaManualmente: false,
+    secoesRenderizadas: {
+        fotos: false,
+        audios: false,
+        videos: false,
+        exclusivo: false
+    }
 };
 
 const audioTema = document.getElementById("temaMusical");
@@ -948,7 +956,6 @@ function validarRepositorio(configuracao) {
 function construirRawUrl(caminho, configuracao) {
     const partes = String(caminho).split("/").map(encodeURIComponent);
     const branch = configuracao.branch || "main";
-
     return `https://raw.githubusercontent.com/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/${encodeURIComponent(branch)}/${partes.join("/")}`;
 }
 
@@ -970,7 +977,6 @@ async function githubFetch(url) {
 
 async function obterConfiguracaoEfetiva() {
     const configuracao = detectarRepositorioAutomaticamente();
-
     validarRepositorio(configuracao);
 
     if (!configuracao.branch) {
@@ -1012,48 +1018,29 @@ async function listarCatalogoViaTree(configuracao, usuario) {
 
     const prefixo = `${configuracao.pastaMidia}/`;
     const pastaExclusiva = usuario ? `${prefixo}${usuario}/` : "";
-
     const resultado = {
-        compartilhado: {
-            fotos: [],
-            audios: [],
-            videos: []
-        },
+        compartilhado: { fotos: [], audios: [], videos: [] },
         exclusivo: []
     };
 
     for (const item of dados.tree) {
-        if (!item || item.type !== "blob" || !item.path || !item.path.startsWith(prefixo)) {
-            continue;
-        }
+        if (!item || item.type !== "blob" || !item.path || !item.path.startsWith(prefixo)) continue;
 
         const relativo = item.path.slice(prefixo.length);
         const caminhoMinusculo = item.path.toLowerCase();
         const tema = `${prefixo}tema.mp3`.toLowerCase();
 
         if (!relativo.includes("/")) {
-            if (caminhoMinusculo === tema) {
-                continue;
-            }
+            if (caminhoMinusculo === tema) continue;
 
             const arquivo = criarObjetoMedia(item, configuracao);
-
-            if (arquivo) {
-                resultado.compartilhado[arquivo.tipo].push(arquivo);
-            }
-
+            if (arquivo) resultado.compartilhado[arquivo.tipo].push(arquivo);
             continue;
         }
 
-        if (
-            usuario &&
-            item.path.toLowerCase().startsWith(pastaExclusiva.toLowerCase())
-        ) {
+        if (usuario && item.path.toLowerCase().startsWith(pastaExclusiva.toLowerCase())) {
             const arquivo = criarObjetoMedia(item, configuracao);
-
-            if (arquivo) {
-                resultado.exclusivo.push(arquivo);
-            }
+            if (arquivo) resultado.exclusivo.push(arquivo);
         }
     }
 
@@ -1063,33 +1050,17 @@ async function listarCatalogoViaTree(configuracao, usuario) {
 async function listarPastaDireta(caminho, configuracao) {
     const url = `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/contents/${caminho.split("/").map(encodeURIComponent).join("/")}?ref=${encodeURIComponent(configuracao.branch)}`;
     const dados = await githubFetch(url);
-
-    const resultado = {
-        fotos: [],
-        audios: [],
-        videos: []
-    };
-
+    const resultado = { fotos: [], audios: [], videos: [] };
     const tema = `${configuracao.pastaMidia}/tema.mp3`.toLowerCase();
 
-    if (!Array.isArray(dados)) {
-        return resultado;
-    }
+    if (!Array.isArray(dados)) return resultado;
 
     for (const item of dados) {
-        if (!item || item.type !== "file" || !item.path) {
-            continue;
-        }
-
-        if (item.path.toLowerCase() === tema) {
-            continue;
-        }
+        if (!item || item.type !== "file" || !item.path) continue;
+        if (item.path.toLowerCase() === tema) continue;
 
         const tipo = classificarArquivo(item.name, item.mime_type || "");
-
-        if (!tipo) {
-            continue;
-        }
+        if (!tipo) continue;
 
         resultado[tipo].push({
             nome: item.name,
@@ -1109,17 +1080,12 @@ async function listarPastaDireta(caminho, configuracao) {
 async function listarPastaRecursiva(caminho, configuracao) {
     const url = `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/contents/${caminho.split("/").map(encodeURIComponent).join("/")}?ref=${encodeURIComponent(configuracao.branch)}`;
     const dados = await githubFetch(url);
-
     let resultados = [];
 
-    if (!Array.isArray(dados)) {
-        return resultados;
-    }
+    if (!Array.isArray(dados)) return resultados;
 
     for (const item of dados) {
-        if (!item) {
-            continue;
-        }
+        if (!item) continue;
 
         if (item.type === "dir") {
             const subResultados = await listarPastaRecursiva(item.path, configuracao);
@@ -1127,15 +1093,10 @@ async function listarPastaRecursiva(caminho, configuracao) {
             continue;
         }
 
-        if (item.type !== "file" || !item.path) {
-            continue;
-        }
+        if (item.type !== "file" || !item.path) continue;
 
         const tipo = classificarArquivo(item.name, item.mime_type || "");
-
-        if (!tipo) {
-            continue;
-        }
+        if (!tipo) continue;
 
         resultados.push({
             nome: item.name,
@@ -1153,39 +1114,24 @@ async function listarPastaRecursiva(caminho, configuracao) {
 }
 
 async function carregarCatalogo() {
-    let catalogo = {
-        fotos: [],
-        audios: [],
-        videos: []
-    };
-
+    let catalogo = { fotos: [], audios: [], videos: [] };
     let exclusivo = [];
 
     try {
         const configuracao = await obterConfiguracaoEfetiva();
-
         estado.configuracao = configuracao;
 
-        const resultadoTree = await listarCatalogoViaTree(
-            configuracao,
-            estado.usuario
-        );
+        const resultadoTree = await listarCatalogoViaTree(configuracao, estado.usuario);
 
         if (resultadoTree) {
             catalogo = resultadoTree.compartilhado;
             exclusivo = resultadoTree.exclusivo;
         } else {
-            catalogo = await listarPastaDireta(
-                configuracao.pastaMidia,
-                configuracao
-            );
+            catalogo = await listarPastaDireta(configuracao.pastaMidia, configuracao);
 
             if (estado.usuario) {
                 try {
-                    exclusivo = await listarPastaRecursiva(
-                        `${configuracao.pastaMidia}/${estado.usuario}`,
-                        configuracao
-                    );
+                    exclusivo = await listarPastaRecursiva(`${configuracao.pastaMidia}/${estado.usuario}`, configuracao);
                 } catch (_) {
                     exclusivo = [];
                 }
@@ -1204,13 +1150,13 @@ async function carregarCatalogo() {
     estado.exclusivo.sort(compararNomes);
 
     atualizarResumo();
+
     renderizarFotos();
-    renderizarAudios();
-    renderizarVideos();
-    renderizarExclusivo();
 
     if (estado.configuracao) {
-        configurarMusica(estado.configuracao);
+        requestAnimationFrame(() => {
+            configurarMusica(estado.configuracao);
+        });
     } else {
         atualizarBotaoMusica(false);
     }
@@ -1247,27 +1193,63 @@ function renderizarFotos() {
 
     container.innerHTML = "";
 
-    removerLoading("fotoLoading");
-
     document.getElementById("fotoEmpty").classList.toggle(
         "visible",
         estado.arquivos.fotos.length === 0
     );
 
-    estado.arquivos.fotos.forEach((arquivo, index) => {
-        container.appendChild(
-            criarCartaoFoto(
-                arquivo,
-                estado.arquivos.fotos,
-                index
-            )
-        );
+    estado.secoesRenderizadas.fotos = true;
+
+    if (!estado.arquivos.fotos.length) {
+        removerLoading("fotoLoading");
+        return;
+    }
+
+    const fotos = estado.arquivos.fotos;
+    const loteInicial = Math.min(12, fotos.length);
+
+    preCarregarImagensPrioritarias(fotos, 3);
+
+    for (let index = 0; index < loteInicial; index++) {
+        container.appendChild(criarCartaoFoto(fotos[index], fotos, index));
+    }
+
+    removerLoading("fotoLoading");
+
+    if (fotos.length > loteInicial) {
+        let proximo = loteInicial;
+
+        const carregarLote = () => {
+            const limite = Math.min(proximo + 12, fotos.length);
+
+            for (let index = proximo; index < limite; index++) {
+                container.appendChild(criarCartaoFoto(fotos[index], fotos, index));
+            }
+
+            proximo = limite;
+
+            if (proximo < fotos.length) {
+                requestAnimationFrame(carregarLote);
+            }
+        };
+
+        requestAnimationFrame(carregarLote);
+    }
+}
+
+function preCarregarImagensPrioritarias(lista, quantidade = 3) {
+    lista.slice(0, quantidade).forEach((arquivo, index) => {
+        const link = document.createElement("link");
+        link.rel = "preload";
+        link.as = "image";
+        link.href = arquivo.url;
+        if (index === 0) link.fetchPriority = "high";
+        document.head.appendChild(link);
     });
 }
 
 function criarCartaoFoto(arquivo, lista, index) {
     const card = document.createElement("article");
-
     card.className = "media-card";
     card.tabIndex = 0;
     card.setAttribute("role", "button");
@@ -1277,31 +1259,22 @@ function criarCartaoFoto(arquivo, lista, index) {
     shell.className = "photo-shell";
 
     const imagem = document.createElement("img");
-
-    imagem.loading = "lazy";
+    imagem.loading = index < 8 ? "eager" : "lazy";
+    imagem.fetchPriority = index < 4 ? "high" : "auto";
     imagem.decoding = "async";
     imagem.alt = arquivo.nome;
     imagem.src = arquivo.url;
 
     const overlay = document.createElement("div");
-
     overlay.className = "photo-overlay";
     overlay.textContent = obterNomeSemExtensao(arquivo.nome);
 
     shell.append(imagem, overlay);
     card.appendChild(shell);
 
-    const abrir = () => {
-        abrirLightbox(
-            arquivo,
-            lista,
-            index,
-            card
-        );
-    };
+    const abrir = () => abrirLightbox(arquivo, lista, index, card);
 
     card.addEventListener("click", abrir);
-
     card.addEventListener("keydown", event => {
         if (event.key === "Enter" || event.key === " ") {
             event.preventDefault();
@@ -1313,10 +1286,9 @@ function criarCartaoFoto(arquivo, lista, index) {
 }
 
 function renderizarAudios() {
+    estado.secoesRenderizadas.audios = true;
     const container = document.getElementById("audios");
-
     container.innerHTML = "";
-
     removerLoading("audioLoading");
 
     document.getElementById("audioEmpty").classList.toggle(
@@ -1324,16 +1296,13 @@ function renderizarAudios() {
         estado.arquivos.audios.length === 0
     );
 
-    if (!estado.arquivos.audios.length) {
-        return;
-    }
+    if (!estado.arquivos.audios.length) return;
 
     const panel = document.createElement("article");
     panel.className = "media-panel";
 
     const titulo = document.createElement("h3");
     titulo.textContent = "Áudios";
-
     panel.appendChild(titulo);
 
     estado.arquivos.audios.forEach(arquivo => {
@@ -1345,7 +1314,6 @@ function renderizarAudios() {
         nome.textContent = arquivo.nome;
 
         const player = document.createElement("audio");
-
         player.controls = true;
         player.preload = "none";
         player.playsInline = true;
@@ -1359,10 +1327,9 @@ function renderizarAudios() {
 }
 
 function renderizarVideos() {
+    estado.secoesRenderizadas.videos = true;
     const container = document.getElementById("videos");
-
     container.innerHTML = "";
-
     removerLoading("videoLoading");
 
     document.getElementById("videoEmpty").classList.toggle(
@@ -1370,16 +1337,13 @@ function renderizarVideos() {
         estado.arquivos.videos.length === 0
     );
 
-    if (!estado.arquivos.videos.length) {
-        return;
-    }
+    if (!estado.arquivos.videos.length) return;
 
     const panel = document.createElement("article");
     panel.className = "media-panel";
 
     const titulo = document.createElement("h3");
     titulo.textContent = "Vídeos";
-
     panel.appendChild(titulo);
 
     estado.arquivos.videos.forEach(arquivo => {
@@ -1391,17 +1355,13 @@ function renderizarVideos() {
         nome.textContent = arquivo.nome;
 
         const player = document.createElement("video");
-
         player.controls = true;
         player.preload = "metadata";
         player.playsInline = true;
         player.src = arquivo.url;
 
         const mime = tipoMimePorArquivo(arquivo);
-
-        if (mime) {
-            player.setAttribute("type", mime);
-        }
+        if (mime) player.setAttribute("type", mime);
 
         item.append(nome, player);
         panel.appendChild(item);
@@ -1411,10 +1371,9 @@ function renderizarVideos() {
 }
 
 function renderizarExclusivo() {
+    estado.secoesRenderizadas.exclusivo = true;
     const container = document.getElementById("exclusivo");
-
     container.innerHTML = "";
-
     removerLoading("exclusiveLoading");
 
     document.getElementById("exclusiveEmpty").classList.toggle(
@@ -1424,50 +1383,39 @@ function renderizarExclusivo() {
 
     estado.exclusivo.forEach(arquivo => {
         const item = document.createElement("article");
-
         item.className = "exclusive-item";
 
         const nome = document.createElement("span");
-
         nome.className = "media-name";
         nome.textContent = arquivo.nome;
-
         item.appendChild(nome);
 
         if (arquivo.tipo === "fotos") {
             const imagem = document.createElement("img");
-
             imagem.loading = "lazy";
             imagem.decoding = "async";
             imagem.src = arquivo.url;
             imagem.alt = arquivo.nome;
-
             item.appendChild(imagem);
         }
 
         if (arquivo.tipo === "audios") {
             const audio = document.createElement("audio");
-
             audio.controls = true;
             audio.preload = "none";
             audio.src = arquivo.url;
-
             item.appendChild(audio);
         }
 
         if (arquivo.tipo === "videos") {
             const video = document.createElement("video");
-
             video.controls = true;
             video.preload = "metadata";
             video.playsInline = true;
             video.src = arquivo.url;
 
             const mime = tipoMimePorArquivo(arquivo);
-
-            if (mime) {
-                video.setAttribute("type", mime);
-            }
+            if (mime) video.setAttribute("type", mime);
 
             item.appendChild(video);
         }
@@ -1482,7 +1430,6 @@ function atualizarBotaoMusica(tocando) {
     if (tocando) {
         btnMusica.title = "Pausar música";
         btnMusica.setAttribute("aria-label", "Pausar música");
-
         iconeMusica.innerHTML = `
             <rect x="6" y="5" width="4" height="14" rx="1"></rect>
             <rect x="14" y="5" width="4" height="14" rx="1"></rect>
@@ -1490,7 +1437,6 @@ function atualizarBotaoMusica(tocando) {
     } else {
         btnMusica.title = "Continuar música";
         btnMusica.setAttribute("aria-label", "Continuar música");
-
         iconeMusica.innerHTML = `
             <path d="m7 4 12 8-12 8z"></path>
         `;
@@ -1498,31 +1444,19 @@ function atualizarBotaoMusica(tocando) {
 }
 
 function configurarMusica(configuracao) {
-    audioTema.src = construirRawUrl(
-        `${configuracao.pastaMidia}/tema.mp3`,
-        configuracao
-    );
-
+    audioTema.src = construirRawUrl(`${configuracao.pastaMidia}/tema.mp3`, configuracao);
     audioTema.loop = true;
     audioTema.currentTime = 0;
     audioTema.load();
-
     estado.musicaPausadaManualmente = false;
-
     tentarAutoplay();
 }
 
 async function tentarAutoplay() {
-    if (
-        !audioTema.src ||
-        (audioTema.paused && estado.musicaPausadaManualmente)
-    ) {
-        return;
-    }
+    if (!audioTema.src || audioTema.paused && estado.musicaPausadaManualmente) return;
 
     try {
         await audioTema.play();
-
         atualizarBotaoMusica(true);
         removerListenersDeAutoplay();
     } catch (_) {
@@ -1531,292 +1465,139 @@ async function tentarAutoplay() {
 }
 
 function removerListenersDeAutoplay() {
-    document.removeEventListener(
-        "pointerdown",
-        lidarInteracaoAutoplay
-    );
-
-    document.removeEventListener(
-        "touchstart",
-        lidarInteracaoAutoplay
-    );
-
-    document.removeEventListener(
-        "keydown",
-        lidarInteracaoAutoplay
-    );
+    document.removeEventListener("pointerdown", lidarInteracaoAutoplay);
+    document.removeEventListener("touchstart", lidarInteracaoAutoplay);
+    document.removeEventListener("keydown", lidarInteracaoAutoplay);
 }
 
 function lidarInteracaoAutoplay(event) {
-    if (
-        event.target instanceof Element &&
-        event.target.closest("#btnMusica")
-    ) {
-        return;
-    }
-
+    if (event.target instanceof Element && event.target.closest("#btnMusica")) return;
     tentarAutoplay();
 }
 
 async function alternarMusica() {
     if (audioTema.paused) {
         estado.musicaPausadaManualmente = false;
-
         await tentarAutoplay();
-
         return;
     }
 
     estado.musicaPausadaManualmente = true;
-
     audioTema.pause();
-
     atualizarBotaoMusica(false);
 }
 
-btnMusica.addEventListener(
-    "click",
-    alternarMusica
-);
+btnMusica.addEventListener("click", alternarMusica);
+document.addEventListener("pointerdown", lidarInteracaoAutoplay);
+document.addEventListener("touchstart", lidarInteracaoAutoplay);
+document.addEventListener("keydown", lidarInteracaoAutoplay);
 
-document.addEventListener(
-    "pointerdown",
-    lidarInteracaoAutoplay
-);
+audioTema.addEventListener("play", () => atualizarBotaoMusica(true));
+audioTema.addEventListener("pause", () => atualizarBotaoMusica(false));
+audioTema.addEventListener("error", () => atualizarBotaoMusica(false));
 
-document.addEventListener(
-    "touchstart",
-    lidarInteracaoAutoplay
-);
-
-document.addEventListener(
-    "keydown",
-    lidarInteracaoAutoplay
-);
-
-audioTema.addEventListener(
-    "play",
-    () => atualizarBotaoMusica(true)
-);
-
-audioTema.addEventListener(
-    "pause",
-    () => atualizarBotaoMusica(false)
-);
-
-audioTema.addEventListener(
-    "error",
-    () => atualizarBotaoMusica(false)
-);
-
-function abrirLightbox(
-    arquivo,
-    lista,
-    index,
-    origem
-) {
-    const lightbox =
-        document.getElementById("lightbox");
-
-    const content =
-        document.getElementById("lightboxContent");
-
-    const caption =
-        document.getElementById("lightboxCaption");
+function abrirLightbox(arquivo, lista, index, origem) {
+    const lightbox = document.getElementById("lightbox");
+    const content = document.getElementById("lightboxContent");
+    const caption = document.getElementById("lightboxCaption");
 
     estado.ultimaFocada = origem;
     estado.lightboxAberto = true;
-
     content.innerHTML = "";
 
     const imagem = document.createElement("img");
-
     imagem.className = "lightbox-img";
     imagem.src = arquivo.url;
     imagem.alt = arquivo.nome;
 
     content.appendChild(imagem);
-
     caption.textContent = arquivo.nome;
 
     lightbox.classList.add("aberto");
-
-    lightbox.setAttribute(
-        "aria-hidden",
-        "false"
-    );
-
+    lightbox.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
 
     if (!history.state?.momentosLightbox) {
-        history.pushState(
-            {
-                ...(history.state || {}),
-                momentosLightbox: true
-            },
-            ""
-        );
-
+        history.pushState({ ...(history.state || {}), momentosLightbox: true }, "");
         estado.lightboxUsouHistorico = true;
     }
 }
 
-function fecharLightbox(
-    viaHistorico = false
-) {
-    const lightbox =
-        document.getElementById("lightbox");
-
-    if (!estado.lightboxAberto) {
-        return;
-    }
+function fecharLightbox(viaHistorico = false) {
+    const lightbox = document.getElementById("lightbox");
+    if (!estado.lightboxAberto) return;
 
     estado.lightboxAberto = false;
-
     lightbox.classList.remove("aberto");
-
-    lightbox.setAttribute(
-        "aria-hidden",
-        "true"
-    );
-
+    lightbox.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
 
-    document.getElementById(
-        "lightboxContent"
-    ).innerHTML = "";
-
-    document.getElementById(
-        "lightboxCaption"
-    ).textContent = "";
+    document.getElementById("lightboxContent").innerHTML = "";
+    document.getElementById("lightboxCaption").textContent = "";
 
     const foco = estado.ultimaFocada;
-
     estado.ultimaFocada = null;
 
-    if (
-        !viaHistorico &&
-        estado.lightboxUsouHistorico &&
-        history.state?.momentosLightbox
-    ) {
+    if (!viaHistorico && estado.lightboxUsouHistorico && history.state?.momentosLightbox) {
         estado.lightboxUsouHistorico = false;
-
         history.back();
-
         return;
     }
 
     estado.lightboxUsouHistorico = false;
 
-    if (
-        foco &&
-        typeof foco.focus === "function"
-    ) {
-        requestAnimationFrame(
-            () => foco.focus()
-        );
+    if (foco && typeof foco.focus === "function") {
+        requestAnimationFrame(() => foco.focus());
     }
 }
 
-document.getElementById(
-    "lightboxClose"
-).addEventListener(
-    "click",
-    () => fecharLightbox()
-);
-
-document.getElementById(
-    "lightbox"
-).addEventListener(
-    "click",
-    event => {
-        if (
-            event.target.id === "lightbox"
-        ) {
-            fecharLightbox();
-        }
-    }
-);
-
-document.addEventListener(
-    "keydown",
-    event => {
-        if (
-            event.key === "Escape" &&
-            estado.lightboxAberto
-        ) {
-            fecharLightbox();
-        }
-    }
-);
-
-window.addEventListener(
-    "popstate",
-    () => {
-        if (estado.lightboxAberto) {
-            fecharLightbox(true);
-        }
-    }
-);
-
-function trocarSecao(nome) {
-    document.querySelectorAll(
-        ".media-tab"
-    ).forEach(botao => {
-        const ativo =
-            botao.dataset.section === nome;
-
-        botao.classList.toggle(
-            "active",
-            ativo
-        );
-
-        botao.setAttribute(
-            "aria-selected",
-            String(ativo)
-        );
-    });
-
-    document.querySelectorAll(
-        ".section"
-    ).forEach(secao => {
-        const ativo =
-            secao.id === `section-${nome}`;
-
-        secao.classList.toggle(
-            "active",
-            ativo
-        );
-
-        secao.hidden = !ativo;
-    });
-}
-
-document.querySelectorAll(
-    ".media-tab"
-).forEach(botao => {
-    botao.addEventListener(
-        "click",
-        () => {
-            trocarSecao(
-                botao.dataset.section
-            );
-        }
-    );
+document.getElementById("lightboxClose").addEventListener("click", () => fecharLightbox());
+document.getElementById("lightbox").addEventListener("click", event => {
+    if (event.target.id === "lightbox") fecharLightbox();
 });
 
-document.getElementById(
-    "btnVoltar"
-).addEventListener(
-    "click",
-    () => {
-        window.location.href = "home.html";
-    }
-);
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && estado.lightboxAberto) fecharLightbox();
+});
+
+window.addEventListener("popstate", () => {
+    if (estado.lightboxAberto) fecharLightbox(true);
+});
+
+function renderizarSecao(nome) {
+    if (estado.secoesRenderizadas[nome]) return;
+
+    if (nome === "audios") renderizarAudios();
+    if (nome === "videos") renderizarVideos();
+    if (nome === "exclusivo") renderizarExclusivo();
+}
+
+function trocarSecao(nome) {
+    document.querySelectorAll(".media-tab").forEach(botao => {
+        const ativo = botao.dataset.section === nome;
+        botao.classList.toggle("active", ativo);
+        botao.setAttribute("aria-selected", String(ativo));
+    });
+
+    document.querySelectorAll(".section").forEach(secao => {
+        const ativo = secao.id === `section-${nome}`;
+        secao.classList.toggle("active", ativo);
+        secao.hidden = !ativo;
+    });
+
+    renderizarSecao(nome);
+}
+
+document.querySelectorAll(".media-tab").forEach(botao => {
+    botao.addEventListener("click", () => trocarSecao(botao.dataset.section));
+});
+
+document.getElementById("btnVoltar").addEventListener("click", () => {
+    window.location.href = "home.html";
+});
 
 async function iniciar() {
     estado.usuario = obterUsuario();
-
     await carregarCatalogo();
 }
 
@@ -1824,4 +1605,4 @@ iniciar();
 </script>
 
 </body>
-    </html>
+</html>
