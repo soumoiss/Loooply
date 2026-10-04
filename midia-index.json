@@ -1,0 +1,18 @@
+{
+  "generatedAt": "2026-10-04T00:00:00.000Z",
+  "repository": {
+    "owner": "soumoiss",
+    "repo": "Loooply",
+    "branch": "main"
+  },
+  "schemaVersion": 3,
+  "fotos": [],
+  "audios": [],
+  "videos": [],
+  "exclusivo": {
+    "Patati": [],
+    "Misol": [],
+    "Lilika": [],
+    "YARA": []
+  }
+}
