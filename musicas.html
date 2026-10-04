@@ -1,31 +1,293 @@
 <!doctype html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#F5F0FA">
-  <link rel="stylesheet" href="assets/css/app.css">
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1,viewport-fit=cover"
+  >
+
+  <meta
+    name="theme-color"
+    content="#F5F0FA"
+  >
+
+  <link
+    rel="stylesheet"
+    href="assets/css/app.css"
+  >
+
   <title>Músicas — Looply</title>
 </head>
+
+
 <body>
+
   <main class="container-page">
+
     <header class="page-header">
-      <a class="brand-inline" href="home.html" aria-label="Voltar para a Home">
-        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none"><path d="M50 15A35 35 0 0 1 85 50" stroke="currentColor" stroke-width="7"/></svg></span>
-        <span><strong>Looply</strong><span>MoissWorld</span></span>
+
+      <a
+        class="brand-inline"
+        href="home.html"
+        aria-label="Voltar para a Home"
+      >
+
+        <span
+          class="brand-mark"
+          aria-hidden="true"
+        >
+
+          <svg
+            viewBox="0 0 100 100"
+            fill="none"
+          >
+
+            <path
+              d="M50 15A35 35 0 0 1 85 50"
+              stroke="currentColor"
+              stroke-width="7"
+            />
+
+          </svg>
+
+        </span>
+
+
+        <span>
+          <strong>Looply</strong>
+          <span>MoissWorld</span>
+        </span>
+
       </a>
-      <div class="header-actions"><a class="header-action" href="galeria.html"><span>▧ Galeria</span></a><a class="header-action" href="perfil.html"><span>Perfil</span></a></div>
+
+
+      <div class="header-actions">
+
+        <a
+          class="header-action"
+          href="galeria.html"
+        >
+          <span>▧ Galeria</span>
+        </a>
+
+
+        <a
+          class="header-action"
+          href="perfil.html"
+        >
+          <span>Perfil</span>
+        </a>
+
+      </div>
+
     </header>
-    <section class="hero-panel"><div class="eyebrow">MoissWorld</div><h1 class="hero-title">Músicas</h1><p class="hero-subtitle">Faixas centralizadas em um catálogo leve, com busca e reprodução direta sem depender de uma biblioteca externa.</p></section>
-    <section class="panel page-panel" style="margin-top:14px">
-      <div class="toolbar"><div class="search-wrap"><input class="input" id="musicSearch" type="search" placeholder="Buscar música ou artista" autocomplete="off"></div><span class="filter-status" id="musicStatus">Carregando músicas…</span></div>
-      <div class="track-list" id="musicList"></div>
+
+
+    <section class="hero-panel">
+
+      <div class="eyebrow">
+        MoissWorld
+      </div>
+
+
+      <h1 class="hero-title">
+        Músicas
+      </h1>
+
+
+      <p class="hero-subtitle">
+        Todas as músicas da nossa playlist reunidas aqui.
+      </p>
+
     </section>
+
+
+    <section
+      class="panel page-panel"
+      style="margin-top:14px"
+    >
+
+      <div class="toolbar">
+
+        <div class="search-wrap">
+
+          <input
+            class="input"
+            id="musicSearch"
+            type="search"
+            placeholder="Buscar música"
+            autocomplete="off"
+            aria-label="Buscar música"
+          >
+
+        </div>
+
+
+        <span
+          class="filter-status"
+          id="musicStatus"
+          aria-live="polite"
+        >
+          Carregando músicas…
+        </span>
+
+      </div>
+
+
+      <div
+        class="track-list"
+        id="musicList"
+        aria-live="polite"
+        aria-busy="true"
+      >
+
+        <article class="track-card">
+
+          <div
+            class="track-art"
+            aria-hidden="true"
+          >
+            ♫
+          </div>
+
+
+          <div class="track-info">
+
+            <div class="media-badges">
+
+              <span class="badge">
+                Música
+              </span>
+
+            </div>
+
+
+            <h3>
+              Carregando playlist…
+            </h3>
+
+
+            <p>
+              Buscando músicas no YouTube
+            </p>
+
+          </div>
+
+
+          <div
+            class="play-button"
+            aria-hidden="true"
+          >
+            …
+          </div>
+
+        </article>
+
+
+        <article class="track-card">
+
+          <div
+            class="track-art"
+            aria-hidden="true"
+          >
+            ♫
+          </div>
+
+
+          <div class="track-info">
+
+            <div class="media-badges">
+
+              <span class="badge">
+                YouTube
+              </span>
+
+            </div>
+
+
+            <h3>
+              Aguarde…
+            </h3>
+
+
+            <p>
+              Organizando a playlist
+            </p>
+
+          </div>
+
+
+          <div
+            class="play-button"
+            aria-hidden="true"
+          >
+            …
+          </div>
+
+        </article>
+
+      </div>
+
+
+      <div
+        class="empty-state"
+        id="musicEmpty"
+        hidden
+      >
+
+        <strong>
+          Nenhuma música encontrada
+        </strong>
+
+        <span>
+          A playlist não possui vídeos disponíveis para exibição.
+        </span>
+
+      </div>
+
+
+      <div
+        class="error-state"
+        id="musicError"
+        hidden
+      >
+
+        <strong>
+          Não foi possível carregar as músicas
+        </strong>
+
+        <span id="musicErrorText">
+          Tente novamente.
+        </span>
+
+      </div>
+
+    </section>
+
   </main>
+
+
   <script type="module">
-    import { requireAuth } from "./assets/js/session.js";
-    import { initMusic } from "./assets/js/music.js";
-    if (requireAuth()) initMusic();
+
+    import {
+      requireAuth
+    } from "./assets/js/session.js";
+
+
+    import {
+      initMusic
+    } from "./assets/js/music.js";
+
+
+    if (requireAuth()) {
+      initMusic();
+    }
+
   </script>
+
 </body>
+
 </html>
