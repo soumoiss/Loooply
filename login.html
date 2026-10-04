@@ -1,218 +1,207 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#7010B0" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <title>Looply</title>
-  <link rel="icon" href="icon.png" type="image/png" />
-  <style>
-    :root {
-      --primary: #7010B0;
-      --primary-dark: #6010A0;
-      --secondary: #503090;
-      --surface: #F5F0FA;
-      --surface-soft: #F0E0F0;
-      --text: #403050;
-      --muted: #8A8195;
-      --white: #ffffff;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#7010B0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Looply</title>
 
-    * { box-sizing: border-box; }
-    html, body {
-      margin: 0;
-      width: 100%;
-      height: 100%;
-      min-height: 100vh;
-      font-family: 'Cabin Sketch', 'Segoe UI', sans-serif;
-      background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 48%, var(--surface) 48%, var(--surface) 100%);
-      color: var(--text);
-      overflow: hidden;
-    }
+<link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch&display=swap" rel="stylesheet">
 
-    body {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-    }
+<style>
 
-    body::before {
-      content: "";
-      position: absolute;
-      width: 150%;
-      height: 62%;
-      left: -25%;
-      top: 34%;
-      background: var(--surface);
-      border-radius: 50% 50% 0 0 / 18% 18% 0 0;
-      z-index: 0;
-    }
+:root {
+  --primary: #7010B0;
+  --primary-dark: #6010A0;
+  --primary-deep: #503090;
+  --deep-purple: #302050;
 
-    body::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 50% 20%, rgba(255,255,255,.10), transparent 30%);
-      z-index: 0;
-    }
+  --white: #FFFFFF;
 
-    .logo-container {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      width: min(90vw, 520px);
-      padding: clamp(20px, 5vw, 38px) clamp(18px, 5vw, 34px);
-      animation: logoAnimation 2s forwards ease;
-      user-select: none;
-    }
+  --surface: #F5F0FA;
+  --surface-lilac: #F0E0F0;
 
-    .logo-circle {
-      position: relative;
-      width: 100px;
-      height: 100px;
-      border: 10px solid var(--primary);
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      background: rgba(112,16,176,.03);
-      box-shadow: 0 0 8px rgba(112,16,176,.85), 0 0 18px rgba(112,16,176,.55), 0 0 32px rgba(112,16,176,.35), 0 0 50px rgba(112,16,176,.18), inset 0 0 18px rgba(112,16,176,.10);
-      animation: spin 3s linear infinite;
-    }
+  --text-primary: #403050;
+  --text-secondary: #7010B0;
+  --text-muted: #AAA2B0;
 
-    .logo-circle::before,
-    .logo-circle::after {
-      content: "";
-      position: absolute;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      left: 50%;
-      top: 50%;
-    }
+  --border: #DED6E5;
 
-    .logo-circle::before {
-      width: 100px;
-      height: 100px;
-      border: 1px solid rgba(112,16,176,.35);
-      animation: logoGlow 2.5s ease-in-out infinite;
-    }
+  --success: #35C878;
+  --error: #E63232;
 
-    .logo-circle::after {
-      width: 118px;
-      height: 118px;
-      border: 1px solid rgba(112,16,176,.12);
-    }
+  --logo-color: #7010B0;
+  --logo-glow: rgba(112,16,176,.70);
+  --logo-glow-soft: rgba(112,16,176,.35);
 
-    .logo-circle svg {
-      width: 50px;
-      height: 50px;
-      display: block;
-      filter: drop-shadow(0 0 6px rgba(112,16,176,.80)) drop-shadow(0 0 13px rgba(112,16,176,.42));
-    }
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-pill: 999px;
 
-    .logo-circle path {
-      stroke: var(--primary);
-      fill: none;
-      stroke-width: 5;
-      stroke-linecap: round;
-      vector-effect: non-scaling-stroke;
-    }
+  --shadow-soft: 0 8px 24px rgba(70,30,100,.10);
+  --shadow-logo: 0 0 12px rgba(112,16,176,.45);
+}
 
-    .logo-text {
-      margin-top: 20px;
-      font-size: clamp(42px, 11vw, 48px);
-      line-height: 1;
-      font-weight: 700;
-      color: var(--primary);
-      text-shadow: 0 2px 8px rgba(48,32,80,.16), 0 0 10px rgba(112,16,176,.38), 0 0 20px rgba(112,16,176,.20);
-    }
 
-    .message {
-      position: absolute;
-      left: 50%;
-      bottom: clamp(78px, 11vh, 105px);
-      transform: translateX(-50%);
-      width: min(90vw, 560px);
-      font-size: clamp(20px, 5vw, 25px);
-      line-height: 1.2;
-      font-weight: 700;
-      color: var(--secondary);
-      text-align: center;
-      opacity: 0;
-      animation: messageAppear .8s ease .35s forwards;
-      z-index: 2;
-    }
+html, body {
+  margin: 0;
+  width: 100%;
+  min-height: 100%;
+  background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 48%, var(--surface) 48%, var(--surface) 100%);
+  font-family: 'Cabin Sketch', cursive, sans-serif;
+  color: var(--text-primary);
+  overflow: hidden;
+}
 
-    .company-name {
-      position: absolute;
-      left: 50%;
-      bottom: clamp(18px, 4vh, 30px);
-      transform: translateX(-50%);
-      color: var(--primary);
-      font-size: clamp(13px, 3.5vw, 18px);
-      line-height: 1;
-      letter-spacing: .03em;
-      white-space: nowrap;
-      z-index: 2;
-    }
+body {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+}
 
-    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-    @keyframes logoAnimation {
-      0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-      50% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-      100% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-    }
-    @keyframes messageAppear {
-      from { opacity: 0; transform: translateX(-50%) translateY(10px); }
-      to { opacity: 1; transform: translateX(-50%) translateY(0); }
-    }
-    @keyframes logoGlow {
-      0%, 100% { opacity: .12; transform: translate(-50%, -50%) scale(1); }
-      50% { opacity: .035; transform: translate(-50%, -50%) scale(1.08); }
-    }
+body::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  transform: translate(-50%, -50%);
+  width: min(46vw, 560px);
+  height: min(46vw, 560px);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.18), rgba(255,255,255,0.02) 58%, transparent 72%);
+  filter: blur(12px);
+}
 
-    @media (max-width: 520px) {
-      .logo-circle { width: 88px; height: 88px; border-width: 8px; }
-      .logo-circle::before { width: 88px; height: 88px; }
-      .logo-circle::after { width: 104px; height: 104px; }
-      .logo-circle svg { width: 44px; height: 44px; }
-      .logo-text { font-size: clamp(40px, 12vw, 48px); }
-      .message { bottom: 82px; font-size: clamp(19px, 5.5vw, 23px); }
-    }
-  </style>
+.logo-wrap {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  animation: logoFloat 1.6s ease-out forwards;
+}
+
+.logo-ring {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(255,255,255,0.04);
+  border: 8px solid var(--primary);
+  box-shadow: var(--shadow-logo), 0 0 18px rgba(112,16,176,.2);
+}
+
+.logo-ring::before,
+.logo-ring::after {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  border: 1px solid rgba(112,16,176,.35);
+}
+
+.logo-ring::after {
+  inset: -24px;
+  border-color: rgba(112,16,176,.15);
+}
+
+.logo-ring .mark {
+  width: 62px;
+  height: 62px;
+  position: relative;
+  display: block;
+}
+
+.logo-ring .mark::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 5px solid var(--primary);
+  border-top-color: transparent;
+  border-right-color: transparent;
+  transform: translate(-50%, -50%) rotate(30deg);
+  box-shadow: 0 0 10px rgba(112,16,176,.4);
+}
+
+.brand {
+  font-size: clamp(2.7rem, 7vw, 5rem);
+  color: var(--white);
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 24px rgba(112,16,176,.60);
+  font-weight: 700;
+}
+
+.subtitle {
+  position: absolute;
+  bottom: 76px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--text-secondary);
+  font-size: clamp(1.1rem, 4vw, 1.7rem);
+  text-align: center;
+  width: min(80vw, 520px);
+  opacity: 0;
+  animation: fadeUp 0.7s ease 0.7s forwards;
+}
+
+.footer-tag {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--text-secondary);
+  font-size: clamp(.8rem, 2.5vw, 1.1rem);
+  letter-spacing: 0.08em;
+  opacity: 0.9;
+}
+
+@keyframes logoFloat {
+  0% { opacity: 0; transform: translateY(15px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translate(-50%, 10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+</style>
 </head>
 <body>
-  <div class="logo-container">
-    <div class="logo-circle" aria-hidden="true">
-      <svg viewBox="0 0 100 100" aria-hidden="true">
-        <path d="M50 15 A35 35 0 0 1 85 50" />
-      </svg>
+  <div class="logo-wrap" aria-label="Looply logo">
+    <div class="logo-ring" aria-hidden="true">
+      <span class="mark"></span>
     </div>
-    <div class="logo-text">Looply</div>
+    <div class="brand">Looply</div>
   </div>
 
-  <div id="message" class="message" style="display:none;">Cartas aos amigos ;)</div>
+  <div class="subtitle">Cartas aos amigos ;)</div>
+  <div class="footer-tag">MoissWorld</div>
 
-  <div class="company-name">MoissWorld</div>
-
-  <script src="config.js"></script>
   <script>
-    const isLoggedIn = localStorage.getItem(LOOOPLY_CONFIG.STORAGE.LOGIN_STATE) === 'true';
-    const message = document.getElementById('message');
+    const loginPage = 'login.html';
+    const homePage = 'home.html';
 
-    if (message) {
-      message.style.display = 'block';
-    }
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
     setTimeout(() => {
-      window.location.replace(isLoggedIn ? LOOOPLY_CONFIG.ROUTES.HOME : LOOOPLY_CONFIG.ROUTES.LOGIN);
+      window.location.href = isLoggedIn ? homePage : loginPage;
     }, 1800);
   </script>
 </body>
