@@ -10,27 +10,114 @@
 <body>
   <main class="container-page">
     <header class="page-header">
-      <a class="brand-inline" href="home.html" aria-label="Voltar para a Home"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none"><path d="M50 15A35 35 0 0 1 85 50" stroke="currentColor" stroke-width="7"/></svg></span><span><strong>Looply</strong><span>MoissWorld</span></span></a>
-      <div class="header-actions"><a class="header-action" href="galeria.html">Galeria</a><a class="header-action" href="musicas.html">Músicas</a></div>
+      <a class="brand-inline" href="home.html" aria-label="Voltar para a Home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 100 100" fill="none">
+            <path d="M50 15A35 35 0 0 1 85 50"
+              stroke="currentColor"
+              stroke-width="7"/>
+          </svg>
+        </span>
+
+        <span>
+          <strong>Looply</strong>
+          <span>MoissWorld</span>
+        </span>
+      </a>
+
+      <div class="header-actions">
+        <a class="header-action" href="galeria.html">Galeria</a>
+        <a class="header-action" href="musicas.html">Músicas</a>
+      </div>
     </header>
 
     <section class="panel profile-card">
-      <div class="profile-large"><img class="profile-avatar" id="profileAvatar" alt=""><span class="profile-fallback" id="profileFallback">EU</span></div>
-      <div class="profile-meta"><div class="eyebrow">Perfil</div><h2 id="profileName">Carregando…</h2><p style="color:var(--muted);margin:5px 0 0;font-size:12px">Sessão local sincronizada com o login legado do Looply.</p></div>
+      <div class="profile-large">
+        <img
+          class="profile-avatar"
+          id="profileAvatar"
+          alt=""
+          decoding="async"
+        >
+
+        <span
+          class="profile-fallback"
+          id="profileFallback"
+          aria-hidden="true"
+        >EU</span>
+      </div>
+
+      <div class="profile-meta">
+        <div class="eyebrow">Perfil</div>
+
+        <h2 id="profileName">Carregando…</h2>
+
+        <p style="color:var(--muted);margin:5px 0 0;font-size:12px">
+          Sessão local sincronizada com o login do Looply.
+        </p>
+      </div>
     </section>
 
     <section class="panel page-panel" style="margin-top:14px">
       <div class="eyebrow">Progresso</div>
-      <h2 style="margin:4px 0 0;font-size:25px">Minha coleção</h2>
-      <div class="stat-grid"><div class="stat"><span>Cartas lidas</span><strong id="profileCounter">0/50</strong></div><div class="stat"><span>Armazenamento</span><strong>Local</strong></div></div>
+
+      <h2 style="margin:4px 0 0;font-size:25px">
+        Minha coleção
+      </h2>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <span>Cartas lidas</span>
+          <strong id="profileCounter">0/50</strong>
+        </div>
+
+        <div class="stat">
+          <span>Armazenamento</span>
+          <strong>Local</strong>
+        </div>
+      </div>
     </section>
 
     <section class="panel page-panel" style="margin-top:14px">
       <div class="eyebrow">Preferências</div>
-      <div class="preference"><div><h3>Reduzir movimento</h3><p>Desativa animações para uma experiência mais estável.</p></div><input class="toggle" id="reduceMotion" type="checkbox" aria-label="Reduzir movimento"></div>
-      <div class="actions"><button class="danger-button" id="resetReads" type="button">Zerar somente o estado de cartas lidas</button><button class="secondary-button" id="profileLogout" type="button">Sair</button></div>
+
+      <div class="preference">
+        <div>
+          <h3>Reduzir movimento</h3>
+
+          <p>
+            Desativa animações para uma experiência mais estável.
+          </p>
+        </div>
+
+        <input
+          class="toggle"
+          id="reduceMotion"
+          type="checkbox"
+          aria-label="Reduzir movimento"
+        >
+      </div>
+
+      <div class="actions">
+        <button
+          class="danger-button"
+          id="resetReads"
+          type="button"
+        >
+          Zerar cartas lidas
+        </button>
+
+        <button
+          class="secondary-button"
+          id="profileLogout"
+          type="button"
+        >
+          Sair
+        </button>
+      </div>
     </section>
   </main>
+
   <script type="module" src="assets/js/profile.js"></script>
 </body>
 </html>
