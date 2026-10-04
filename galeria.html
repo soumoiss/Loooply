@@ -470,6 +470,47 @@ video {
     max-height: 500px;
 }
 
+.error-state {
+    display: grid;
+    gap: 7px;
+    margin: 0 0 17px;
+    padding: 18px 16px;
+    border: 1px solid rgba(190,72,106,.18);
+    border-radius: 18px;
+    background: rgba(255,244,248,.88);
+    color: #75616a;
+    text-align: center;
+}
+
+.error-state[hidden] {
+    display: none;
+}
+
+.error-state strong {
+    color: #6f3047;
+    font-family: "Quillen", Georgia, serif;
+    font-size: 20px;
+    font-weight: 400;
+}
+
+.error-state span {
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.error-state button {
+    justify-self: center;
+    min-height: 40px;
+    padding: 0 15px;
+    border: 1px solid rgba(155,93,229,.18);
+    border-radius: 13px;
+    background: #fff;
+    color: var(--primary-strong);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 800;
+}
+
 .loading-state {
     min-height: 150px;
     display: flex;
@@ -719,6 +760,12 @@ video {
             <div class="contador" id="contador">0 mídias</div>
         </div>
 
+        <div class="error-state" id="galleryError" role="alert" hidden>
+            <strong id="galleryErrorTitle">Não foi possível carregar a galeria.</strong>
+            <span id="galleryErrorText">Tente novamente.</span>
+            <button type="button" id="galleryRetry">Tentar novamente</button>
+        </div>
+
         <div class="media-tabs" id="mediaTabs" role="tablist">
 
             <button class="media-tab active" type="button" role="tab" aria-selected="true" data-section="fotos">
@@ -855,37 +902,45 @@ const MIME_POR_EXTENSAO = {
 };
 
 const REPOSITORIO = {
-    owner: "",
-    repo: "",
+    owner: "soumoiss",
+    repo: "Loooply",
     branch: "",
     pastaMidia: "midia"
 };
+
+const USUARIOS_VALIDOS = new Set(["patati", "misol", "lilika", "yara"]);
+const API_VERSION = "2026-03-10";
 
 const estado = {
     arquivos: { fotos: [], audios: [], videos: [] },
     exclusivo: [],
     usuario: "",
     configuracao: null,
+    carregamento: "idle",
+    promessaCatalogo: null,
     lightboxAberto: false,
     lightboxUsouHistorico: false,
     ultimaFocada: null,
     musicaPausadaManualmente: false,
-    secoesRenderizadas: {
-        fotos: false,
-        audios: false,
-        videos: false,
-        exclusivo: false
-    }
+    secoesRenderizadas: { fotos: false, audios: false, videos: false, exclusivo: false }
 };
 
 const audioTema = document.getElementById("temaMusical");
 const btnMusica = document.getElementById("btnMusica");
 const textoMusica = document.getElementById("textoMusica");
 const iconeMusica = document.getElementById("iconeMusica");
+const galleryError = document.getElementById("galleryError");
+const galleryErrorTitle = document.getElementById("galleryErrorTitle");
+const galleryErrorText = document.getElementById("galleryErrorText");
+const galleryRetry = document.getElementById("galleryRetry");
 
 function obterUsuario() {
     const bruto = String(localStorage.getItem("username") || "").trim().toLowerCase();
-    return ["misol", "patati"].includes(bruto) ? bruto : "";
+    return USUARIOS_VALIDOS.has(bruto) ? bruto : "";
+}
+
+function normalizarCaminho(caminho) {
+    return String(caminho || "").replace(/^\/+|\/+$/g, "");
 }
 
 function obterExtensao(nome) {
@@ -912,276 +967,368 @@ function tipoMimePorArquivo(arquivo) {
     return arquivo.mime || MIME_POR_EXTENSAO[obterExtensao(arquivo.nome)] || "";
 }
 
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
-
-function compararNomes(a, b) {
-    return String(a.nome).localeCompare(String(b.nome), "pt-BR", {
+function compararArquivos(a, b) {
+    return String(a.caminho).localeCompare(String(b.caminho), "pt-BR", {
         numeric: true,
         sensitivity: "base"
     });
 }
 
+function deduplicarArquivos(lista) {
+    const vistos = new Set();
+    return lista.filter(arquivo => {
+        const chave = String(arquivo?.caminho || "");
+        if (!chave || vistos.has(chave)) return false;
+        vistos.add(chave);
+        return true;
+    });
+}
+
 function detectarRepositorioAutomaticamente() {
+    const configuracao = { ...REPOSITORIO };
     const host = window.location.hostname;
     const caminho = window.location.pathname.split("/").filter(Boolean);
-    const configuracao = { ...REPOSITORIO };
-    const ehGithubPages = host.endsWith(".github.io");
 
-    if (!configuracao.owner && ehGithubPages) {
+    if (!configuracao.owner && host.endsWith(".github.io")) {
         configuracao.owner = host.split(".")[0];
     }
 
-    if (!configuracao.repo && ehGithubPages && caminho.length > 0 && !caminho[0].includes(".")) {
+    if (!configuracao.repo && host.endsWith(".github.io") && caminho[0]) {
         configuracao.repo = caminho[0];
-    }
-
-    if (!configuracao.repo && ehGithubPages && configuracao.owner) {
-        configuracao.repo = `${configuracao.owner}.github.io`;
     }
 
     return configuracao;
 }
 
 function validarRepositorio(configuracao) {
-    if (!configuracao.owner || !configuracao.repo) {
-        throw new Error("Não foi possível identificar o repositório do GitHub.");
+    if (!configuracao.owner || !configuracao.repo || !configuracao.pastaMidia) {
+        throw criarErro("CONFIG_INVALIDA", "A configuração do repositório está incompleta.");
     }
+}
+
+function criarErro(codigo, mensagem, detalhes = {}) {
+    const erro = new Error(mensagem);
+    erro.codigo = codigo;
+    Object.assign(erro, detalhes);
+    return erro;
 }
 
 function construirRawUrl(caminho, configuracao) {
-    const partes = String(caminho).split("/").map(encodeURIComponent);
-    const branch = configuracao.branch || "main";
+    const partes = normalizarCaminho(caminho).split("/").filter(Boolean).map(encodeURIComponent);
+    const branch = String(configuracao.branch || "").trim();
+    if (!branch || !partes.length) {
+        throw criarErro("URL_INVALIDA", "Não foi possível construir a URL da mídia.");
+    }
     return `https://raw.githubusercontent.com/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/${encodeURIComponent(branch)}/${partes.join("/")}`;
 }
 
-async function githubFetch(url) {
-    const resposta = await fetch(url, {
-        cache: "no-store",
-        headers: {
-            Accept: "application/vnd.github+json",
-            "X-GitHub-Api-Version": "2026-03-10"
-        }
-    });
+async function lerJsonSeguro(resposta) {
+    const texto = await resposta.text();
+    if (!texto) return null;
+    try {
+        return JSON.parse(texto);
+    } catch {
+        throw criarErro("JSON_INVALIDO", "O GitHub retornou uma resposta que não pôde ser interpretada como JSON.", { status: resposta.status });
+    }
+}
 
-    if (!resposta.ok) {
-        throw new Error(`GitHub API ${resposta.status}`);
+async function githubFetch(url) {
+    let resposta;
+
+    try {
+        resposta = await fetch(url, {
+            method: "GET",
+            cache: "no-store",
+            headers: {
+                Accept: "application/vnd.github+json",
+                "X-GitHub-Api-Version": API_VERSION
+            }
+        });
+    } catch (erro) {
+        throw criarErro("REDE", "Não foi possível conectar à GitHub API.", { causa: erro });
     }
 
-    return resposta.json();
+    const dados = await lerJsonSeguro(resposta);
+
+    if (!resposta.ok) {
+        const restante = resposta.headers.get("x-ratelimit-remaining");
+        const reset = resposta.headers.get("x-ratelimit-reset");
+        const mensagemApi = String(dados?.message || "").trim();
+        let codigo = "HTTP";
+
+        if (resposta.status === 404) codigo = "HTTP_404";
+        else if (resposta.status === 403 && restante === "0") codigo = "RATE_LIMIT";
+        else if (resposta.status === 429) codigo = "RATE_LIMIT";
+        else if (resposta.status === 403) codigo = "HTTP_403";
+
+        throw criarErro(codigo, mensagemApi || `GitHub API respondeu HTTP ${resposta.status}.`, {
+            status: resposta.status,
+            apiMessage: mensagemApi,
+            rateRemaining: restante,
+            rateReset: reset
+        });
+    }
+
+    return dados;
 }
 
 async function obterConfiguracaoEfetiva() {
     const configuracao = detectarRepositorioAutomaticamente();
     validarRepositorio(configuracao);
 
-    if (!configuracao.branch) {
-        const url = `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}`;
-        const dados = await githubFetch(url);
-        configuracao.branch = dados.default_branch || "main";
+    const url = `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}`;
+    const dados = await githubFetch(url);
+
+    if (!dados || typeof dados !== "object" || !String(dados.default_branch || "").trim()) {
+        throw criarErro("REPOSITORIO_INVALIDO", "A resposta do GitHub não informou um branch padrão válido.");
     }
+
+    configuracao.branch = String(dados.default_branch).trim();
+
+    console.info("[Galeria] Repositório:", `${configuracao.owner}/${configuracao.repo}`);
+    console.info("[Galeria] Branch:", configuracao.branch);
+    console.info("[Galeria] Pasta de mídia:", configuracao.pastaMidia);
 
     return configuracao;
 }
 
 function criarObjetoMedia(item, configuracao) {
-    const nome = String(item.path || "").split("/").pop();
+    const caminho = normalizarCaminho(item?.path);
+    const nome = caminho.split("/").pop();
     const tipo = classificarArquivo(nome);
 
-    if (!tipo) return null;
+    if (!caminho || !nome || !tipo || item?.type !== "blob") return null;
 
     return {
         nome,
-        caminho: item.path,
-        url: construirRawUrl(item.path, configuracao),
-        apiUrl: item.url || "",
-        sha: item.sha || "",
+        caminho,
+        url: construirRawUrl(caminho, configuracao),
+        apiUrl: String(item.url || ""),
+        sha: String(item.sha || ""),
         tamanho: Number(item.size || 0),
-        mime: item.mime_type || MIME_POR_EXTENSAO[obterExtensao(nome)] || "",
+        mime: String(item.mime_type || MIME_POR_EXTENSAO[obterExtensao(nome)] || ""),
         tipo
     };
 }
 
-async function listarCatalogoViaTree(configuracao, usuario) {
-    const url = `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/git/trees/${encodeURIComponent(configuracao.branch)}?recursive=1`;
-    const dados = await githubFetch(url);
+function caminhoEhCompartilhado(caminho, pastaMidia) {
+    const prefixo = `${normalizarCaminho(pastaMidia)}/`;
+    const relativo = normalizarCaminho(caminho).slice(prefixo.length);
+    return relativo.length > 0 && !relativo.includes("/");
+}
 
-    if (!dados || !Array.isArray(dados.tree)) {
-        throw new Error("A API do GitHub não retornou a árvore do repositório.");
+function caminhoEhDoUsuario(caminho, pastaMidia, usuario) {
+    if (!usuario) return false;
+
+    const prefixo = `${normalizarCaminho(pastaMidia)}/`;
+    const caminhoNormalizado = normalizarCaminho(caminho);
+    const partes = caminhoNormalizado.split("/");
+
+    if (partes.length < 3 || partes[0].toLowerCase() !== normalizarCaminho(pastaMidia).toLowerCase()) {
+        return false;
     }
 
-    if (dados.truncated) return null;
+    return partes[1].toLowerCase() === usuario.toLowerCase() && caminhoNormalizado.toLowerCase().startsWith(prefixo.toLowerCase());
+}
 
-    const prefixo = `${configuracao.pastaMidia}/`;
-    const pastaExclusiva = usuario ? `${prefixo}${usuario}/` : "";
-    const resultado = {
-        compartilhado: { fotos: [], audios: [], videos: [] },
-        exclusivo: []
-    };
+function montarCatalogoDaTree(dados, configuracao, usuario) {
+    if (!dados || typeof dados !== "object" || !Array.isArray(dados.tree)) {
+        throw criarErro("TREE_INVALIDA", "A GitHub API não retornou uma árvore válida do repositório.");
+    }
+
+    if (dados.truncated === true) {
+        return null;
+    }
+
+    const pasta = normalizarCaminho(configuracao.pastaMidia);
+    const prefixo = `${pasta}/`;
+    const tema = `${prefixo}tema.mp3`.toLowerCase();
+    const compartilhado = { fotos: [], audios: [], videos: [] };
+    const exclusivo = [];
 
     for (const item of dados.tree) {
-        if (!item || item.type !== "blob" || !item.path || !item.path.startsWith(prefixo)) continue;
+        if (!item || item.type !== "blob" || !item.path) continue;
 
-        const relativo = item.path.slice(prefixo.length);
-        const caminhoMinusculo = item.path.toLowerCase();
-        const tema = `${prefixo}tema.mp3`.toLowerCase();
+        const caminho = normalizarCaminho(item.path);
+        if (!caminho.toLowerCase().startsWith(prefixo.toLowerCase())) continue;
 
-        if (!relativo.includes("/")) {
-            if (caminhoMinusculo === tema) continue;
+        if (caminho.toLowerCase() === tema) continue;
 
-            const arquivo = criarObjetoMedia(item, configuracao);
-            if (arquivo) resultado.compartilhado[arquivo.tipo].push(arquivo);
-            continue;
-        }
+        const arquivo = criarObjetoMedia(item, configuracao);
+        if (!arquivo) continue;
 
-        if (usuario && item.path.toLowerCase().startsWith(pastaExclusiva.toLowerCase())) {
-            const arquivo = criarObjetoMedia(item, configuracao);
-            if (arquivo) resultado.exclusivo.push(arquivo);
+        if (caminhoEhCompartilhado(caminho, pasta)) {
+            compartilhado[arquivo.tipo].push(arquivo);
+        } else if (caminhoEhDoUsuario(caminho, pasta, usuario)) {
+            exclusivo.push(arquivo);
         }
     }
 
-    return resultado;
+    return {
+        compartilhado: {
+            fotos: deduplicarArquivos(compartilhado.fotos).sort(compararArquivos),
+            audios: deduplicarArquivos(compartilhado.audios).sort(compararArquivos),
+            videos: deduplicarArquivos(compartilhado.videos).sort(compararArquivos)
+        },
+        exclusivo: deduplicarArquivos(exclusivo).sort(compararArquivos)
+    };
 }
 
-async function listarPastaDireta(caminho, configuracao) {
-    const url = `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/contents/${caminho.split("/").map(encodeURIComponent).join("/")}?ref=${encodeURIComponent(configuracao.branch)}`;
+async function listarConteudoRecursivo(caminho, configuracao, resultado = []) {
+    const caminhoSeguro = normalizarCaminho(caminho);
+    const url = `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/contents/${caminhoSeguro.split("/").map(encodeURIComponent).join("/")}?ref=${encodeURIComponent(configuracao.branch)}`;
     const dados = await githubFetch(url);
-    const resultado = { fotos: [], audios: [], videos: [] };
-    const tema = `${configuracao.pastaMidia}/tema.mp3`.toLowerCase();
 
-    if (!Array.isArray(dados)) return resultado;
-
-    for (const item of dados) {
-        if (!item || item.type !== "file" || !item.path) continue;
-        if (item.path.toLowerCase() === tema) continue;
-
-        const tipo = classificarArquivo(item.name, item.mime_type || "");
-        if (!tipo) continue;
-
-        resultado[tipo].push({
-            nome: item.name,
-            caminho: item.path,
-            url: item.download_url || construirRawUrl(item.path, configuracao),
-            apiUrl: item.url || "",
-            sha: item.sha || "",
-            tamanho: Number(item.size || 0),
-            mime: item.mime_type || MIME_POR_EXTENSAO[obterExtensao(item.name)] || "",
-            tipo
-        });
+    if (!Array.isArray(dados)) {
+        throw criarErro("CONTEUDO_INVALIDO", `O caminho ${caminhoSeguro} não retornou uma lista de conteúdo.`);
     }
 
-    return resultado;
-}
-
-async function listarPastaRecursiva(caminho, configuracao) {
-    const url = `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/contents/${caminho.split("/").map(encodeURIComponent).join("/")}?ref=${encodeURIComponent(configuracao.branch)}`;
-    const dados = await githubFetch(url);
-    let resultados = [];
-
-    if (!Array.isArray(dados)) return resultados;
-
     for (const item of dados) {
-        if (!item) continue;
-
+        if (!item || !item.type || !item.path) continue;
         if (item.type === "dir") {
-            const subResultados = await listarPastaRecursiva(item.path, configuracao);
-            resultados = resultados.concat(subResultados);
+            await listarConteudoRecursivo(item.path, configuracao, resultado);
             continue;
         }
-
-        if (item.type !== "file" || !item.path) continue;
-
-        const tipo = classificarArquivo(item.name, item.mime_type || "");
-        if (!tipo) continue;
-
-        resultados.push({
-            nome: item.name,
-            caminho: item.path,
-            url: item.download_url || construirRawUrl(item.path, configuracao),
-            apiUrl: item.url || "",
-            sha: item.sha || "",
-            tamanho: Number(item.size || 0),
-            mime: item.mime_type || MIME_POR_EXTENSAO[obterExtensao(item.name)] || "",
-            tipo
-        });
+        if (item.type === "file") resultado.push(item);
     }
 
-    return resultados;
+    return resultado;
 }
 
-async function carregarCatalogo() {
-    let catalogo = { fotos: [], audios: [], videos: [] };
-    let exclusivo = [];
+async function carregarCatalogoViaFallback(configuracao, usuario) {
+    const itensMidia = await listarConteudoRecursivo(configuracao.pastaMidia, configuracao);
+    const dados = { tree: itensMidia.map(item => ({
+        type: "blob",
+        path: item.path,
+        sha: item.sha,
+        size: item.size,
+        url: item.url,
+        mime_type: item.mime_type
+    })) };
+    return montarCatalogoDaTree(dados, configuracao, usuario);
+}
 
-    try {
-        const configuracao = await obterConfiguracaoEfetiva();
-        estado.configuracao = configuracao;
+async function carregarCatalogoDoGitHub() {
+    const configuracao = await obterConfiguracaoEfetiva();
+    const treeUrl = `https://api.github.com/repos/${encodeURIComponent(configuracao.owner)}/${encodeURIComponent(configuracao.repo)}/git/trees/${encodeURIComponent(configuracao.branch)}?recursive=1`;
+    const dadosTree = await githubFetch(treeUrl);
+    let catalogo = montarCatalogoDaTree(dadosTree, configuracao, estado.usuario);
 
-        const resultadoTree = await listarCatalogoViaTree(configuracao, estado.usuario);
-
-        if (resultadoTree) {
-            catalogo = resultadoTree.compartilhado;
-            exclusivo = resultadoTree.exclusivo;
-        } else {
-            catalogo = await listarPastaDireta(configuracao.pastaMidia, configuracao);
-
-            if (estado.usuario) {
-                try {
-                    exclusivo = await listarPastaRecursiva(`${configuracao.pastaMidia}/${estado.usuario}`, configuracao);
-                } catch (_) {
-                    exclusivo = [];
-                }
-            }
-        }
-    } catch (erro) {
-        console.warn("Falha ao carregar a galeria pelo GitHub:", erro);
+    if (catalogo === null) {
+        console.warn("[Galeria] A árvore recursiva foi truncada; usando consulta de conteúdo como fallback.");
+        catalogo = await carregarCatalogoViaFallback(configuracao, estado.usuario);
     }
 
-    estado.arquivos = catalogo;
-    estado.exclusivo = exclusivo;
+    if (!catalogo) {
+        throw criarErro("CATALOGO_INVALIDO", "Não foi possível montar o catálogo de mídia.");
+    }
 
-    shuffleArray(estado.arquivos.fotos);
-    estado.arquivos.audios.sort(compararNomes);
-    estado.arquivos.videos.sort(compararNomes);
-    estado.exclusivo.sort(compararNomes);
+    const total = catalogo.compartilhado.fotos.length + catalogo.compartilhado.audios.length + catalogo.compartilhado.videos.length;
+    console.info("[Galeria] Usuário:", estado.usuario || "não identificado");
+    console.info("[Galeria] Mídia compartilhada:", total);
+    console.info("[Galeria] Fotos:", catalogo.compartilhado.fotos.length);
+    console.info("[Galeria] Áudios:", catalogo.compartilhado.audios.length);
+    console.info("[Galeria] Vídeos:", catalogo.compartilhado.videos.length);
+    console.info("[Galeria] Exclusivos:", catalogo.exclusivo.length);
+
+    return { configuracao, catalogo };
+}
+
+function mensagemDeErro(erro) {
+    if (erro?.codigo === "RATE_LIMIT") {
+        return ["Não foi possível carregar a galeria agora.", "O GitHub limitou temporariamente as consultas. Tente novamente mais tarde."];
+    }
+    if (erro?.codigo === "HTTP_404") {
+        return ["Não foi possível carregar a galeria.", "O repositório ou o branch configurado não foi encontrado no GitHub."];
+    }
+    if (erro?.codigo === "HTTP_403") {
+        return ["Não foi possível carregar a galeria.", "O GitHub recusou a consulta à API."];
+    }
+    if (erro?.codigo === "REDE") {
+        return ["Não foi possível carregar a galeria.", "Não foi possível conectar à GitHub API. Verifique a conexão e tente novamente."];
+    }
+    if (erro?.codigo === "JSON_INVALIDO") {
+        return ["Não foi possível carregar a galeria.", "O GitHub enviou uma resposta inesperada."];
+    }
+    return ["Não foi possível carregar a galeria.", "Falha ao consultar o GitHub API."];
+}
+
+function mostrarEstadoErro(erro) {
+    const [titulo, texto] = mensagemDeErro(erro);
+    galleryErrorTitle.textContent = titulo;
+    galleryErrorText.textContent = texto;
+    galleryError.hidden = false;
+    console.error("[Galeria] Falha no carregamento:", erro);
+}
+
+function esconderEstadoErro() {
+    galleryError.hidden = true;
+}
+
+function definirCarregando(ativo) {
+    document.getElementById("fotoLoading").style.display = ativo ? "flex" : "none";
+    document.getElementById("audioLoading").style.display = ativo ? "flex" : "none";
+    document.getElementById("videoLoading").style.display = ativo ? "flex" : "none";
+    document.getElementById("exclusiveLoading").style.display = ativo ? "flex" : "none";
+}
+
+function limparEstadosVazios() {
+    ["fotoEmpty", "audioEmpty", "videoEmpty", "exclusiveEmpty"].forEach(id => {
+        document.getElementById(id).classList.remove("visible");
+    });
+}
+
+function aplicarCatalogo(resultado) {
+    estado.configuracao = resultado.configuracao;
+    estado.arquivos = resultado.catalogo.compartilhado;
+    estado.exclusivo = resultado.catalogo.exclusivo;
+    estado.carregamento = "success";
+    estado.secoesRenderizadas = { fotos: false, audios: false, videos: false, exclusivo: false };
 
     atualizarResumo();
-
+    limparEstadosVazios();
+    definirCarregando(false);
     renderizarFotos();
+    configurarMusica(estado.configuracao);
+}
 
-    if (estado.configuracao) {
-        requestAnimationFrame(() => {
-            configurarMusica(estado.configuracao);
+async function carregarCatalogo({ forcar = false } = {}) {
+    if (!forcar && estado.carregamento === "success") return;
+    if (!forcar && estado.promessaCatalogo) return estado.promessaCatalogo;
+
+    estado.carregamento = "loading";
+    esconderEstadoErro();
+    limparEstadosVazios();
+    definirCarregando(true);
+    document.getElementById("galeria").replaceChildren();
+
+    estado.promessaCatalogo = carregarCatalogoDoGitHub()
+        .then(aplicarCatalogo)
+        .catch(erro => {
+            estado.carregamento = "error";
+            estado.arquivos = { fotos: [], audios: [], videos: [] };
+            estado.exclusivo = [];
+            estado.configuracao = null;
+            definirCarregando(false);
+            atualizarResumo();
+            mostrarEstadoErro(erro);
+            atualizarBotaoMusica(false);
+            throw erro;
+        })
+        .finally(() => {
+            estado.promessaCatalogo = null;
         });
-    } else {
-        atualizarBotaoMusica(false);
-    }
+
+    return estado.promessaCatalogo;
 }
 
 function atualizarResumo() {
-    const total =
-        estado.arquivos.fotos.length +
-        estado.arquivos.audios.length +
-        estado.arquivos.videos.length;
-
-    document.getElementById("contador").textContent =
-        `${total} ${total === 1 ? "mídia" : "mídias"}`;
-
-    document.getElementById("fotoStatus").textContent =
-        `${estado.arquivos.fotos.length} ${estado.arquivos.fotos.length === 1 ? "foto" : "fotos"}`;
-
-    document.getElementById("audioStatus").textContent =
-        `${estado.arquivos.audios.length} ${estado.arquivos.audios.length === 1 ? "áudio" : "áudios"}`;
-
-    document.getElementById("videoStatus").textContent =
-        `${estado.arquivos.videos.length} ${estado.arquivos.videos.length === 1 ? "vídeo" : "vídeos"}`;
-
-    document.getElementById("exclusiveStatus").textContent =
-        `${estado.exclusivo.length} ${estado.exclusivo.length === 1 ? "arquivo" : "arquivos"}`;
+    const total = estado.arquivos.fotos.length + estado.arquivos.audios.length + estado.arquivos.videos.length;
+    document.getElementById("contador").textContent = `${total} ${total === 1 ? "mídia" : "mídias"}`;
+    document.getElementById("fotoStatus").textContent = `${estado.arquivos.fotos.length} ${estado.arquivos.fotos.length === 1 ? "foto" : "fotos"}`;
+    document.getElementById("audioStatus").textContent = `${estado.arquivos.audios.length} ${estado.arquivos.audios.length === 1 ? "áudio" : "áudios"}`;
+    document.getElementById("videoStatus").textContent = `${estado.arquivos.videos.length} ${estado.arquivos.videos.length === 1 ? "vídeo" : "vídeos"}`;
+    document.getElementById("exclusiveStatus").textContent = `${estado.exclusivo.length} ${estado.exclusivo.length === 1 ? "arquivo" : "arquivos"}`;
 }
 
 function removerLoading(id) {
@@ -1190,62 +1337,28 @@ function removerLoading(id) {
 
 function renderizarFotos() {
     const container = document.getElementById("galeria");
-
-    container.innerHTML = "";
-
-    document.getElementById("fotoEmpty").classList.toggle(
-        "visible",
-        estado.arquivos.fotos.length === 0
-    );
-
+    container.replaceChildren();
+    removerLoading("fotoLoading");
     estado.secoesRenderizadas.fotos = true;
 
-    if (!estado.arquivos.fotos.length) {
-        removerLoading("fotoLoading");
-        return;
-    }
-
     const fotos = estado.arquivos.fotos;
-    const loteInicial = Math.min(12, fotos.length);
+    const vazio = document.getElementById("fotoEmpty");
+    vazio.classList.toggle("visible", estado.carregamento === "success" && fotos.length === 0);
 
-    preCarregarImagensPrioritarias(fotos, 3);
+    if (!fotos.length) return;
 
-    for (let index = 0; index < loteInicial; index++) {
-        container.appendChild(criarCartaoFoto(fotos[index], fotos, index));
-    }
+    fotos.slice(0, 12).forEach((arquivo, index) => container.appendChild(criarCartaoFoto(arquivo, fotos, index)));
 
-    removerLoading("fotoLoading");
-
-    if (fotos.length > loteInicial) {
-        let proximo = loteInicial;
-
-        const carregarLote = () => {
-            const limite = Math.min(proximo + 12, fotos.length);
-
-            for (let index = proximo; index < limite; index++) {
-                container.appendChild(criarCartaoFoto(fotos[index], fotos, index));
-            }
-
-            proximo = limite;
-
-            if (proximo < fotos.length) {
-                requestAnimationFrame(carregarLote);
-            }
-        };
-
-        requestAnimationFrame(carregarLote);
-    }
-}
-
-function preCarregarImagensPrioritarias(lista, quantidade = 3) {
-    lista.slice(0, quantidade).forEach((arquivo, index) => {
-        const link = document.createElement("link");
-        link.rel = "preload";
-        link.as = "image";
-        link.href = arquivo.url;
-        if (index === 0) link.fetchPriority = "high";
-        document.head.appendChild(link);
-    });
+    let proximo = 12;
+    const carregarLote = () => {
+        const limite = Math.min(proximo + 12, fotos.length);
+        for (let index = proximo; index < limite; index++) {
+            container.appendChild(criarCartaoFoto(fotos[index], fotos, index));
+        }
+        proximo = limite;
+        if (proximo < fotos.length) requestAnimationFrame(carregarLote);
+    };
+    if (proximo < fotos.length) requestAnimationFrame(carregarLote);
 }
 
 function criarCartaoFoto(arquivo, lista, index) {
@@ -1260,7 +1373,6 @@ function criarCartaoFoto(arquivo, lista, index) {
 
     const imagem = document.createElement("img");
     imagem.loading = index < 8 ? "eager" : "lazy";
-    imagem.fetchPriority = index < 4 ? "high" : "auto";
     imagem.decoding = "async";
     imagem.alt = arquivo.nome;
     imagem.src = arquivo.url;
@@ -1269,11 +1381,15 @@ function criarCartaoFoto(arquivo, lista, index) {
     overlay.className = "photo-overlay";
     overlay.textContent = obterNomeSemExtensao(arquivo.nome);
 
+    imagem.addEventListener("error", () => {
+        shell.classList.add("media-load-error");
+        overlay.textContent = `${obterNomeSemExtensao(arquivo.nome)} • não foi possível exibir`;
+    }, { once: true });
+
     shell.append(imagem, overlay);
     card.appendChild(shell);
 
-    const abrir = () => abrirLightbox(arquivo, lista, index, card);
-
+    const abrir = () => abrirLightbox(arquivo, card);
     card.addEventListener("click", abrir);
     card.addEventListener("keydown", event => {
         if (event.key === "Enter" || event.key === " ") {
@@ -1288,19 +1404,15 @@ function criarCartaoFoto(arquivo, lista, index) {
 function renderizarAudios() {
     estado.secoesRenderizadas.audios = true;
     const container = document.getElementById("audios");
-    container.innerHTML = "";
+    container.replaceChildren();
     removerLoading("audioLoading");
 
-    document.getElementById("audioEmpty").classList.toggle(
-        "visible",
-        estado.arquivos.audios.length === 0
-    );
-
+    const vazio = document.getElementById("audioEmpty");
+    vazio.classList.toggle("visible", estado.carregamento === "success" && estado.arquivos.audios.length === 0);
     if (!estado.arquivos.audios.length) return;
 
     const panel = document.createElement("article");
     panel.className = "media-panel";
-
     const titulo = document.createElement("h3");
     titulo.textContent = "Áudios";
     panel.appendChild(titulo);
@@ -1308,40 +1420,40 @@ function renderizarAudios() {
     estado.arquivos.audios.forEach(arquivo => {
         const item = document.createElement("div");
         item.className = "audio-item";
-
         const nome = document.createElement("span");
         nome.className = "media-name";
         nome.textContent = arquivo.nome;
-
         const player = document.createElement("audio");
         player.controls = true;
         player.preload = "none";
         player.playsInline = true;
         player.src = arquivo.url;
-
-        item.append(nome, player);
+        const falha = document.createElement("span");
+        falha.className = "media-name";
+        falha.hidden = true;
+        falha.textContent = "Não foi possível reproduzir este áudio.";
+        player.addEventListener("error", () => {
+            falha.hidden = false;
+            console.warn("[Galeria] Falha ao carregar áudio:", arquivo.caminho);
+        }, { once: true });
+        item.append(nome, player, falha);
         panel.appendChild(item);
     });
-
     container.appendChild(panel);
 }
 
 function renderizarVideos() {
     estado.secoesRenderizadas.videos = true;
     const container = document.getElementById("videos");
-    container.innerHTML = "";
+    container.replaceChildren();
     removerLoading("videoLoading");
 
-    document.getElementById("videoEmpty").classList.toggle(
-        "visible",
-        estado.arquivos.videos.length === 0
-    );
-
+    const vazio = document.getElementById("videoEmpty");
+    vazio.classList.toggle("visible", estado.carregamento === "success" && estado.arquivos.videos.length === 0);
     if (!estado.arquivos.videos.length) return;
 
     const panel = document.createElement("article");
     panel.className = "media-panel";
-
     const titulo = document.createElement("h3");
     titulo.textContent = "Vídeos";
     panel.appendChild(titulo);
@@ -1349,42 +1461,43 @@ function renderizarVideos() {
     estado.arquivos.videos.forEach(arquivo => {
         const item = document.createElement("div");
         item.className = "video-item";
-
         const nome = document.createElement("span");
         nome.className = "media-name";
         nome.textContent = arquivo.nome;
-
         const player = document.createElement("video");
         player.controls = true;
         player.preload = "metadata";
         player.playsInline = true;
         player.src = arquivo.url;
-
         const mime = tipoMimePorArquivo(arquivo);
         if (mime) player.setAttribute("type", mime);
-
-        item.append(nome, player);
+        const falha = document.createElement("span");
+        falha.className = "media-name";
+        falha.hidden = true;
+        falha.textContent = "Não foi possível reproduzir este vídeo.";
+        player.addEventListener("error", () => {
+            falha.hidden = false;
+            console.warn("[Galeria] Falha ao carregar vídeo:", arquivo.caminho);
+        }, { once: true });
+        item.append(nome, player, falha);
         panel.appendChild(item);
     });
-
     container.appendChild(panel);
 }
 
 function renderizarExclusivo() {
     estado.secoesRenderizadas.exclusivo = true;
     const container = document.getElementById("exclusivo");
-    container.innerHTML = "";
+    container.replaceChildren();
     removerLoading("exclusiveLoading");
 
-    document.getElementById("exclusiveEmpty").classList.toggle(
-        "visible",
-        estado.exclusivo.length === 0
-    );
+    const vazio = document.getElementById("exclusiveEmpty");
+    vazio.classList.toggle("visible", estado.carregamento === "success" && estado.exclusivo.length === 0);
+    if (!estado.exclusivo.length) return;
 
     estado.exclusivo.forEach(arquivo => {
         const item = document.createElement("article");
         item.className = "exclusive-item";
-
         const nome = document.createElement("span");
         nome.className = "media-name";
         nome.textContent = arquivo.nome;
@@ -1396,70 +1509,66 @@ function renderizarExclusivo() {
             imagem.decoding = "async";
             imagem.src = arquivo.url;
             imagem.alt = arquivo.nome;
+            imagem.addEventListener("error", () => {
+                imagem.remove();
+                const falha = document.createElement("span");
+                falha.className = "media-name";
+                falha.textContent = "Não foi possível exibir esta imagem.";
+                item.appendChild(falha);
+            }, { once: true });
             item.appendChild(imagem);
-        }
-
-        if (arquivo.tipo === "audios") {
+        } else if (arquivo.tipo === "audios") {
             const audio = document.createElement("audio");
             audio.controls = true;
             audio.preload = "none";
             audio.src = arquivo.url;
+            audio.addEventListener("error", () => console.warn("[Galeria] Falha ao carregar áudio exclusivo:", arquivo.caminho), { once: true });
             item.appendChild(audio);
-        }
-
-        if (arquivo.tipo === "videos") {
+        } else {
             const video = document.createElement("video");
             video.controls = true;
             video.preload = "metadata";
             video.playsInline = true;
             video.src = arquivo.url;
-
             const mime = tipoMimePorArquivo(arquivo);
             if (mime) video.setAttribute("type", mime);
-
+            video.addEventListener("error", () => console.warn("[Galeria] Falha ao carregar vídeo exclusivo:", arquivo.caminho), { once: true });
             item.appendChild(video);
         }
-
         container.appendChild(item);
     });
 }
 
 function atualizarBotaoMusica(tocando) {
     textoMusica.textContent = "Música";
-
     if (tocando) {
         btnMusica.title = "Pausar música";
         btnMusica.setAttribute("aria-label", "Pausar música");
-        iconeMusica.innerHTML = `
-            <rect x="6" y="5" width="4" height="14" rx="1"></rect>
-            <rect x="14" y="5" width="4" height="14" rx="1"></rect>
-        `;
+        iconeMusica.innerHTML = '<rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect>';
     } else {
         btnMusica.title = "Continuar música";
         btnMusica.setAttribute("aria-label", "Continuar música");
-        iconeMusica.innerHTML = `
-            <path d="m7 4 12 8-12 8z"></path>
-        `;
+        iconeMusica.innerHTML = '<path d="m7 4 12 8-12 8z"></path>';
     }
 }
 
 function configurarMusica(configuracao) {
-    audioTema.src = construirRawUrl(`${configuracao.pastaMidia}/tema.mp3`, configuracao);
+    const url = construirRawUrl(`${configuracao.pastaMidia}/tema.mp3`, configuracao);
+    audioTema.src = url;
     audioTema.loop = true;
-    audioTema.currentTime = 0;
+    audioTema.preload = "none";
     audioTema.load();
     estado.musicaPausadaManualmente = false;
     tentarAutoplay();
 }
 
 async function tentarAutoplay() {
-    if (!audioTema.src || audioTema.paused && estado.musicaPausadaManualmente) return;
-
+    if (!audioTema.src || estado.musicaPausadaManualmente) return;
     try {
         await audioTema.play();
         atualizarBotaoMusica(true);
         removerListenersDeAutoplay();
-    } catch (_) {
+    } catch {
         atualizarBotaoMusica(false);
     }
 }
@@ -1479,40 +1588,40 @@ async function alternarMusica() {
     if (audioTema.paused) {
         estado.musicaPausadaManualmente = false;
         await tentarAutoplay();
-        return;
+    } else {
+        estado.musicaPausadaManualmente = true;
+        audioTema.pause();
+        atualizarBotaoMusica(false);
     }
-
-    estado.musicaPausadaManualmente = true;
-    audioTema.pause();
-    atualizarBotaoMusica(false);
 }
 
 btnMusica.addEventListener("click", alternarMusica);
 document.addEventListener("pointerdown", lidarInteracaoAutoplay);
 document.addEventListener("touchstart", lidarInteracaoAutoplay);
 document.addEventListener("keydown", lidarInteracaoAutoplay);
-
 audioTema.addEventListener("play", () => atualizarBotaoMusica(true));
 audioTema.addEventListener("pause", () => atualizarBotaoMusica(false));
 audioTema.addEventListener("error", () => atualizarBotaoMusica(false));
 
-function abrirLightbox(arquivo, lista, index, origem) {
+function abrirLightbox(arquivo, origem) {
     const lightbox = document.getElementById("lightbox");
     const content = document.getElementById("lightboxContent");
     const caption = document.getElementById("lightboxCaption");
-
     estado.ultimaFocada = origem;
     estado.lightboxAberto = true;
-    content.innerHTML = "";
+    content.replaceChildren();
 
     const imagem = document.createElement("img");
     imagem.className = "lightbox-img";
     imagem.src = arquivo.url;
     imagem.alt = arquivo.nome;
+    imagem.addEventListener("error", () => {
+        content.textContent = "Não foi possível exibir esta imagem.";
+        console.warn("[Galeria] Falha no lightbox:", arquivo.caminho);
+    }, { once: true });
 
     content.appendChild(imagem);
     caption.textContent = arquivo.nome;
-
     lightbox.classList.add("aberto");
     lightbox.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
@@ -1526,13 +1635,11 @@ function abrirLightbox(arquivo, lista, index, origem) {
 function fecharLightbox(viaHistorico = false) {
     const lightbox = document.getElementById("lightbox");
     if (!estado.lightboxAberto) return;
-
     estado.lightboxAberto = false;
     lightbox.classList.remove("aberto");
     lightbox.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
-
-    document.getElementById("lightboxContent").innerHTML = "";
+    document.getElementById("lightboxContent").replaceChildren();
     document.getElementById("lightboxCaption").textContent = "";
 
     const foco = estado.ultimaFocada;
@@ -1543,33 +1650,27 @@ function fecharLightbox(viaHistorico = false) {
         history.back();
         return;
     }
-
     estado.lightboxUsouHistorico = false;
-
-    if (foco && typeof foco.focus === "function") {
-        requestAnimationFrame(() => foco.focus());
-    }
+    if (foco && typeof foco.focus === "function") requestAnimationFrame(() => foco.focus());
 }
 
 document.getElementById("lightboxClose").addEventListener("click", () => fecharLightbox());
 document.getElementById("lightbox").addEventListener("click", event => {
     if (event.target.id === "lightbox") fecharLightbox();
 });
-
 document.addEventListener("keydown", event => {
     if (event.key === "Escape" && estado.lightboxAberto) fecharLightbox();
 });
-
 window.addEventListener("popstate", () => {
     if (estado.lightboxAberto) fecharLightbox(true);
 });
 
 function renderizarSecao(nome) {
+    if (estado.carregamento !== "success") return;
     if (estado.secoesRenderizadas[nome]) return;
-
     if (nome === "audios") renderizarAudios();
-    if (nome === "videos") renderizarVideos();
-    if (nome === "exclusivo") renderizarExclusivo();
+    else if (nome === "videos") renderizarVideos();
+    else if (nome === "exclusivo") renderizarExclusivo();
 }
 
 function trocarSecao(nome) {
@@ -1578,13 +1679,11 @@ function trocarSecao(nome) {
         botao.classList.toggle("active", ativo);
         botao.setAttribute("aria-selected", String(ativo));
     });
-
     document.querySelectorAll(".section").forEach(secao => {
         const ativo = secao.id === `section-${nome}`;
         secao.classList.toggle("active", ativo);
         secao.hidden = !ativo;
     });
-
     renderizarSecao(nome);
 }
 
@@ -1596,9 +1695,18 @@ document.getElementById("btnVoltar").addEventListener("click", () => {
     window.location.href = "home.html";
 });
 
+galleryRetry.addEventListener("click", () => {
+    carregarCatalogo({ forcar: true }).catch(() => {});
+});
+
 async function iniciar() {
     estado.usuario = obterUsuario();
-    await carregarCatalogo();
+    console.info("[Galeria] Usuário normalizado:", estado.usuario || "não identificado");
+    try {
+        await carregarCatalogo();
+    } catch {
+        // O estado visual e o console já foram atualizados por carregarCatalogo().
+    }
 }
 
 iniciar();
