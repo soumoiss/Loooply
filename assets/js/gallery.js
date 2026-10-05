@@ -116,36 +116,82 @@ function pathIsExclusive(src) {
 }
 
 
+function titleFromPath(src) {
+  const name = String(src || "")
+    .split("/")
+    .filter(Boolean)
+    .pop() || "";
+
+  return name
+    .replace(/\.[^.]+$/, "")
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim() || "Mídia sem título";
+}
+
+
+function mediaUrl(value) {
+  const src = String(value || "").trim();
+  return src ? encodeURI(src) : "";
+}
+
+
+function normalizeType(value) {
+  const type = String(value || "").trim().toLowerCase();
+
+  if (["image", "imagem", "foto", "fotos"].includes(type)) {
+    return "image";
+  }
+
+  if (["video", "vídeo", "videos", "vídeos"].includes(type)) {
+    return "video";
+  }
+
+  if (["audio", "áudio", "audios", "áudios"].includes(type)) {
+    return "audio";
+  }
+
+  return "";
+}
+
+
 function normalizeItem(item, index) {
   const source = item || {};
 
+  const src = mediaUrl(
+    source.src || source.path || source.url
+  );
+
   const type =
-    String(
-      source.type || "image"
-    ).toLowerCase();
-
-
-  const src =
-    String(source.src || "");
-
+    normalizeType(source.type) ||
+    (src.match(/\.(jpe?g|png|webp|gif|avif|bmp|svg|heic|heif|jfif|tiff?|)$/i)
+      ? "image"
+      : src.match(/\.(mp4|webm|mov|m4v|ogv|avi|mkv)$/i)
+        ? "video"
+        : "audio");
 
   const owner =
-    canonicalUsername(source.owner)
-    || inferOwner(src);
+    canonicalUsername(source.owner) ||
+    inferOwner(src);
 
-
-  /*
-   * Mesmo que o JSON antigo diga
-   * exclusive:false, uma mídia dentro
-   * de midia/Misol/, midia/Patati/,
-   * midia/Lilika/ ou midia/YARA/
-   * será considerada exclusiva.
-   */
   const exclusive =
-    Boolean(source.exclusive)
-    || Boolean(owner)
-    || pathIsExclusive(src);
+    Boolean(source.exclusive) ||
+    Boolean(owner) ||
+    pathIsExclusive(src);
 
+  const dateValue =
+    String(
+      source.date ||
+      source.modified ||
+      ""
+    );
+
+  const dateISO =
+    /^\d{4}-\d{2}-\d{2}$/.test(dateValue)
+      ? dateValue
+      : (/^\d{4}-\d{2}-\d{2}/.test(dateValue)
+        ? dateValue.slice(0, 10)
+        : "");
 
   return {
     id: String(
@@ -155,30 +201,22 @@ function normalizeItem(item, index) {
 
     title: String(
       source.title ||
-      "Mídia sem título"
+      source.name ||
+      titleFromPath(src)
     ),
 
-    type: [
-      "image",
-      "video",
-      "audio"
-    ].includes(type)
-      ? type
-      : "image",
+    type,
 
     src,
 
-    thumb: String(
-      source.thumb || src
+    thumb: mediaUrl(
+      source.thumb ||
+      (type === "image" ? src : "")
     ),
 
-    date: fromISO(
-      source.date
-    ),
+    date: fromISO(dateISO),
 
-    iso: String(
-      source.date || ""
-    ),
+    iso: dateISO,
 
     tags: Array.isArray(source.tags)
       ? source.tags.map(String)
@@ -199,18 +237,15 @@ function normalizeItem(item, index) {
 
 
 async function fetchIndex() {
-  const response =
-    await fetch(
-      APP_CONFIG.data.gallery,
-      {
-        cache: "no-cache",
-        headers: {
-          Accept:
-            "application/json"
-        }
+  const response = await fetch(
+    APP_CONFIG.data.gallery,
+    {
+      cache: "no-cache",
+      headers: {
+        Accept: "application/json"
       }
-    );
-
+    }
+  );
 
   if (!response.ok) {
     throw new Error(
@@ -218,18 +253,67 @@ async function fetchIndex() {
     );
   }
 
+  const data = await response.json();
 
-  const data =
-    await response.json();
+  if (Array.isArray(data)) {
+    return data;
+  }
 
+  const result = [];
+  const seen = new Set();
 
-  return Array.isArray(data)
-    ? data
-    : (
-      Array.isArray(data?.items)
-        ? data.items
-        : []
+  const add = (item, owner = "") => {
+    if (!item || typeof item !== "object") return;
+
+    const candidate = {
+      ...item,
+      ...(owner ? { owner, exclusive: true } : {})
+    };
+
+    const key = String(
+      candidate.path ||
+      candidate.src ||
+      `${candidate.type || ""}:${candidate.name || ""}`
     );
+
+    if (seen.has(key)) return;
+
+    seen.add(key);
+    result.push(candidate);
+  };
+
+  if (Array.isArray(data.items)) {
+    for (const item of data.items) {
+      add(item);
+    }
+  }
+
+  for (const item of Array.isArray(data.fotos) ? data.fotos : []) {
+    add(item);
+  }
+
+  for (const item of Array.isArray(data.videos) ? data.videos : []) {
+    add(item);
+  }
+
+  for (const item of Array.isArray(data.audios) ? data.audios : []) {
+    add(item);
+  }
+
+  if (data.exclusivo && typeof data.exclusivo === "object") {
+    for (const [owner, items] of Object.entries(data.exclusivo)) {
+      if (!Array.isArray(items)) continue;
+
+      const canonicalOwner = canonicalUsername(owner);
+      if (!canonicalOwner) continue;
+
+      for (const item of items) {
+        add(item, canonicalOwner);
+      }
+    }
+  }
+
+  return result;
 }
 
 

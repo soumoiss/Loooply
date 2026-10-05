@@ -1,6 +1,5 @@
-// Credenciais migradas do login original para um registro centralizado.
-// O aplicativo continua sendo client-side: hashes no navegador não substituem
-// autenticação de servidor e não devem ser tratados como segredo.
+// Registro local dos usuários do aplicativo.
+// A autenticação continua sendo client-side e não substitui um backend seguro.
 export const USER_REGISTRY = Object.freeze({
   Patati: Object.freeze({
     passwordHash: "8e7ef22586692050a1086b01128a2deb983147a0d54fca3eb14cad4de84db5e4",
@@ -22,10 +21,18 @@ export const USER_REGISTRY = Object.freeze({
 
 export const USERNAMES = Object.freeze(Object.keys(USER_REGISTRY));
 
+export function canonicalUsername(value) {
+  const normalized = String(value || "").trim().toLocaleLowerCase("pt-BR");
+  return USERNAMES.find(
+    (username) => username.toLocaleLowerCase("pt-BR") === normalized
+  ) || "";
+}
+
 export function getUser(username) {
-  return USER_REGISTRY[username] || null;
+  const canonical = canonicalUsername(username);
+  return canonical ? USER_REGISTRY[canonical] : null;
 }
 
 export function userExists(username) {
-  return Boolean(getUser(String(username || "").trim()));
+  return Boolean(canonicalUsername(username));
 }

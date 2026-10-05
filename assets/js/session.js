@@ -1,5 +1,5 @@
 import { APP_CONFIG } from "./config.js";
-import { getUser, userExists } from "./users.js";
+import { canonicalUsername, getUser, userExists } from "./users.js";
 import {
   readJSON,
   readString,
@@ -20,7 +20,7 @@ async function sha256Hex(value) {
 }
 
 function normalizeUsername(value) {
-  return String(value || "").trim();
+  return canonicalUsername(value);
 }
 
 export async function authenticate(username, password) {
