@@ -2,7 +2,12 @@ import { APP_CONFIG, CARD_STATUS } from "./config.js";
 import { bindNavigation, navigate } from "./navigation.js";
 import { requireAuth, logout } from "./session.js";
 import { getReadCards, markCardRead } from "./storage.js";
-import { CardRepository, buildCardRow, updateCardRow } from "./cards.js";
+import {
+  CardRepository,
+  buildCardRow,
+  updateCardRow,
+  unlockCard
+} from "./cards.js";
 import { formatShort, formatFull, formatMonthYear, toISO, fromISO, sameDay, firstDayOfMonth, addMonths } from "./date-parser.js";
 
 const state = {
@@ -232,9 +237,64 @@ function modalElements() {
     title: $("#modalTitulo"),
     date: $("#modalData"),
     text: $("#modalTexto"),
+    unlock: $("#modalUnlock"),
+    hint: $("#modalHint"),
+    password: $("#modalPassword"),
+    unlockButton: $("#modalUnlockButton"),
+    unlockError: $("#modalUnlockError"),
     previous: $("#modalPrevious"),
     next: $("#modalNext")
   };
+}
+
+function showModalContent(value) {
+  const { text, unlock } = modalElements();
+
+  if (unlock) unlock.hidden = true;
+
+  if (text) {
+    text.hidden = false;
+    text.textContent = String(value || "");
+  }
+}
+
+function showUnlockPrompt(card) {
+  const { text, unlock, hint, password, unlockError } = modalElements();
+
+  if (text) {
+    text.hidden = true;
+    text.textContent = "";
+  }
+
+  if (unlock) unlock.hidden = false;
+
+  if (hint) {
+    hint.textContent = card?.hint
+      ? `Dica: ${card.hint}`
+      : "Dica: nenhuma dica foi configurada para esta carta.";
+  }
+
+  if (password) {
+    password.value = "";
+    password.focus();
+  }
+
+  if (unlockError) {
+    unlockError.textContent = "";
+    unlockError.classList.remove("show");
+  }
+}
+
+function showUnlockError() {
+  const { unlockError, password } = modalElements();
+
+  if (unlockError) {
+    unlockError.textContent = "Senha incorreta. Tente novamente.";
+    unlockError.classList.add("show");
+  }
+
+  password?.focus();
+  password?.select?.();
 }
 
 function setModal(open) {
@@ -266,38 +326,108 @@ function focusModalText() {
 async function openCard(number) {
   const card = state.repository?.get(number);
   if (!card) return;
+
   state.lastFocused = document.activeElement;
   state.modalNumber = Number(number);
-  const { title, date, text } = modalElements();
-  if (title) title.textContent = card.title || "Carregando…";
-  if (date) date.textContent = card.date ? formatShort(card.date) : "";
-  if (text) text.textContent = card.text || "Carregando carta…";
+
+  const { title, date } = modalElements();
+
+  if (title) {
+    title.textContent = card.isProtected && !card.unlocked
+      ? "Carta protegida"
+      : card.title || "Carregando…";
+  }
+
+  if (date) {
+    date.textContent = card.date ? formatShort(card.date) : "";
+  }
+
+  if (card.isProtected && !card.unlocked) {
+    showUnlockPrompt(card);
+  } else {
+    showModalContent(card.text || "Carregando carta…");
+  }
+
   setModal(true);
-  focusModalText();
 
   let current = card;
+
   if (current.status !== CARD_STATUS.ready) {
     current = await state.repository.loadOne(number);
     updateRow(current);
-    if (title) title.textContent = current.title;
-    if (date) date.textContent = current.date ? formatShort(current.date) : "";
-    if (text) text.textContent = current.status === CARD_STATUS.ready
-      ? current.text
-      : current.status === CARD_STATUS.unavailable
-        ? "Esta carta ainda não está disponível no conjunto de arquivos enviado."
-        : "Não foi possível carregar esta carta.";
+
+    if (title) {
+      title.textContent = current.isProtected && !current.unlocked
+        ? "Carta protegida"
+        : current.title;
+    }
+
+    if (date) {
+      date.textContent = current.date ? formatShort(current.date) : "";
+    }
   }
 
-  if (current.status === CARD_STATUS.ready) {
+  if (current.status !== CARD_STATUS.ready) {
+    showModalContent(
+      current.status === CARD_STATUS.unavailable
+        ? "Esta carta ainda não está disponível no conjunto de arquivos enviado."
+        : "Não foi possível carregar esta carta."
+    );
+  } else if (current.isProtected && !current.unlocked) {
+    showUnlockPrompt(current);
+  } else {
+    showModalContent(current.text);
     state.reads = markCardRead(state.session.username, number);
     updateRow(current);
     updateOverview();
   }
+
   updateModalNavigation();
 }
 
+
+function submitUnlock() {
+  const card = state.repository?.get(state.modalNumber);
+  if (!card?.isProtected) return;
+
+  const { password, title } = modalElements();
+  const result = unlockCard(card, password?.value || "");
+
+  if (!result.ok) {
+    showUnlockError();
+    return;
+  }
+
+  if (title) title.textContent = card.title || "Carta";
+  showModalContent(result.text);
+
+  state.reads = markCardRead(state.session.username, card.number);
+  updateRow(card);
+  updateOverview();
+  updateModalNavigation();
+
+  focusModalText();
+}
+
 function closeCard() {
+  const { text, unlock, password, hint, unlockError } = modalElements();
+
   setModal(false);
+
+  if (text) {
+    text.textContent = "";
+    text.hidden = false;
+  }
+
+  if (unlock) unlock.hidden = true;
+  if (password) password.value = "";
+  if (hint) hint.textContent = "";
+
+  if (unlockError) {
+    unlockError.textContent = "";
+    unlockError.classList.remove("show");
+  }
+
   state.modalNumber = null;
   state.lastFocused?.focus?.();
 }
@@ -310,17 +440,44 @@ function moveModal(step) {
 }
 
 function setupModal() {
-  const { modal, previous, next } = modalElements();
-  modal?.addEventListener("click", (event) => { if (event.target === modal) closeCard(); });
+  const {
+    modal,
+    previous,
+    next,
+    unlockButton,
+    password
+  } = modalElements();
+
+  modal?.addEventListener("click", (event) => {
+    if (event.target === modal) closeCard();
+  });
+
   $("#modalClose")?.addEventListener("click", closeCard);
   $("#modalCloseFooter")?.addEventListener("click", closeCard);
   previous?.addEventListener("click", () => moveModal(-1));
   next?.addEventListener("click", () => moveModal(1));
+
+  unlockButton?.addEventListener("click", submitUnlock);
+
+  password?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      submitUnlock();
+    }
+  });
+
   document.addEventListener("keydown", (event) => {
     if (!$("#modal")?.classList.contains("is-open")) return;
     if (event.key === "Escape") closeCard();
-    if (event.key === "ArrowLeft") moveModal(-1);
-    if (event.key === "ArrowRight") moveModal(1);
+
+    const active = document.activeElement;
+    const typing =
+      active?.tagName === "INPUT" ||
+      active?.tagName === "TEXTAREA" ||
+      active?.isContentEditable;
+
+    if (!typing && event.key === "ArrowLeft") moveModal(-1);
+    if (!typing && event.key === "ArrowRight") moveModal(1);
   });
 }
 

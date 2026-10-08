@@ -38,6 +38,36 @@ function normalizeText(text) {
     .trim();
 }
 
+function parseCardText(rawText) {
+  const source = String(rawText || "").replace(/\r/g, "");
+  const lines = source.split("\n");
+
+  const firstLine = (lines[0] || "").trim();
+  const protectedMatch = firstLine.match(
+    /^Essa carta é protegida pela senha:\s*(.*)$/i
+  );
+
+  if (!protectedMatch) {
+    return {
+      isProtected: false,
+      password: "",
+      hint: "",
+      text: source
+    };
+  }
+
+  const password = protectedMatch[1].trim();
+  const secondLine = (lines[1] || "").trim();
+  const hintMatch = secondLine.match(/^Dica\s*:\s*(.*)$/i);
+
+  return {
+    isProtected: true,
+    password,
+    hint: hintMatch ? hintMatch[1].trim() : "",
+    text: lines.slice(2).join("\n")
+  };
+}
+
 function normalizeWord(word) {
   return String(word || "")
     .toLocaleLowerCase("pt-BR")
@@ -389,6 +419,11 @@ export class CardRepository {
         fileName: this.getFileName(n),
         title: "Analisando carta...",
         text: "",
+        protectedText: "",
+        password: "",
+        hint: "",
+        isProtected: false,
+        unlocked: false,
         date: null,
         iso: null,
         status: CARD_STATUS.loading,
@@ -448,16 +483,31 @@ export class CardRepository {
          * A carta inteira é carregada antes da geração do título.
          * Nada é cortado antes da análise.
          */
-        const text = await response.text();
+        const rawText = await response.text();
+        const parsed = parseCardText(rawText);
 
-        const date = extractDate(text);
+        const date = extractDate(parsed.text);
 
-        card.text = text;
+        card.isProtected = parsed.isProtected;
+        card.password = parsed.password;
+        card.hint = parsed.hint;
+        card.unlocked = false;
+        card.protectedText = parsed.isProtected ? parsed.text : "";
 
         /*
-         * O conteúdo completo da carta é enviado ao gerador.
+         * Cartas protegidas nunca recebem o corpo no campo público `text`
+         * enquanto permanecerem trancadas. Isso impede que o leitor/modais
+         * existentes exibam o conteúdo antes da autenticação local.
          */
-        card.title = generateTitleFromText(text);
+        card.text = parsed.isProtected ? "" : parsed.text;
+
+        /*
+         * O corpo de uma carta protegida não é usado para gerar título.
+         * Assim, nenhum trecho do texto privado vaza para a lista.
+         */
+        card.title = parsed.isProtected
+          ? "Carta protegida"
+          : generateTitleFromText(parsed.text);
 
         card.date = date;
         card.iso = date ? toISO(date) : null;
@@ -528,6 +578,23 @@ export class CardRepository {
   }
 }
 
+export function unlockCard(card, password) {
+  if (!card?.isProtected) {
+    return { ok: true, text: card?.text || "" };
+  }
+
+  const supplied = String(password ?? "").trim();
+
+  if (supplied !== String(card.password || "").trim()) {
+    return { ok: false, text: "" };
+  }
+
+  card.unlocked = true;
+  card.text = card.protectedText || "";
+
+  return { ok: true, text: card.text };
+}
+
 export function buildCardRow({ card, read }) {
   const row = document.createElement("article");
 
@@ -544,7 +611,7 @@ export function buildCardRow({ card, read }) {
 
     <div class="card-info">
       <span class="card-label">
-        Carta ${String(card.number).padStart(2, "0")}
+        Carta ${String(card.number).padStart(2, "0")}${card.isProtected ? " 🔒" : ""}
       </span>
 
       <h3 class="card-title"></h3>
@@ -564,6 +631,13 @@ export function updateCardRow(row, card, read) {
   if (!row || !card) return;
 
   row.dataset.status = card.status;
+  row.classList.toggle("is-protected", Boolean(card.isProtected));
+  row.setAttribute(
+    "aria-label",
+    card.isProtected
+      ? `Carta ${String(card.number).padStart(2, "0")}, protegida por senha`
+      : `Carta ${String(card.number).padStart(2, "0")}`
+  );
 
   row.classList.toggle(
     "is-unavailable",
@@ -576,7 +650,9 @@ export function updateCardRow(row, card, read) {
   const check = row.querySelector(".card-check");
 
   if (title) {
-    title.textContent = card.title || "Sem título";
+    title.textContent = card.isProtected && !card.unlocked
+      ? "Carta protegida por senha"
+      : card.title || "Sem título";
   }
 
   if (date) {
