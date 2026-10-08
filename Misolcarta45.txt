@@ -1,0 +1,21 @@
+Oii, ei, vocês. Então… acho que nunca falei desse aplicativo direito pra vocês, né? KKKKK. Pois é, eu fiz isso aqui há um bom tempo. Na verdade, a primeira versão começou no ano passado e desde então, eu fui mexendo, quebrando a cabeça, aprendendo coisa que eu nem sabia que existia e tentando fazer ficar minimamente “da hora”.
+ Eu não sou exatamente o cara da programação, muito menos alguém que entende profundamente dessas coisas. Quando comecei a aprender o básico, foi mais porque eu queria encontrar uma forma diferente de demonstrar o quanto vocês são importantes pra mim. Vocês são algumas das pessoas que eu mais amo, meus melhores amigos e de alguma forma, fazem parte de quem eu sou. Então eu pensei: por que não criar um lugar só nosso?
+ Foi daí que nasceu isso aqui.
+ O Loooply é um aplicativo de cartas, músicas, fotos, vídeos e lembranças. No começo, ele era praticamente feito só para o Gabriel e a Grazielly. Cada um tinha suas cartas e eram somente cartas. Só que, meu Deus, administrar aquilo era muito difícil KKKKK. Eu tinha que mexer em um código para uma coisa, em outro para outra, e quando percebi que precisava manter tudo funcionando para duas pessoas de formas diferentes, já estava ficando muito mais complicado do que eu imaginava.
+ E o pior é que eu tinha colocado umas sete cartas só pra uma pessoa (site da Yara) naquela ideia antiga e mesmo sendo poucas já era um trabalhão para adicionar e organizar tudo. Imagina manter dois “sistemas” assim. 😭
+ Então eu decidi fazer diferente. Peguei o código-base, praticamente reconstruí uma parte enorme dele e passei muito, muito tempo tentando criar uma forma mais automática de administrar tudo. Deu trabalho de verdade. Teve coisa que eu passei horas tentando entender, erro atrás de erro, coisa que funcionava e depois simplesmente parava de funcionar KKKKK.
+Mas no fim, consegui deixar tudo muito mais simples de administrar e também muito mais bonito e organizado.
+ E foi justamente nessa nova versão que eu pensei em transformar aquilo em algo que pudesse reunir vocês três. Então agora o Looply não é mais só uma coisa feita para duas pessoas. Ele é um espaço para nós três.
+ E tem uma coisa que talvez vocês reparem: o nome.
+ Looply.
+ Eu escolhi esse nome porque vem de "Loop + Friendly", algo como “um loop de amizade”. A ideia é bem simples, mas significa bastante pra mim.
+ Eu sei que amizades não são perfeitas. A gente discute, se distancia, passa dias ou até períodos sem conversar direito, muda, cresce, segue caminhos diferentes… mas eu gosto de acreditar que algumas pessoas sempre encontram uma forma de voltar. Como um loop.
+ A amizade pode dar voltas, mas o carinho permanece e de algum jeito a gente acaba se encontrando novamente.
+ Foi isso que eu quis colocar nesse nome.
+ Por isso esse aplicativo nunca foi só um projeto de programação pra mim. É meio que uma cápsula de coisas que eu não queria deixar simplesmente passar.
+ Tem cartas porque algumas coisas eu prefiro escrever. Tem músicas porque às vezes uma música consegue dizer algo que eu não conseguiria. Tem fotos e vídeos porque existem momentos que merecem ficar guardados. E tem coisas que simplesmente me fazem lembrar vocês.
+ É um lugar cheio de erros e feito por alguém que definitivamente não é programador KKKKK, mas foi feito com muito tempo, muita insistência e principalmente com muito carinho.
+ Então… sejam bem-vindos ao Loooply.
+ Espero que vocês gostem. E por favor, não reparem demais nos bugs, porque cada vez que eu lembro de quanto tempo passei tentando fazer isso funcionar, eu já considero uma vitória ele estar aberto KKKKK.
+ Mas brincadeiras à parte kakakaka eu fiz tudo isso porque algumas pessoas são importantes demais para simplesmente deixarem de ser registradas.
+E vocês três são algumas dessas pessoas.
