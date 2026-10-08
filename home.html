@@ -101,6 +101,36 @@
             <button class="modal-close" id="modalClose" type="button" aria-label="Fechar carta">×</button>
           </div>
         </header>
+
+        <div id="modalUnlock" hidden>
+          <div style="padding:22px;">
+            <p style="margin:0 0 6px; color:var(--paper-text); font-weight:800; font-size:16px;">
+              Esta carta está protegida.
+            </p>
+            <p id="modalHint" style="margin:0 0 18px; color:#8b7f72; font-size:13px; line-height:1.5;"></p>
+
+            <div class="form-field">
+              <label class="form-label" for="modalPassword">Senha</label>
+              <div class="input-wrap">
+                <input
+                  class="input password-input"
+                  id="modalPassword"
+                  type="password"
+                  autocomplete="current-password"
+                  placeholder="Digite a senha"
+                  aria-describedby="modalHint modalUnlockError"
+                >
+              </div>
+            </div>
+
+            <button class="login-button" id="modalUnlockButton" type="button">
+              Desbloquear carta
+            </button>
+
+            <div class="form-message" id="modalUnlockError" role="alert" aria-live="assertive"></div>
+          </div>
+        </div>
+
         <div class="modal-text" id="modalTexto" tabindex="0" aria-live="polite">Carregando carta…</div>
         <footer class="modal-footer"><button id="modalCloseFooter" type="button">Fechar carta</button></footer>
       </article>
