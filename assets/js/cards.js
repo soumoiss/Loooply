@@ -325,15 +325,6 @@ export function generateTitleFromText(text) {
     return "Carta sem conteúdo";
   }
 
-  /*
-   * O título agora é escolhido considerando a carta inteira.
-   *
-   * A prioridade é:
-   * 1. Um possível título escrito na própria carta.
-   * 2. A frase mais representativa depois da análise de todo o texto.
-   * 3. Um trecho relevante da carta como fallback.
-   */
-
   const explicitHeading = findStrongHeading(clean);
 
   if (explicitHeading) {
@@ -410,7 +401,19 @@ export class CardRepository {
   }
 
   getAll() {
-    return [...this.cards.values()].sort((a, b) => Number(b.isPrivateFile) - Number(a.isPrivateFile) || (a.isPrivateFile ? a.privateNumber - b.privateNumber : a.number - b.number));
+    return [...this.cards.values()].sort((a, b) => {
+      // As cartas privadas sempre vêm primeiro.
+      if (a.isPrivateFile && !b.isPrivateFile) return -1;
+      if (!a.isPrivateFile && b.isPrivateFile) return 1;
+
+      // Ordena as cartas privadas pela numeração privada.
+      if (a.isPrivateFile && b.isPrivateFile) {
+        return a.privateNumber - b.privateNumber;
+      }
+
+      // Depois das privadas, ordena as cartas normais.
+      return a.number - b.number;
+    });
   }
 
   getAvailable() {
@@ -473,9 +476,6 @@ export class CardRepository {
 
         let response = await fetch(card.fileName, requestOptions);
 
-        // Alguns arquivos privados usam dois dígitos (carta01.txt),
-        // enquanto outros usam um (carta1.txt). Tente ambos sem misturar
-        // a numeração privada com a numeração das cartas normais.
         if (!response.ok && response.status === 404 && card.isPrivateFile) {
           const paddedFileName = `${this.username}cartaprivada${String(card.privateNumber).padStart(2, "0")}.txt`;
           if (paddedFileName !== card.fileName) {
@@ -510,10 +510,6 @@ export class CardRepository {
           return card;
         }
 
-        /*
-         * A carta inteira é carregada antes da geração do título.
-         * Nada é cortado antes da análise.
-         */
         const rawText = await response.text();
         const parsed = parseCardText(rawText);
 
@@ -525,17 +521,8 @@ export class CardRepository {
         card.unlocked = false;
         card.protectedText = card.isProtected ? parsed.text : "";
 
-        /*
-         * Cartas protegidas nunca recebem o corpo no campo público `text`
-         * enquanto permanecerem trancadas. Isso impede que o leitor/modais
-         * existentes exibam o conteúdo antes da autenticação local.
-         */
         card.text = card.isProtected ? "" : parsed.text;
 
-        /*
-         * O corpo de uma carta protegida não é usado para gerar título.
-         * Assim, nenhum trecho do texto privado vaza para a lista.
-         */
         card.title = card.isPrivateFile
           ? "Carta privada protegida"
           : parsed.isProtected ? "Carta protegida" : generateTitleFromText(parsed.text);
@@ -575,7 +562,6 @@ export class CardRepository {
     this.stats.startedAt = performance.now();
 
     const normalQueue = Array.from({ length: this.total }, (_, index) => index + 1);
-    // IDs negativos mantêm as privadas independentes da numeração normal.
     const privateQueue = Array.from({ length: this.total }, (_, index) => -(index + 1));
     const queue = [...privateQueue, ...normalQueue];
 
@@ -586,11 +572,9 @@ export class CardRepository {
         const number = queue[cursor++];
         const card = number < 0 ? this.seedPrivate(Math.abs(number)) : this.seed(number);
         const loaded = await this.loadOne(number);
-        // Arquivos privados ausentes são esperados: não os mostre como cartas inexistentes.
+
         if (loaded.isPrivateFile && loaded.status === CARD_STATUS.unavailable) {
           this.cards.delete(number);
-          // A interface precisa ser avisada para remover a linha provisória;
-          // caso contrário, ela fica exibindo "Carregando..." para sempre.
           onEach?.(loaded);
           continue;
         }
