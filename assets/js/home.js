@@ -83,8 +83,10 @@ function createRows() {
   const fragment = document.createDocumentFragment();
   state.repository.cards.clear();
   state.repository.total = APP_CONFIG.totalCards;
-  for (let number = 1; number <= APP_CONFIG.totalCards; number += 1) {
-    const card = state.repository.seed(number);
+  for (let number = 1; number <= APP_CONFIG.totalCards; number += 1) state.repository.seed(number);
+  for (let number = 1; number <= APP_CONFIG.totalCards; number += 1) state.repository.seedPrivate(number);
+  for (const card of state.repository.getAll()) {
+    const number = card.number;
     const row = buildCardRow({ card, read: state.reads[number] === true });
     row.addEventListener("click", () => openCard(number));
     row.addEventListener("keydown", (event) => {
