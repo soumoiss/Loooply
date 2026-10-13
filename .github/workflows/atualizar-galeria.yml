@@ -45,4 +45,17 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/midia-index.json
           git commit -m "chore: atualizar índice da galeria"
-          git push
+          # Reintegra commits concorrentes antes de publicar; nunca usa force push.
+          for attempt in 1 2 3; do
+            git fetch origin "${GITHUB_REF_NAME}"
+            if ! git rebase "origin/${GITHUB_REF_NAME}"; then
+              git rebase --abort || true
+              echo "Conflito durante rebase; nenhuma alteração foi forçada." >&2
+              exit 1
+            fi
+            if git push origin "HEAD:${GITHUB_REF_NAME}"; then
+              exit 0
+            fi
+            echo "Push concorrente; nova tentativa ${attempt}/3."
+          echo "Não foi possível publicar o índice após 3 tentativas." >&2
+          exit 1
