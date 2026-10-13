@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -13,6 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MEDIA_DIR = ROOT / "midia"
 OUTPUT = ROOT / "data" / "midia-index.json"
+
 
 USERS = {
     "patati": "Patati",
@@ -100,14 +102,30 @@ def media_type_for(path: Path) -> str:
     raise ValueError(f"Extensão não suportada: {extension}")
 
 
-def build_item(path: Path) -> dict:
+def git_first_added_at(path: Path) -> str | None:
+    """Data do commit que introduziu o arquivo; não usa mtime do checkout."""
+    relative = path.relative_to(ROOT).as_posix()
+    try:
+        result = subprocess.run(
+            ["git", "log", "--follow", "--diff-filter=A", "--format=%aI", "--", relative],
+            cwd=ROOT, check=False, capture_output=True, text=True, timeout=10,
+        )
+        values = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+        # git log apresenta o commit de adição mais recente primeiro; a primeira adição é a última linha.
+        return values[-1] if result.returncode == 0 and values else None
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+
+def build_item(path: Path, previous_dates: dict[str, str]) -> dict:
     relative = path.relative_to(ROOT).as_posix()
     stat = path.stat()
-    modified = datetime.fromtimestamp(
-        stat.st_mtime,
-        tz=timezone.utc,
-    ).isoformat()
-
+    # A data já publicada nunca é substituída por uma nova data de geração.
+    uploaded_at = previous_dates.get(relative) or git_first_added_at(path) or date_from_path(path)
+    if uploaded_at and re.fullmatch(r"\d{4}-\d{2}-\d{2}", uploaded_at):
+        uploaded_at = f"{uploaded_at}T12:00:00+00:00"
+    if not uploaded_at:
+        uploaded_at = datetime.fromtimestamp(stat.st_mtime, tz=timezone.utc).isoformat()
     return {
         "path": relative,
         "name": path.name,
@@ -118,7 +136,8 @@ def build_item(path: Path) -> dict:
         "ratio": 0.0,
         "bytes": stat.st_size,
         "mtime": stat.st_mtime,
-        "modified": modified,
+        "uploadedAt": uploaded_at,
+        "modified": uploaded_at,
     }
 
 
@@ -130,12 +149,21 @@ def main() -> None:
     MEDIA_DIR.mkdir(parents=True, exist_ok=True)
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
 
+    previous_dates: dict[str, str] = {}
+    if OUTPUT.exists():
+        try:
+            previous = json.loads(OUTPUT.read_text(encoding="utf-8"))
+            collections = [previous.get("fotos", []), previous.get("audios", []), previous.get("videos", [])]
+            collections.extend((previous.get("exclusivo") or {}).values())
+            for collection in collections:
+                for item in collection if isinstance(collection, list) else []:
+                    if isinstance(item, dict) and item.get("path") and item.get("uploadedAt"):
+                        previous_dates[str(item["path"])] = str(item["uploadedAt"])
+        except (OSError, ValueError, TypeError):
+            pass
+
     files = sorted(
-        (
-            path
-            for path in MEDIA_DIR.rglob("*")
-            if path.is_file() and path.suffix.lower() in EXTENSIONS
-        ),
+        (path for path in MEDIA_DIR.rglob("*") if path.is_file() and path.suffix.lower() in EXTENSIONS),
         key=lambda path: path.as_posix().lower(),
     )
 
@@ -150,7 +178,7 @@ def main() -> None:
             ignored.append(path.relative_to(ROOT).as_posix())
             continue
 
-        item = build_item(path)
+        item = build_item(path, previous_dates)
         owner = owner_from_path(path)
 
         if owner:
