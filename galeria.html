@@ -206,6 +206,24 @@
       </div>
 
 
+      <!-- Radar de Memórias: capítulos são calculados a partir das datas já presentes no índice. -->
+      <section class="memory-radar" id="memoryRadar" aria-labelledby="memoryRadarTitle" aria-describedby="memoryRadarDescription">
+        <div class="memory-radar-copy">
+          <span class="memory-radar-kicker">LOOPLY · MEMÓRIA VIVA</span>
+          <h2 id="memoryRadarTitle">Reencontre um momento.</h2>
+          <p id="memoryRadarDescription">O Radar encontra dias com registros e transforma sua galeria em pequenos capítulos — sem enviar suas fotos para serviços externos.</p>
+        </div>
+        <div class="memory-radar-summary" aria-live="polite">
+          <strong id="memoryRadarDays">—</strong>
+          <span>dias com memórias</span>
+        </div>
+        <div class="memory-radar-chapters" id="memoryRadarChapters" aria-label="Dias em destaque"></div>
+        <div class="memory-radar-footer">
+          <span id="memoryRadarInsight">Preparando sua linha do tempo…</span>
+          <button class="memory-radar-reset" id="memoryRadarReset" type="button" hidden>Ver todas as memórias</button>
+        </div>
+      </section>
+
       <div
         class="gallery-grid"
         id="galleryGrid"
@@ -260,6 +278,17 @@
           >
             ↓
           </a>
+
+          <!-- Alterna o painel da mídia para o fullscreen nativo do navegador. -->
+          <button
+            id="lightboxFullscreen"
+            type="button"
+            aria-label="Abrir em tela cheia"
+            aria-pressed="false"
+            title="Tela cheia"
+          >
+            ⛶
+          </button>
 
           <button
             id="lightboxPrev"
