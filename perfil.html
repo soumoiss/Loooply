@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#F5F0FA">
   <link rel="stylesheet" href="assets/css/app.css">
   <title>Perfil — Looply</title>
+<script type="module" src="assets/js/theme.js"></script>
 </head>
 <body>
   <main class="container-page">
@@ -80,6 +81,20 @@
 
     <section class="panel page-panel" style="margin-top:14px">
       <div class="eyebrow">Preferências</div>
+
+      <div class="preference theme-preference">
+        <div>
+          <h3>Tema do aplicativo</h3>
+          <p>Escolha as cores usadas nas páginas do Loooply. A preferência fica salva neste dispositivo.</p>
+        </div>
+        <select id="themeSelect" class="input" aria-label="Tema do aplicativo">
+          <option value="lilas">Lilás clássico</option>
+          <option value="noite">Noite neon</option>
+          <option value="oceano">Oceano</option>
+          <option value="rosa">Rosa suave</option>
+          <option value="floresta">Floresta</option>
+        </select>
+      </div>
 
       <div class="preference">
         <div>
