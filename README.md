@@ -25,3 +25,7 @@ Coloque fotos, vídeos e áudios em `midia/`. Rode `python scripts/gerar-midia-i
 ## Testes
 
 `node scripts/test-static.mjs` valida a estrutura e os JSON. `python scripts/smoke_test.py` executa um fluxo real de navegador com Chromium/Playwright.
+
+
+### Radar de Memórias
+A galeria inclui o “Radar de Memórias”, que agrupa fotos por dia e permite reabrir rapidamente os capítulos com mais registros. O agrupamento usa datas explícitas no índice ou datas reconhecíveis no nome do arquivo. Todo o processamento é local no navegador e respeita a visibilidade dos itens exclusivos. Consulte `docs/IMPLEMENTACAO-MELHORIAS.md`.
