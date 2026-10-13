@@ -20,12 +20,21 @@ const YOUTUBE_API_KEY =
   "AIzaSyDrJdOQ9y5SxLR_1_nNt8fY5DGNIg8pskU";
 
 
-const PLAYLIST_URL =
-  "https://youtube.com/playlist?list=PLMeQ_QyqhY7s&si=uPKgxxgFpAnX2xIP";
+const PLAYLISTS_BY_USER = Object.freeze({
+  misol: "PLUZFdmgmipvI",
+  yara: "PLCn4CAsA_tiM",
+  patati: "PLE0tcB0gaSzM"
+});
+const DEFAULT_PLAYLIST_ID = "PLMeQ_QyqhY7s";
+let activePlaylistId = DEFAULT_PLAYLIST_ID;
+let loadVersion = 0;
 
-
-const PLAYLIST_ID =
-  "PLMeQ_QyqhY7s";
+function playlistForCurrentUser() {
+  let username = "";
+  try { username = localStorage.getItem("username") || ""; } catch {}
+  const key = username.trim().toLocaleLowerCase("pt-BR");
+  return PLAYLISTS_BY_USER[key] || DEFAULT_PLAYLIST_ID;
+}
 
 
 const YOUTUBE_API_URL =
@@ -331,7 +340,7 @@ function transformarItem(item) {
       `https://www.youtube.com/watch?v=${encodeURIComponent(
         videoId
       )}&list=${encodeURIComponent(
-        PLAYLIST_ID
+        activePlaylistId
       )}`
 
   };
@@ -1359,13 +1368,9 @@ function normalizarErro(
    ========================================================= */
 
 
-async function iniciar() {
+async function iniciar(playlistId = activePlaylistId, version = loadVersion) {
 
-  const playlistId =
-    extrairPlaylistId(
-      PLAYLIST_URL
-    ) ||
-    PLAYLIST_ID;
+  playlistId = extrairPlaylistId(playlistId) || DEFAULT_PLAYLIST_ID;
 
 
   if (!playlistId) {
@@ -1381,6 +1386,7 @@ async function iniciar() {
     await obterTodosOsVideos(
       playlistId
     );
+  if (version !== loadVersion) return;
 
 
   const musicas =
@@ -1429,15 +1435,11 @@ async function iniciar() {
    ========================================================= */
 
 
-async function carregar() {
+async function carregar(force = false) {
 
-  if (
-    state.loading
-  ) {
-
-    return;
-
-  }
+  if (state.loading && !force) return;
+  const version = ++loadVersion;
+  activePlaylistId = playlistForCurrentUser();
 
 
   state.loading =
@@ -1480,7 +1482,7 @@ async function carregar() {
 
   try {
 
-    await iniciar();
+    await iniciar(activePlaylistId, version);
 
 
   } catch (erro) {
@@ -1491,6 +1493,7 @@ async function carregar() {
     );
 
 
+    if (version !== loadVersion) return;
     state.tracks =
       [];
 
