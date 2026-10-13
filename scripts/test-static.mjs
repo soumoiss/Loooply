@@ -6,7 +6,7 @@ const required = [
   "index.html", "login.html", "home.html", "galeria.html", "musicas.html", "perfil.html",
   "manifest.webmanifest", "assets/css/app.css", "assets/js/app-core.js", "assets/js/config.js",
   "assets/js/users.js", "assets/js/storage.js", "assets/js/session.js", "assets/js/navigation.js",
-  "assets/js/date-parser.js", "assets/js/cards.js", "assets/js/home.js", "assets/js/gallery.js", "assets/js/media-normalizer.js",
+  "assets/js/date-parser.js", "assets/js/cards.js", "assets/js/home.js", "assets/js/gallery.js",
   "assets/js/music.js", "assets/js/profile.js", "data/midia-index.json", "data/musicas-index.json",
   "scripts/gerar-midia-index.py", ".github/workflows/atualizar-galeria.yml"
 ];
