@@ -168,14 +168,23 @@ function normalizeType(value) {
 // Prioriza datas explicitamente gravadas no índice; quando faltam, tenta inferir
 // datas comuns do nome do arquivo (YYYY-MM-DD ou YYYYMMDD). Não inventa datas.
 function inferISODate(source, src) {
+  const filename = String(src || "").split(/[?#]/, 1)[0].split("/").pop() || "";
+  // A data e hora exatas no nome prevalecem sobre a data de upload.
+  const exact = filename.match(/(?:^|[^0-9])(\\d{4})(\\d{2})(\\d{2})_\\d{6}(?=\\.[^.]+$|$)/);
+  if (exact) {
+    const exactDate = `${exact[1]}-${exact[2]}-${exact[3]}`;
+    const parsedExact = new Date(`${exactDate}T12:00:00`);
+    if (!Number.isNaN(parsedExact.getTime()) && parsedExact.toISOString().slice(0, 10) === exactDate) return exactDate;
+  }
+
   const explicit = [source?.date, source?.createdAt, source?.uploadedAt, source?.modified]
     .map(value => String(value || "").trim())
-    .find(value => /^\d{4}-\d{2}-\d{2}(?:$|T)/.test(value));
+    .find(value => /^\\d{4}-\\d{2}-\\d{2}(?:$|T)/.test(value));
   if (explicit) return explicit.slice(0, 10);
 
-  const filename = String(src || "").split(/[?#]/, 1)[0].split("/").pop() || "";
-  const dashed = filename.match(/(?:^|[^0-9])(\d{4}-\d{2}-\d{2})(?:[^0-9]|$)/);
-  const compact = filename.match(/(?:^|[^0-9])(\d{4})(\d{2})(\d{2})(?:[^0-9]|$)/);
+  // Compatibilidade com nomes antigos quando o índice não contém data de upload.
+  const dashed = filename.match(/(?:^|[^0-9])(\\d{4}-\\d{2}-\\d{2})(?:[^0-9]|$)/);
+  const compact = filename.match(/(?:^|[^0-9])(\\d{4})(\\d{2})(\\d{2})(?:[^0-9]|$)/);
   const candidate = dashed?.[1] || (compact ? `${compact[1]}-${compact[2]}-${compact[3]}` : "");
   if (!candidate) return "";
   const parsed = new Date(`${candidate}T12:00:00`);
@@ -734,9 +743,15 @@ function openLightbox(index) {
     image.src = item.src || item.thumb;
 
 
-    body.appendChild(
-      image
-    );
+    body.appendChild(image);
+    image.classList.add("lightbox-zoomable");
+    image.setAttribute("title", "Toque para ampliar; toque novamente para restaurar");
+    image.addEventListener("click", () => {
+      const zoomed = image.classList.toggle("is-zoomed");
+      image.style.transform = zoomed ? "scale(2)" : "scale(1)";
+      image.style.cursor = zoomed ? "zoom-out" : "zoom-in";
+      body.classList.toggle("is-image-zoomed", zoomed);
+    });
 
   } else if (
     item.type === "video"
@@ -790,23 +805,20 @@ function openLightbox(index) {
   }
 
 
-  // Somente mensagens versionadas no repositório são exibidas. A interface
-  // não oferece textarea, botão de envio nem armazenamento de comentários locais.
-  const messagePanel = document.createElement("section");
-  messagePanel.className = "media-message-panel";
-  messagePanel.setAttribute("aria-labelledby", "mediaMessageTitle");
-  const messageHeading = document.createElement("h3");
-  messageHeading.id = "mediaMessageTitle";
-  messageHeading.textContent = "Mensagem";
-  const messageContent = document.createElement("p");
-  messageContent.className = "media-message-content";
-  messageContent.textContent = "Carregando mensagem…";
-  messagePanel.append(messageHeading, messageContent);
-  body.appendChild(messagePanel);
+  // A seção só existe quando o arquivo de mensagem contém texto.
   loadMediaMessage(item).then(message => {
-    if (!messagePanel.isConnected) return;
-    messageContent.textContent = message || "Nenhuma mensagem publicada para esta mídia.";
-    messageContent.classList.toggle("is-empty", !message);
+    if (!message || !body.isConnected || state.items[state.lightboxIndex] !== item) return;
+    const messagePanel = document.createElement("section");
+    messagePanel.className = "media-message-panel";
+    messagePanel.setAttribute("aria-labelledby", "mediaMessageTitle");
+    const messageHeading = document.createElement("h3");
+    messageHeading.id = "mediaMessageTitle";
+    messageHeading.textContent = "Mensagem";
+    const messageContent = document.createElement("p");
+    messageContent.className = "media-message-content";
+    messageContent.textContent = message;
+    messagePanel.append(messageHeading, messageContent);
+    body.appendChild(messagePanel);
   });
 
   if (elements.lightboxTitle) {
@@ -1110,6 +1122,36 @@ export async function initGallery() {
     ?.addEventListener("click", () => { void toggleLightboxFullscreen(); });
 
   document.addEventListener("fullscreenchange", syncFullscreenButton);
+
+  // Navegação por gesto funciona no lightbox comum e em tela cheia.
+  let swipeStartX = 0;
+  let swipeStartY = 0;
+  elements.lightboxBody?.addEventListener("touchstart", event => {
+    if (event.touches.length !== 1) return;
+    swipeStartX = event.touches[0].clientX;
+    swipeStartY = event.touches[0].clientY;
+  }, { passive: true });
+  elements.lightboxBody?.addEventListener("touchend", event => {
+    if (event.changedTouches.length !== 1) return;
+    const dx = event.changedTouches[0].clientX - swipeStartX;
+    const dy = event.changedTouches[0].clientY - swipeStartY;
+    const zoomed = elements.lightboxBody.querySelector("img.is-zoomed");
+    if (!zoomed && Math.abs(dx) >= 55 && Math.abs(dx) > Math.abs(dy) * 1.25) {
+      moveLightbox(dx < 0 ? 1 : -1);
+    }
+  }, { passive: true });
+  elements.lightboxBody?.addEventListener("wheel", event => {
+    const image = elements.lightboxBody.querySelector("img.lightbox-zoomable");
+    if (!image || !event.ctrlKey) return;
+    event.preventDefault();
+    const current = Number(image.dataset.zoom || 1);
+    const next = Math.max(1, Math.min(4, current + (event.deltaY < 0 ? 0.25 : -0.25)));
+    image.dataset.zoom = String(next);
+    image.style.transform = `scale(${next})`;
+    image.style.cursor = next > 1 ? "zoom-out" : "zoom-in";
+    image.classList.toggle("is-zoomed", next > 1);
+    elements.lightboxBody.classList.toggle("is-image-zoomed", next > 1);
+  }, { passive: false });
 
   elements.lightbox
     ?.addEventListener(
