@@ -12,6 +12,8 @@ const state = {
   sort: "random",
   view: "grid",
   exclusiveOnly: false,
+  // Filtro opcional do Radar de Memórias; YYYY-MM-DD ou vazio.
+  memoryDate: "",
   lightboxIndex: -1,
   username: ""
 };
@@ -33,10 +35,17 @@ function cacheElements() {
     "galleryGridView",
     "galleryListView",
     "galleryMasonryView",
+    "memoryRadar",
+    "memoryRadarDays",
+    "memoryRadarChapters",
+    "memoryRadarInsight",
+    "memoryRadarReset",
     "lightbox",
     "lightboxBody",
     "lightboxTitle",
-    "lightboxMeta"
+    "lightboxMeta",
+    "lightboxFullscreen",
+    "lightboxClose"
   ]) {
     elements[id] =
       document.getElementById(id);
@@ -156,6 +165,24 @@ function normalizeType(value) {
 }
 
 
+// Prioriza datas explicitamente gravadas no índice; quando faltam, tenta inferir
+// datas comuns do nome do arquivo (YYYY-MM-DD ou YYYYMMDD). Não inventa datas.
+function inferISODate(source, src) {
+  const explicit = [source?.date, source?.createdAt, source?.uploadedAt, source?.modified]
+    .map(value => String(value || "").trim())
+    .find(value => /^\d{4}-\d{2}-\d{2}(?:$|T)/.test(value));
+  if (explicit) return explicit.slice(0, 10);
+
+  const filename = String(src || "").split(/[?#]/, 1)[0].split("/").pop() || "";
+  const dashed = filename.match(/(?:^|[^0-9])(\d{4}-\d{2}-\d{2})(?:[^0-9]|$)/);
+  const compact = filename.match(/(?:^|[^0-9])(\d{4})(\d{2})(\d{2})(?:[^0-9]|$)/);
+  const candidate = dashed?.[1] || (compact ? `${compact[1]}-${compact[2]}-${compact[3]}` : "");
+  if (!candidate) return "";
+  const parsed = new Date(`${candidate}T12:00:00`);
+  return Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== candidate ? "" : candidate;
+}
+
+
 function normalizeItem(item, index) {
   const source = item || {};
 
@@ -180,21 +207,7 @@ function normalizeItem(item, index) {
     Boolean(owner) ||
     pathIsExclusive(src);
 
-  const dateValue =
-    String(
-      source.date ||
-      source.uploadedAt ||
-      source.createdAt ||
-      source.modified ||
-      ""
-    );
-
-  const dateISO =
-    /^\d{4}-\d{2}-\d{2}$/.test(dateValue)
-      ? dateValue
-      : (/^\d{4}-\d{2}-\d{2}/.test(dateValue)
-        ? dateValue.slice(0, 10)
-        : "");
+  const dateISO = inferISODate(source, src);
 
   return {
     id: String(
@@ -380,6 +393,7 @@ function matches(item) {
 
   return (
     (!q || text.includes(q)) &&
+    (!state.memoryDate || item.iso === state.memoryDate) &&
     (
       state.type === "all" ||
       item.type === state.type
@@ -521,6 +535,65 @@ function escapeHtml(value) {
       '"': "&quot;"
     }[char])
   );
+}
+
+
+function renderMemoryRadar() {
+  const host = elements.memoryRadarChapters;
+  if (!host) return;
+
+  // Só conta itens que a sessão atual pode ver; conteúdo exclusivo não vaza
+  // nem para estatísticas agregadas nem para os capítulos sugeridos.
+  const dated = state.items.filter(item => canSeeItem(item) && item.iso && item.type === "image");
+  const groups = new Map();
+  for (const item of dated) {
+    if (!groups.has(item.iso)) groups.set(item.iso, { iso: item.iso, count: 0, cover: item });
+    const group = groups.get(item.iso);
+    group.count += 1;
+    if (!group.cover || item.src) group.cover = item;
+  }
+
+  const chapters = [...groups.values()]
+    .sort((a, b) => b.count - a.count || b.iso.localeCompare(a.iso));
+  const formatDay = iso => {
+    const date = new Date(`${iso}T12:00:00`);
+    return new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short", year: "numeric" }).format(date).replace(" de ", " ");
+  };
+
+  if (elements.memoryRadarDays) elements.memoryRadarDays.textContent = String(groups.size);
+  if (elements.memoryRadarInsight) {
+    elements.memoryRadarInsight.textContent = groups.size
+      ? `${dated.length} foto${dated.length === 1 ? "" : "s"} com data identificada · destaque para os dias com mais registros`
+      : "Ainda não há datas suficientes para montar capítulos. Datas no nome do arquivo também são reconhecidas.";
+  }
+
+  const fragment = document.createDocumentFragment();
+  for (const chapter of chapters.slice(0, 5)) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "memory-chapter";
+    button.classList.toggle("is-active", state.memoryDate === chapter.iso);
+    button.setAttribute("aria-pressed", String(state.memoryDate === chapter.iso));
+    button.setAttribute("aria-label", `Ver ${chapter.count} foto${chapter.count === 1 ? "" : "s"} de ${formatDay(chapter.iso)}`);
+
+    const date = document.createElement("span");
+    date.className = "memory-chapter-date";
+    date.textContent = formatDay(chapter.iso);
+    const count = document.createElement("strong");
+    count.textContent = `${chapter.count} ${chapter.count === 1 ? "foto" : "fotos"}`;
+    const action = document.createElement("span");
+    action.className = "memory-chapter-action";
+    action.textContent = state.memoryDate === chapter.iso ? "Dia selecionado ✓" : "Revisitar dia →";
+    button.append(date, count, action);
+    button.addEventListener("click", () => {
+      state.memoryDate = state.memoryDate === chapter.iso ? "" : chapter.iso;
+      renderMemoryRadar();
+      applyFilters();
+    });
+    fragment.appendChild(button);
+  }
+  host.replaceChildren(fragment);
+  if (elements.memoryRadarReset) elements.memoryRadarReset.hidden = !state.memoryDate;
 }
 
 
@@ -717,47 +790,23 @@ function openLightbox(index) {
   }
 
 
+  // Somente mensagens versionadas no repositório são exibidas. A interface
+  // não oferece textarea, botão de envio nem armazenamento de comentários locais.
   const messagePanel = document.createElement("section");
   messagePanel.className = "media-message-panel";
   messagePanel.setAttribute("aria-labelledby", "mediaMessageTitle");
   const messageHeading = document.createElement("h3");
   messageHeading.id = "mediaMessageTitle";
-  messageHeading.textContent = "Mensagem / Nota";
+  messageHeading.textContent = "Mensagem";
   const messageContent = document.createElement("p");
   messageContent.className = "media-message-content";
   messageContent.textContent = "Carregando mensagem…";
-  const noteInput = document.createElement("textarea");
-  noteInput.className = "media-note-input";
-  noteInput.rows = 3;
-  noteInput.maxLength = 2000;
-  noteInput.placeholder = "Escreva uma anotação privada neste dispositivo…";
-  noteInput.setAttribute("aria-label", "Anotação local para esta mídia");
-  const noteActions = document.createElement("div");
-  noteActions.className = "media-note-actions";
-  const saveNote = document.createElement("button");
-  saveNote.type = "button";
-  saveNote.className = "secondary-button";
-  saveNote.textContent = "Salvar anotação neste dispositivo";
-  const noteStatus = document.createElement("span");
-  noteStatus.className = "media-note-status";
-  noteStatus.setAttribute("aria-live", "polite");
-  noteActions.append(saveNote, noteStatus);
-  messagePanel.append(messageHeading, messageContent, noteInput, noteActions);
+  messagePanel.append(messageHeading, messageContent);
   body.appendChild(messagePanel);
-  const localNoteKey = `looply_media_note:${item.src}`;
   loadMediaMessage(item).then(message => {
     if (!messagePanel.isConnected) return;
-    messageContent.textContent = message || "Nenhuma mensagem compartilhada foi adicionada a esta mídia.";
+    messageContent.textContent = message || "Nenhuma mensagem publicada para esta mídia.";
     messageContent.classList.toggle("is-empty", !message);
-    try { noteInput.value = localStorage.getItem(localNoteKey) || ""; } catch {}
-  });
-  saveNote.addEventListener("click", () => {
-    try {
-      localStorage.setItem(localNoteKey, noteInput.value.trim());
-      noteStatus.textContent = "Anotação salva neste dispositivo.";
-    } catch {
-      noteStatus.textContent = "Não foi possível salvar. Verifique o espaço disponível no navegador.";
-    }
   });
 
   if (elements.lightboxTitle) {
@@ -821,7 +870,44 @@ function openLightbox(index) {
 }
 
 
+
+async function toggleLightboxFullscreen() {
+  const panel = elements.lightbox?.querySelector(".lightbox-panel");
+  if (!panel) return;
+  try {
+    if (document.fullscreenElement === panel) {
+      await document.exitFullscreen();
+    } else if (panel.requestFullscreen) {
+      await panel.requestFullscreen();
+    } else {
+      // Fallback para navegadores sem Fullscreen API: o lightbox já ocupa a tela.
+      elements.lightbox.classList.add("is-fallback-fullscreen");
+    }
+  } catch (error) {
+    console.warn("Looply: o navegador não permitiu entrar em tela cheia.", error);
+  }
+}
+
+function syncFullscreenButton() {
+  const button = elements.lightboxFullscreen;
+  if (!button) return;
+  const panel = elements.lightbox?.querySelector(".lightbox-panel");
+  const active = Boolean(panel && document.fullscreenElement === panel);
+  button.setAttribute("aria-pressed", String(active));
+  button.setAttribute("aria-label", active ? "Sair da tela cheia" : "Abrir em tela cheia");
+  button.title = active ? "Sair da tela cheia" : "Tela cheia";
+}
+
+async function exitLightboxFullscreen() {
+  elements.lightbox?.classList.remove("is-fallback-fullscreen");
+  if (document.fullscreenElement && document.exitFullscreen) {
+    try { await document.exitFullscreen(); } catch (_) {}
+  }
+}
+
 function closeLightbox() {
+  // Fecha também o fullscreen nativo/fallback antes de limpar o conteúdo.
+  void exitLightboxFullscreen();
   if (!elements.lightbox) {
     return;
   }
@@ -955,6 +1041,13 @@ export async function initGallery() {
     );
 
 
+  elements.memoryRadarReset?.addEventListener("click", () => {
+    state.memoryDate = "";
+    renderMemoryRadar();
+    applyFilters();
+  });
+
+
   elements.galleryGridView
     ?.addEventListener(
       "click",
@@ -1013,6 +1106,11 @@ export async function initGallery() {
     );
 
 
+  elements.lightboxFullscreen
+    ?.addEventListener("click", () => { void toggleLightboxFullscreen(); });
+
+  document.addEventListener("fullscreenchange", syncFullscreenButton);
+
   elements.lightbox
     ?.addEventListener(
       "click",
@@ -1039,10 +1137,14 @@ export async function initGallery() {
       }
 
 
-      if (
-        event.key === "Escape"
-      ) {
-        closeLightbox();
+      if (event.key === "Escape") {
+        // Se o navegador já está saindo do fullscreen por Escape, mantém o
+        // lightbox aberto; um segundo Escape fecha a visualização da galeria.
+        if (document.fullscreenElement) {
+          void exitLightboxFullscreen();
+        } else {
+          closeLightbox();
+        }
       }
 
 
@@ -1097,5 +1199,6 @@ export async function initGallery() {
   }
 
 
+  renderMemoryRadar();
   applyFilters();
 }
