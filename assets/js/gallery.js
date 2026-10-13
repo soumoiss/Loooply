@@ -2,6 +2,7 @@ import { APP_CONFIG } from "./config.js";
 import { formatShort, fromISO } from "./date-parser.js";
 import { getSession } from "./session.js";
 import { USERNAMES } from "./users.js";
+import { normalizeImageOrientation, normalizeVideoElement } from "./media-normalizer.js";
 
 
 const state = {
@@ -12,8 +13,6 @@ const state = {
   sort: "random",
   view: "grid",
   exclusiveOnly: false,
-  // Filtro opcional do Radar de Memórias; YYYY-MM-DD ou vazio.
-  memoryDate: "",
   lightboxIndex: -1,
   username: ""
 };
@@ -35,11 +34,6 @@ function cacheElements() {
     "galleryGridView",
     "galleryListView",
     "galleryMasonryView",
-    "memoryRadar",
-    "memoryRadarDays",
-    "memoryRadarChapters",
-    "memoryRadarInsight",
-    "memoryRadarReset",
     "lightbox",
     "lightboxBody",
     "lightboxTitle",
@@ -393,7 +387,6 @@ function matches(item) {
 
   return (
     (!q || text.includes(q)) &&
-    (!state.memoryDate || item.iso === state.memoryDate) &&
     (
       state.type === "all" ||
       item.type === state.type
@@ -476,6 +469,7 @@ function renderCard(item, index) {
       visual.appendChild(fallback);
     }, { once: true });
     visual.appendChild(img);
+    normalizeImageOrientation(img, item.thumb || item.src);
   } else if (item.type === "video") {
     const preview = document.createElement("div");
     preview.className = "video-preview";
@@ -488,11 +482,13 @@ function renderCard(item, index) {
       }, { once: true });
       img.addEventListener("error", () => { img.remove(); preview.classList.add("video-preview-fallback"); }, { once: true });
       preview.appendChild(img);
+      normalizeImageOrientation(img, item.poster);
     } else {
       // Prévia nativa do primeiro frame: evita canvas, que pode falhar por CORS.
       const video = document.createElement("video");
       video.src = item.src; video.muted = true; video.playsInline = true;
       video.preload = "metadata"; video.setAttribute("aria-hidden", "true");
+      normalizeVideoElement(video, item.src, preview, { thumbnail: true });
       video.addEventListener("loadedmetadata", () => {
         try { video.currentTime = Math.min(0.1, video.duration || 0.1); } catch (_) {}
       }, { once: true });
@@ -537,64 +533,6 @@ function escapeHtml(value) {
   );
 }
 
-
-function renderMemoryRadar() {
-  const host = elements.memoryRadarChapters;
-  if (!host) return;
-
-  // Só conta itens que a sessão atual pode ver; conteúdo exclusivo não vaza
-  // nem para estatísticas agregadas nem para os capítulos sugeridos.
-  const dated = state.items.filter(item => canSeeItem(item) && item.iso && item.type === "image");
-  const groups = new Map();
-  for (const item of dated) {
-    if (!groups.has(item.iso)) groups.set(item.iso, { iso: item.iso, count: 0, cover: item });
-    const group = groups.get(item.iso);
-    group.count += 1;
-    if (!group.cover || item.src) group.cover = item;
-  }
-
-  const chapters = [...groups.values()]
-    .sort((a, b) => b.count - a.count || b.iso.localeCompare(a.iso));
-  const formatDay = iso => {
-    const date = new Date(`${iso}T12:00:00`);
-    return new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short", year: "numeric" }).format(date).replace(" de ", " ");
-  };
-
-  if (elements.memoryRadarDays) elements.memoryRadarDays.textContent = String(groups.size);
-  if (elements.memoryRadarInsight) {
-    elements.memoryRadarInsight.textContent = groups.size
-      ? `${dated.length} foto${dated.length === 1 ? "" : "s"} com data identificada · destaque para os dias com mais registros`
-      : "Ainda não há datas suficientes para montar capítulos. Datas no nome do arquivo também são reconhecidas.";
-  }
-
-  const fragment = document.createDocumentFragment();
-  for (const chapter of chapters.slice(0, 5)) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "memory-chapter";
-    button.classList.toggle("is-active", state.memoryDate === chapter.iso);
-    button.setAttribute("aria-pressed", String(state.memoryDate === chapter.iso));
-    button.setAttribute("aria-label", `Ver ${chapter.count} foto${chapter.count === 1 ? "" : "s"} de ${formatDay(chapter.iso)}`);
-
-    const date = document.createElement("span");
-    date.className = "memory-chapter-date";
-    date.textContent = formatDay(chapter.iso);
-    const count = document.createElement("strong");
-    count.textContent = `${chapter.count} ${chapter.count === 1 ? "foto" : "fotos"}`;
-    const action = document.createElement("span");
-    action.className = "memory-chapter-action";
-    action.textContent = state.memoryDate === chapter.iso ? "Dia selecionado ✓" : "Revisitar dia →";
-    button.append(date, count, action);
-    button.addEventListener("click", () => {
-      state.memoryDate = state.memoryDate === chapter.iso ? "" : chapter.iso;
-      renderMemoryRadar();
-      applyFilters();
-    });
-    fragment.appendChild(button);
-  }
-  host.replaceChildren(fragment);
-  if (elements.memoryRadarReset) elements.memoryRadarReset.hidden = !state.memoryDate;
-}
 
 
 function applyFilters() {
@@ -732,11 +670,8 @@ function openLightbox(index) {
       body.textContent = "Não foi possível carregar esta imagem.";
     }, { once: true });
     image.src = item.src || item.thumb;
-
-
-    body.appendChild(
-      image
-    );
+    body.appendChild(image);
+    normalizeImageOrientation(image, item.src || item.thumb);
 
   } else if (
     item.type === "video"
@@ -747,25 +682,22 @@ function openLightbox(index) {
       );
 
 
-    video.controls =
-      true;
-
-    video.playsInline =
-      true;
-
+    video.controls = true;
+    video.playsInline = true;
     video.preload = "metadata";
+    video.setAttribute("aria-label", item.title);
     if (item.poster) video.poster = item.poster;
     video.addEventListener("error", () => {
       const note = document.createElement("p");
       note.textContent = "Não foi possível reproduzir este vídeo.";
       body.appendChild(note);
     }, { once: true });
+    const frame = document.createElement("div");
+    frame.className = "video-frame";
+    body.appendChild(frame);
+    frame.appendChild(video);
+    normalizeVideoElement(video, item.src, frame, { thumbnail: false });
     video.src = item.src;
-
-
-    body.appendChild(
-      video
-    );
 
   } else {
     const audio =
@@ -1041,12 +973,6 @@ export async function initGallery() {
     );
 
 
-  elements.memoryRadarReset?.addEventListener("click", () => {
-    state.memoryDate = "";
-    renderMemoryRadar();
-    applyFilters();
-  });
-
 
   elements.galleryGridView
     ?.addEventListener(
@@ -1199,6 +1125,5 @@ export async function initGallery() {
   }
 
 
-  renderMemoryRadar();
   applyFilters();
 }
