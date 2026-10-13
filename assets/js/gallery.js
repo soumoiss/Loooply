@@ -183,6 +183,8 @@ function normalizeItem(item, index) {
   const dateValue =
     String(
       source.date ||
+      source.uploadedAt ||
+      source.createdAt ||
       source.modified ||
       ""
     );
@@ -590,6 +592,27 @@ function applyFilters() {
 }
 
 
+async function loadMediaMessage(item) {
+  const source = String(item?.src || "");
+  if (!source) return "";
+  const clean = source.split(/[?#]/, 1)[0];
+  const slash = clean.lastIndexOf("/");
+  let filename = clean.slice(slash + 1);
+  try { filename = decodeURIComponent(filename); } catch {}
+  if (!filename) return "";
+  const base = clean.slice(0, slash + 1);
+  // Convenção estrita: MSG_<nome completo do arquivo de mídia>.txt
+  const messageUrl = `${base}MSG_${encodeURIComponent(filename)}.txt`;
+  try {
+    const response = await fetch(messageUrl, { cache: "no-cache" });
+    if (!response.ok) return "";
+    return (await response.text()).trim().slice(0, 5000);
+  } catch (error) {
+    console.debug("Looply: mensagem opcional indisponível para esta mídia.", error);
+    return "";
+  }
+}
+
 function openLightbox(index) {
   const item =
     state.items[index];
@@ -693,6 +716,49 @@ function openLightbox(index) {
     );
   }
 
+
+  const messagePanel = document.createElement("section");
+  messagePanel.className = "media-message-panel";
+  messagePanel.setAttribute("aria-labelledby", "mediaMessageTitle");
+  const messageHeading = document.createElement("h3");
+  messageHeading.id = "mediaMessageTitle";
+  messageHeading.textContent = "Mensagem / Nota";
+  const messageContent = document.createElement("p");
+  messageContent.className = "media-message-content";
+  messageContent.textContent = "Carregando mensagem…";
+  const noteInput = document.createElement("textarea");
+  noteInput.className = "media-note-input";
+  noteInput.rows = 3;
+  noteInput.maxLength = 2000;
+  noteInput.placeholder = "Escreva uma anotação privada neste dispositivo…";
+  noteInput.setAttribute("aria-label", "Anotação local para esta mídia");
+  const noteActions = document.createElement("div");
+  noteActions.className = "media-note-actions";
+  const saveNote = document.createElement("button");
+  saveNote.type = "button";
+  saveNote.className = "secondary-button";
+  saveNote.textContent = "Salvar anotação neste dispositivo";
+  const noteStatus = document.createElement("span");
+  noteStatus.className = "media-note-status";
+  noteStatus.setAttribute("aria-live", "polite");
+  noteActions.append(saveNote, noteStatus);
+  messagePanel.append(messageHeading, messageContent, noteInput, noteActions);
+  body.appendChild(messagePanel);
+  const localNoteKey = `looply_media_note:${item.src}`;
+  loadMediaMessage(item).then(message => {
+    if (!messagePanel.isConnected) return;
+    messageContent.textContent = message || "Nenhuma mensagem compartilhada foi adicionada a esta mídia.";
+    messageContent.classList.toggle("is-empty", !message);
+    try { noteInput.value = localStorage.getItem(localNoteKey) || ""; } catch {}
+  });
+  saveNote.addEventListener("click", () => {
+    try {
+      localStorage.setItem(localNoteKey, noteInput.value.trim());
+      noteStatus.textContent = "Anotação salva neste dispositivo.";
+    } catch {
+      noteStatus.textContent = "Não foi possível salvar. Verifique o espaço disponível no navegador.";
+    }
+  });
 
   if (elements.lightboxTitle) {
     elements.lightboxTitle.textContent =

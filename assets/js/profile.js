@@ -1,4 +1,5 @@
 import { APP_CONFIG } from "./config.js";
+import { applyTheme, getSavedTheme } from "./theme.js";
 
 import {
   getReadCards,
@@ -126,6 +127,11 @@ export function initProfile() {
 
   const reduceMotion =
     document.getElementById("reduceMotion");
+  const themeSelect = document.getElementById("themeSelect");
+  if (themeSelect) {
+    themeSelect.value = getSavedTheme();
+    themeSelect.addEventListener("change", () => applyTheme(themeSelect.value));
+  }
 
 
   if (name) {
