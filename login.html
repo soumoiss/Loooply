@@ -39,7 +39,7 @@
 
         <div class="forgot"><a href="https://wa.me/558589069191?text=esqueci%20minha%20senha" target="_blank" rel="noopener noreferrer">Esqueci minha senha</a></div>
         <button class="login-button" id="loginButton" type="submit">Avante!</button>
-        <div class="form-message" id="message" role="alert">Usuários alterados, bebê! Solicite novo usuário e nova senha ao ADM Moiss hehe.</div>
+        <div class="form-message" id="message" role="alert">Não foi possível entrar. Confira seu usuário e sua senha.</div>
       </form>
 
       <div class="login-footer"><strong>Looply</strong> · MoissWorld</div>
@@ -75,8 +75,8 @@
       button.textContent = "Entrando…";
       try {
         const user = await authenticate(username.value, password.value);
-        if (!user || !createSession(user.username)) throw new Error("invalid");
-        window.location.replace("home.html");
+        if (!user || !createSession(user.username, user.profilePic, user.role, user.cloudAuthenticated)) throw new Error("invalid");
+        window.location.replace(user.role === "admin" ? "admin.html" : "home.html");
       } catch {
         message.classList.add("show");
         password.focus();

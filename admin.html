@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#7010b0"><title>Painel administrativo · Loooply</title>
+  <link rel="stylesheet" href="assets/css/app.css">
+  <style>
+    .admin-page{max-width:1180px;margin:0 auto;padding:24px 16px 60px;color:var(--text)}
+    .admin-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+    .admin-head h1{margin:0;font-size:clamp(1.6rem,4vw,2.2rem)}.admin-head p{margin:6px 0;color:var(--muted)}
+    .admin-actions{display:flex;gap:8px;flex-wrap:wrap}.admin-button{border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:var(--surfaceStrong);color:var(--text);cursor:pointer;font:inherit}
+    .admin-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.admin-tab[aria-selected=true]{background:var(--primary);color:white}
+    .admin-panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 12px 36px #0000000b}
+    .admin-status{padding:12px 14px;border-radius:12px;background:var(--surfaceSoft);margin:12px 0 18px;overflow-wrap:anywhere}.admin-list{display:grid;gap:12px}
+    .admin-user,.admin-comment{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--surfaceStrong);min-width:0}.admin-user{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.admin-user small,.admin-comment small{color:var(--muted)}
+    .admin-comment p{white-space:pre-wrap;overflow-wrap:anywhere}.admin-comment-photos{display:flex;gap:8px;flex-wrap:wrap}.admin-comment-photos img{width:110px;height:110px;object-fit:cover;border-radius:10px}.admin-search{width:100%;box-sizing:border-box;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surfaceStrong);color:var(--text);margin-bottom:14px;font:inherit}
+    .admin-empty{padding:26px;text-align:center;color:var(--muted)}
+  </style>
+  <script type="module" src="assets/js/theme.js"></script>
+</head>
+<body><main class="admin-page">
+  <header class="admin-head"><div><h1>Painel administrativo</h1><p id="adminGreeting">Área reservada ao administrador</p></div><div class="admin-actions"><button class="admin-button" id="adminRefresh">Atualizar</button><button class="admin-button" id="adminLogout">Sair</button></div></header>
+  <div id="adminStatus" class="admin-status" role="status">Verificando acesso seguro…</div>
+  <div class="admin-tabs" role="tablist"><button class="admin-button admin-tab" data-tab="comments" aria-selected="true">Comentários</button><button class="admin-button admin-tab" data-tab="users" aria-selected="false">Usuários</button></div>
+  <section class="admin-panel"><input id="adminSearch" class="admin-search" type="search" placeholder="Buscar por usuário, música ou comentário…" aria-label="Buscar conteúdo"><div id="adminContent" class="admin-list"></div></section>
+</main><script type="module" src="assets/js/admin.js"></script></body></html>
