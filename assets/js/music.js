@@ -1,3 +1,7 @@
+import { getSession } from "./session.js";
+import { cloudConfigured } from "./cloud.js";
+import { getThread, addComment, attachmentURL, formatCommentDate } from "./comments-store.js";
+
 /*
  * LOOPLY — SISTEMA DE MÚSICAS
  *
@@ -806,13 +810,13 @@ function criarCard(
 
   card.setAttribute(
     "role",
-    "link"
+    "button"
   );
 
 
   card.setAttribute(
     "aria-label",
-    `Abrir ${musica.title} no YouTube`
+    `Reproduzir ${musica.title} no Looply`
   );
 
 
@@ -974,7 +978,7 @@ function criarCard(
 
 
   description.textContent =
-    "Abrir no YouTube";
+    "Reproduzir no Looply · Comentários";
 
 
   info.append(
@@ -1017,16 +1021,9 @@ function criarCard(
    * Abre a música.
    */
 
-  const abrir =
-    () => {
-
-      window.open(
-        musica.url,
-        "_blank",
-        "noopener,noreferrer"
-      );
-
-    };
+  const abrir = () => {
+    void abrirMusica(musica);
+  };
 
 
   card.addEventListener(
@@ -1175,6 +1172,181 @@ function render() {
 
 }
 
+
+/* =========================================================
+   PLAYER INTEGRADO + COMENTÁRIOS PERSISTENTES
+   ========================================================= */
+
+let musicOverlay = null;
+let musicAttachmentURLs = [];
+let activeMusic = null;
+
+function revokeMusicAttachmentURLs() {
+  for (const url of musicAttachmentURLs) URL.revokeObjectURL(url);
+  musicAttachmentURLs = [];
+}
+
+function ensureMusicOverlay() {
+  if (musicOverlay?.isConnected) return musicOverlay;
+  musicOverlay = document.createElement("div");
+  musicOverlay.id = "musicPlayerOverlay";
+  musicOverlay.className = "music-player-overlay";
+  musicOverlay.setAttribute("aria-hidden", "true");
+  musicOverlay.innerHTML = `
+    <section class="music-player-window" role="dialog" aria-modal="true" aria-labelledby="musicPlayerTitle">
+      <header class="music-player-header">
+        <div class="music-player-heading"><h2 id="musicPlayerTitle"></h2><p id="musicPlayerMeta"></p></div>
+        <button type="button" class="icon-action" id="musicPlayerClose" aria-label="Fechar player">×</button>
+      </header>
+      <div class="music-player-scroll">
+        <div class="music-player-frame" id="musicPlayerFrame"></div>
+        <section class="music-comments-section" aria-labelledby="musicCommentsTitle">
+          <h3 id="musicCommentsTitle">Comentários</h3>
+          <div class="music-comments-list" id="musicCommentsList" aria-live="polite"></div>
+          <form id="musicCommentForm" class="music-comment-form">
+            <label class="sr-only" for="musicCommentText">Comentário</label>
+            <textarea id="musicCommentText" rows="3" maxlength="5000" placeholder="Escreva um comentário…"></textarea>
+            <div class="music-comment-tools">
+              <label class="music-attach-button" for="musicCommentPhotos">＋ Fotos</label>
+              <input id="musicCommentPhotos" type="file" accept="image/*" multiple hidden>
+              <span id="musicCommentFiles" class="music-comment-files"></span>
+              <button type="submit" class="login-button">Publicar</button>
+            </div>
+            <p id="musicCommentStatus" class="music-comment-status" role="status" aria-live="polite"></p>
+          </form>
+        </section>
+      </div>
+    </section>`;
+  document.body.appendChild(musicOverlay);
+  document.getElementById("musicPlayerClose").addEventListener("click", fecharMusica);
+  musicOverlay.addEventListener("click", event => { if (event.target === musicOverlay) fecharMusica(); });
+  document.getElementById("musicCommentPhotos").addEventListener("change", () => {
+    const files = [...document.getElementById("musicCommentPhotos").files];
+    document.getElementById("musicCommentFiles").textContent = files.map(file => file.name).join(", ");
+  });
+  document.getElementById("musicCommentForm").addEventListener("submit", salvarComentarioMusica);
+  return musicOverlay;
+}
+
+function musicThreadKey(track) {
+  // A mesma música na mesma playlist mantém seu histórico ao reabrir a janela.
+  return `music:${activePlaylistId}:${track.videoId || "playlist"}`;
+}
+
+async function abrirMusica(track) {
+  if (!track || (!track.videoId && !track.playlistId)) return;
+  activeMusic = track;
+  revokeMusicAttachmentURLs();
+  const overlay = ensureMusicOverlay();
+  document.getElementById("musicPlayerTitle").textContent = track.title;
+  document.getElementById("musicPlayerMeta").textContent = "YouTube";
+  const frameHost = document.getElementById("musicPlayerFrame");
+  frameHost.replaceChildren();
+  const frame = document.createElement("iframe");
+  frame.src = track.videoId
+    ? `https://www.youtube-nocookie.com/embed/${encodeURIComponent(track.videoId)}?autoplay=1&playsinline=1&rel=0&list=${encodeURIComponent(activePlaylistId)}`
+    : `https://www.youtube-nocookie.com/embed/videoseries?list=${encodeURIComponent(track.playlistId || activePlaylistId)}&autoplay=1&playsinline=1&rel=0`;
+  frame.title = `Reprodutor: ${track.title}`;
+  frame.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+  frame.allowFullscreen = true;
+  frame.referrerPolicy = "strict-origin-when-cross-origin";
+  frameHost.appendChild(frame);
+  document.getElementById("musicCommentText").value = "";
+  document.getElementById("musicCommentPhotos").value = "";
+  document.getElementById("musicCommentFiles").textContent = "";
+  document.getElementById("musicCommentStatus").textContent = "";
+  overlay.setAttribute("aria-hidden", "false");
+  document.body.classList.add("music-player-open");
+  await renderMusicComments();
+  document.getElementById("musicPlayerClose").focus();
+}
+
+function fecharMusica() {
+  if (!musicOverlay) return;
+  musicOverlay.setAttribute("aria-hidden", "true");
+  document.getElementById("musicPlayerFrame")?.replaceChildren();
+  document.body.classList.remove("music-player-open");
+  revokeMusicAttachmentURLs();
+  activeMusic = null;
+}
+
+async function renderMusicComments() {
+  const host = document.getElementById("musicCommentsList");
+  if (!host || !activeMusic) return;
+  revokeMusicAttachmentURLs();
+  host.replaceChildren();
+  let comments;
+  try {
+    comments = await getThread(musicThreadKey(activeMusic));
+  } catch (error) {
+    const note = document.createElement("p");
+    note.className = "music-comments-empty";
+    note.textContent = error.message || "O armazenamento de comentários está indisponível.";
+    host.appendChild(note);
+    return;
+  }
+  if (!comments.length) {
+    const empty = document.createElement("p");
+    empty.className = "music-comments-empty";
+    empty.textContent = "Ainda não há comentários.";
+    host.appendChild(empty);
+    return;
+  }
+  for (const comment of [...comments].reverse()) {
+    const article = document.createElement("article");
+    article.className = "music-thread-comment";
+    const meta = document.createElement("div");
+    meta.className = "music-thread-comment-meta";
+    meta.textContent = [comment.author, formatCommentDate(comment.createdAt)].filter(Boolean).join(" · ");
+    article.appendChild(meta);
+    if (comment.text) {
+      const text = document.createElement("p");
+      text.className = "music-thread-comment-text";
+      text.textContent = comment.text;
+      article.appendChild(text);
+    }
+    const attachments = document.createElement("div");
+    attachments.className = "music-thread-attachments";
+    for (const file of comment.attachments || []) {
+      if (!String(file.type || "").startsWith("image/")) continue;
+      const img = document.createElement("img");
+      img.src = attachmentURL(file);
+      musicAttachmentURLs.push(img.src);
+      img.alt = file.name || "Fotografia anexada";
+      img.loading = "lazy";
+      attachments.appendChild(img);
+    }
+    if (attachments.childElementCount) article.appendChild(attachments);
+    host.appendChild(article);
+  }
+}
+
+async function salvarComentarioMusica(event) {
+  event.preventDefault();
+  if (!activeMusic) return;
+  const form = document.getElementById("musicCommentForm");
+  const submit = form.querySelector('button[type="submit"]');
+  const status = document.getElementById("musicCommentStatus");
+  const files = [...document.getElementById("musicCommentPhotos").files];
+  const text = document.getElementById("musicCommentText").value;
+  submit.disabled = true;
+  status.textContent = "";
+  try {
+    if (files.length > 6) throw new Error("Anexe no máximo 6 fotografias por comentário.");
+    if (files.some(file => !file.type.startsWith("image/"))) throw new Error("Anexe somente fotografias.");
+    if (files.some(file => file.size > 12 * 1024 * 1024)) throw new Error("Cada fotografia deve ter no máximo 12 MB.");
+    await addComment(musicThreadKey(activeMusic), text, files, getSession()?.username || "");
+    document.getElementById("musicCommentText").value = "";
+    document.getElementById("musicCommentPhotos").value = "";
+    document.getElementById("musicCommentFiles").textContent = "";
+    await renderMusicComments();
+    status.textContent = cloudConfigured() ? "Comentário publicado na nuvem." : "Comentário salvo neste dispositivo. Configure a nuvem para sincronizar entre aparelhos.";
+  } catch (error) {
+    status.textContent = error.message || "Não foi possível salvar o comentário.";
+  } finally {
+    submit.disabled = false;
+  }
+}
 
 /* =========================================================
    ERROS DA API
@@ -1494,46 +1666,22 @@ async function carregar(force = false) {
 
 
     if (version !== loadVersion) return;
-    state.tracks =
-      [];
+    // Mesmo se a Data API atingir a cota ou estiver bloqueada, oferece o
+    // player incorporado da playlist completa em vez de deixar a aba inutilizável.
+    state.tracks = [{
+      videoId: "",
+      playlistId: activePlaylistId,
+      title: "Playlist completa",
+      description: "Reproduzir a playlist no Looply",
+      thumbnail: "",
+      position: 0,
+      url: ""
+    }];
+    render();
 
-
-    if (musicList) {
-
-      musicList.replaceChildren();
-
-      musicList.setAttribute(
-        "aria-busy",
-        "false"
-      );
-
-    }
-
-
-    if (musicStatus) {
-
-      musicStatus.textContent =
-        "Não foi possível carregar a playlist";
-
-    }
-
-
-    if (musicErrorText) {
-
-      musicErrorText.textContent =
-        normalizarErro(
-          erro
-        );
-
-    }
-
-
-    if (musicError) {
-
-      musicError.hidden =
-        false;
-
-    }
+    if (musicStatus) musicStatus.textContent = "Playlist integrada";
+    if (musicError) musicError.hidden = true;
+    console.warn("Looply: usando o player da playlist como alternativa à YouTube Data API.", normalizarErro(erro));
 
 
   } finally {
@@ -1602,6 +1750,9 @@ export function initMusic() {
     }
   );
 
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && musicOverlay?.getAttribute("aria-hidden") === "false") fecharMusica();
+  });
 
   carregar();
 

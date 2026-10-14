@@ -115,6 +115,17 @@ export function initProfile() {
 
   if (!session) return;
 
+  if (session.role === "admin") {
+    const actions = document.querySelector(".header-actions");
+    if (actions && !document.getElementById("adminPanelLink")) {
+      const link = document.createElement("a");
+      link.id = "adminPanelLink";
+      link.className = "header-action";
+      link.href = "admin.html";
+      link.textContent = "Painel administrador";
+      actions.appendChild(link);
+    }
+  }
 
   const name =
     document.getElementById("profileName");

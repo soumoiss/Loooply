@@ -1,4 +1,5 @@
 import { APP_CONFIG } from "./config.js";
+import { cloudConfigured, cloudSignIn, cloudSignOut } from "./cloud.js";
 import { canonicalUsername, getUser, userExists } from "./users.js";
 import {
   readJSON,
@@ -20,10 +21,11 @@ async function sha256Hex(value) {
 }
 
 function normalizeUsername(value) {
-  return canonicalUsername(value);
+  return canonicalUsername(value) || (cloudConfigured() ? String(value || "").trim().toLocaleLowerCase("pt-BR") : "");
 }
 
 export async function authenticate(username, password) {
+  if (cloudConfigured()) return cloudSignIn(username, password);
   const normalized = normalizeUsername(username);
   const user = getUser(normalized);
   if (!user || !password) return null;
@@ -31,50 +33,52 @@ export async function authenticate(username, password) {
   return hash === user.passwordHash ? { username: normalized, ...user } : null;
 }
 
-export function createSession(username) {
-  const normalized = normalizeUsername(username);
+export function createSession(username, profilePic = "", role = "user", cloudAuthenticated = false) {
+  const normalized = normalizeUsername(username) || String(username || "").trim();
   const user = getUser(normalized);
-  if (!user) return false;
+  if (!user && !cloudAuthenticated && !cloudConfigured()) return false;
+  if (!user && !cloudAuthenticated) return false;
+  const resolvedPic = user?.profilePic || profilePic || "";
 
   const session = {
     authenticated: true,
     username: normalized,
-    profilePic: user.profilePic,
+    profilePic: resolvedPic,
+    role: role || "user",
+    cloudAuthenticated: cloudAuthenticated === true,
     createdAt: new Date().toISOString()
   };
 
   writeString(APP_CONFIG.storage.loggedIn, "true");
   writeString(APP_CONFIG.storage.username, normalized);
-  writeString(APP_CONFIG.storage.profilePic, user.profilePic);
+  writeString(APP_CONFIG.storage.profilePic, resolvedPic);
   writeJSON(APP_CONFIG.storage.sessionV2, session);
   return true;
 }
 
 export function getSession() {
   const loggedIn = readString(APP_CONFIG.storage.loggedIn, "") === "true";
-  const username = normalizeUsername(readString(APP_CONFIG.storage.username, ""));
+  const rawUsername = readString(APP_CONFIG.storage.username, "");
+  const username = normalizeUsername(rawUsername) || rawUsername;
   const legacyProfilePic = readString(APP_CONFIG.storage.profilePic, "");
   const user = username ? getUser(username) : null;
   const v2 = readJSON(APP_CONFIG.storage.sessionV2, null);
-
-  const valid = loggedIn && Boolean(user) && (!v2 || v2.authenticated === true ? true : false);
+  const validCloudSession = v2?.cloudAuthenticated === true && Boolean(username);
+  const valid = loggedIn && (cloudConfigured() ? validCloudSession : Boolean(user)) && (!v2 || v2.authenticated === true);
   if (!valid) return null;
 
   const session = {
     authenticated: true,
     username,
-    profilePic: user.profilePic || legacyProfilePic,
+    profilePic: user?.profilePic || legacyProfilePic || v2?.profilePic || "",
+    role: v2?.role || "user",
+    cloudAuthenticated: validCloudSession,
     createdAt: v2?.createdAt || null
   };
-
-  if (legacyProfilePic !== user.profilePic) {
-    writeString(APP_CONFIG.storage.profilePic, user.profilePic);
-  }
-
-  if (!v2 || v2.username !== username || v2.profilePic !== user.profilePic) {
+  if (user && legacyProfilePic !== user.profilePic) writeString(APP_CONFIG.storage.profilePic, user.profilePic);
+  if (!v2 || v2.username !== username || v2.profilePic !== session.profilePic || v2.role !== session.role) {
     writeJSON(APP_CONFIG.storage.sessionV2, session);
   }
-
   return session;
 }
 
@@ -92,13 +96,14 @@ export function requireAuth(redirect = APP_CONFIG.routes.login) {
 }
 
 export function logout() {
+  void cloudSignOut();
   clearSessionStorage();
   window.location.replace(APP_CONFIG.routes.login);
 }
 
 export function redirectIfAuthenticated() {
   if (isAuthenticated()) {
-    window.location.replace(APP_CONFIG.routes.home);
+    window.location.replace(getSession()?.role === "admin" ? "admin.html" : APP_CONFIG.routes.home);
     return true;
   }
   return false;

@@ -551,36 +551,23 @@ function renderCard(item, index) {
   body.append(badges, title, date); card.append(visual, body);
   visual.addEventListener("click", () => openLightbox(index));
 
-  // Só cria o botão quando a foto realmente possui comentário não vazio.
+  // O botão aparece nos cartões que possuem comentário legado; a janela é
+  // compartilhada com o visualizador e mantém o texto integral sem truncamento.
   if (item.type === "image") {
     loadMediaMessage(item).then(message => {
       if (!message || !card.isConnected) return;
-
       const commentButton = document.createElement("button");
       commentButton.type = "button";
       commentButton.className = "media-comment-toggle";
       commentButton.setAttribute("aria-label", `Ver comentário de ${item.title}`);
-      commentButton.setAttribute("aria-expanded", "false");
       commentButton.title = "Ver comentário";
       commentButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.5 8.5 0 0 1 8.7 3.9a8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/></svg>';
-
-      const commentPanel = document.createElement("div");
-      commentPanel.className = "media-comment-popover";
-      commentPanel.hidden = true;
-      commentPanel.setAttribute("role", "status");
-      const commentText = document.createElement("p");
-      commentText.textContent = message;
-      commentPanel.appendChild(commentText);
-
       commentButton.addEventListener("click", event => {
         event.preventDefault();
         event.stopPropagation();
-        const willOpen = commentPanel.hidden;
-        commentPanel.hidden = !willOpen;
-        commentButton.setAttribute("aria-expanded", String(willOpen));
+        void openCommentWindow(item);
       });
-      commentPanel.addEventListener("click", event => event.stopPropagation());
-      card.append(commentButton, commentPanel);
+      card.appendChild(commentButton);
     });
   }
   return card;
@@ -744,7 +731,7 @@ function loadMediaMessage(item) {
     try {
       const response = await fetch(messageUrl, { cache: "no-cache" });
       if (!response.ok) return "";
-      return (await response.text()).trim().slice(0, 5000);
+      return (await response.text()).trim();
     } catch (error) {
       console.debug("Looply: mensagem opcional indisponível para esta mídia.", error);
       return "";
@@ -752,6 +739,68 @@ function loadMediaMessage(item) {
   })();
   mediaMessageCache.set(source, task);
   return task;
+}
+
+async function openCommentWindow(item) {
+  document.querySelector(".media-comment-overlay")?.remove();
+  const overlay = document.createElement("div");
+  overlay.className = "media-comment-overlay";
+  overlay.setAttribute("role", "presentation");
+  const panel = document.createElement("section");
+  panel.className = "media-comment-window";
+  panel.setAttribute("role", "dialog");
+  panel.setAttribute("aria-modal", "true");
+  panel.setAttribute("aria-labelledby", "mediaCommentTitle");
+  const header = document.createElement("header");
+  header.className = "media-comment-window-head";
+  const title = document.createElement("h2");
+  title.id = "mediaCommentTitle";
+  title.textContent = "Comentário da fotografia";
+  const close = document.createElement("button");
+  close.type = "button";
+  close.className = "icon-action";
+  close.textContent = "×";
+  close.setAttribute("aria-label", "Fechar comentário");
+  header.append(title, close);
+  const subtitle = document.createElement("p");
+  subtitle.className = "media-comment-window-subtitle";
+  subtitle.textContent = item.title || "Fotografia";
+  const content = document.createElement("div");
+  content.className = "media-comment-window-content";
+  content.setAttribute("aria-live", "polite");
+  content.textContent = "Carregando comentário…";
+  panel.append(header, subtitle, content);
+  overlay.appendChild(panel);
+  // Quando o visualizador está em fullscreen, o comentário precisa ficar
+  // dentro do elemento fullscreen para continuar visível acima da fotografia.
+  const overlayHost = document.fullscreenElement || document.body;
+  overlayHost.appendChild(overlay);
+
+  const dismiss = () => overlay.remove();
+  close.addEventListener("click", dismiss);
+  overlay.addEventListener("click", event => { if (event.target === overlay) dismiss(); });
+  const onKey = event => { if (event.key === "Escape" && overlay.isConnected) { dismiss(); document.removeEventListener("keydown", onKey); } };
+  document.addEventListener("keydown", onKey);
+  const message = await loadMediaMessage(item);
+  content.textContent = message || "Nenhum comentário disponível para esta fotografia.";
+  close.focus();
+}
+
+function addLightboxCommentButton(item) {
+  document.getElementById("lightboxCommentButton")?.remove();
+  if (item.type !== "image") return;
+  const actions = elements.lightbox?.querySelector(".lightbox-head-actions");
+  if (!actions) return;
+  const button = document.createElement("button");
+  button.type = "button";
+  button.id = "lightboxCommentButton";
+  button.className = "icon-action lightbox-comment-action";
+  button.title = "Ver comentário";
+  button.setAttribute("aria-label", "Ver comentário desta fotografia");
+  button.textContent = "▤";
+  button.addEventListener("click", () => { void openCommentWindow(item); });
+  const next = document.getElementById("lightboxPrev");
+  actions.insertBefore(button, next || null);
 }
 
 function openLightbox(index) {
@@ -771,6 +820,7 @@ function openLightbox(index) {
   state.lightboxIndex =
     index;
 
+  addLightboxCommentButton(item);
 
   const body =
     elements.lightboxBody;
@@ -1053,6 +1103,7 @@ function closeLightbox() {
   elements.lightboxBody
     ?.replaceChildren();
 
+  document.getElementById("lightboxCommentButton")?.remove();
 
   state.lightboxIndex =
     -1;
@@ -1283,6 +1334,15 @@ export async function initGallery() {
   document.addEventListener(
     "keydown",
     (event) => {
+      const commentOverlay = document.querySelector(".media-comment-overlay");
+      if (commentOverlay) {
+        if (event.key === "Escape") {
+          commentOverlay.remove();
+          event.stopImmediatePropagation();
+        }
+        return;
+      }
+
       if (
         !elements.lightbox
           ?.classList
