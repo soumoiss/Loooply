@@ -57,5 +57,6 @@ jobs:
               exit 0
             fi
             echo "Push concorrente; nova tentativa ${attempt}/3."
+          done
           echo "Não foi possível publicar o índice após 3 tentativas." >&2
           exit 1
