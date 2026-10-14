@@ -142,8 +142,27 @@ function titleFromPath(src) {
 
 
 function mediaUrl(value) {
-  const src = String(value || "").trim();
-  return src ? encodeURI(src) : "";
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+
+  // Encode each path segment independently: spaces, #, ?, accents and parentheses
+  // in filenames must not become URL syntax. Keep query strings and fragments intact.
+  const encodePath = path => path.split("/").map(segment => {
+    try { return encodeURIComponent(decodeURIComponent(segment)); }
+    catch (_) { return encodeURIComponent(segment); }
+  }).join("/");
+
+  try {
+    if (/^(?:https?:)?\/\//i.test(raw) || /^(?:data|blob):/i.test(raw)) {
+      const url = new URL(raw, document.baseURI);
+      if (/^(?:data|blob):/i.test(raw)) return raw;
+      url.pathname = encodePath(url.pathname);
+      return url.href;
+    }
+  } catch (_) {}
+
+  const match = raw.match(/^([^?#]*)([?#][\s\S]*)?$/);
+  return `${encodePath(match?.[1] || raw)}${match?.[2] || ""}`;
 }
 
 
@@ -785,12 +804,80 @@ function openLightbox(index) {
 
     body.appendChild(image);
     image.classList.add("lightbox-zoomable");
-    image.setAttribute("title", "Toque para ampliar; toque novamente para restaurar");
-    image.addEventListener("click", () => {
-      const zoomed = image.classList.toggle("is-zoomed");
-      image.style.transform = zoomed ? "scale(2)" : "scale(1)";
-      image.style.cursor = zoomed ? "zoom-out" : "zoom-in";
-      body.classList.toggle("is-image-zoomed", zoomed);
+    image.setAttribute("title", "Toque duas vezes para ampliar; arraste para mover; use pinça para ajustar o zoom");
+    image.draggable = false;
+    image.dataset.zoom = "1";
+    const zoom = { scale: 1, x: 0, y: 0, pointers: new Map(), start: null, pinch: null, lastTap: 0 };
+    const renderZoom = () => {
+      image.dataset.zoom = String(zoom.scale);
+      image.style.transform = `translate3d(${zoom.x}px, ${zoom.y}px, 0) scale(${zoom.scale})`;
+      image.classList.toggle("is-zoomed", zoom.scale > 1.001);
+      body.classList.toggle("is-image-zoomed", zoom.scale > 1.001);
+      image.style.cursor = zoom.scale > 1.001 ? "grab" : "zoom-in";
+    };
+    const resetZoom = () => { zoom.scale = 1; zoom.x = 0; zoom.y = 0; renderZoom(); };
+    const toggleZoom = (x = image.clientWidth / 2, y = image.clientHeight / 2) => {
+      if (zoom.scale > 1.001) return resetZoom();
+      zoom.scale = 2.5;
+      zoom.x = (image.clientWidth / 2 - x) * (zoom.scale - 1);
+      zoom.y = (image.clientHeight / 2 - y) * (zoom.scale - 1);
+      renderZoom();
+    };
+    image.addEventListener("pointerdown", event => {
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+      event.preventDefault();
+      image.setPointerCapture?.(event.pointerId);
+      zoom.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      image.style.cursor = zoom.scale > 1.001 ? "grabbing" : "zoom-in";
+      if (zoom.pointers.size === 1) {
+        zoom.start = { x: event.clientX, y: event.clientY, panX: zoom.x, panY: zoom.y, time: Date.now(), moved: false };
+      } else if (zoom.pointers.size === 2) {
+        const points = [...zoom.pointers.values()];
+        zoom.pinch = { distance: Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y), scale: zoom.scale };
+        zoom.start = null;
+      }
+    });
+    image.addEventListener("pointermove", event => {
+      if (!zoom.pointers.has(event.pointerId)) return;
+      zoom.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      if (zoom.pointers.size >= 2 && zoom.pinch) {
+        const points = [...zoom.pointers.values()];
+        const distance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+        zoom.scale = Math.max(1, Math.min(5, zoom.pinch.scale * distance / Math.max(1, zoom.pinch.distance)));
+        if (zoom.scale === 1) { zoom.x = 0; zoom.y = 0; }
+        renderZoom();
+      } else if (zoom.start) {
+        const dx = event.clientX - zoom.start.x, dy = event.clientY - zoom.start.y;
+        if (Math.abs(dx) + Math.abs(dy) > 5) zoom.start.moved = true;
+        if (zoom.scale > 1.001) {
+          zoom.x = zoom.start.panX + dx;
+          zoom.y = zoom.start.panY + dy;
+          renderZoom();
+        }
+      }
+    });
+    const endPointer = event => {
+      const start = zoom.start;
+      const moved = Boolean(start?.moved);
+      const elapsed = start ? Date.now() - start.time : 1000;
+      const x = event.clientX, y = event.clientY;
+      zoom.pointers.delete(event.pointerId);
+      if (zoom.pointers.size < 2) zoom.pinch = null;
+      if (zoom.pointers.size === 0) {
+        if (!moved && elapsed < 280) {
+          const now = Date.now();
+          if (now - zoom.lastTap < 320) { toggleZoom(x - image.getBoundingClientRect().left, y - image.getBoundingClientRect().top); zoom.lastTap = 0; }
+          else zoom.lastTap = now;
+        }
+        zoom.start = null;
+        renderZoom();
+      }
+    };
+    image.addEventListener("pointerup", endPointer);
+    image.addEventListener("pointercancel", event => { zoom.pointers.delete(event.pointerId); zoom.pinch = null; zoom.start = null; });
+    image.addEventListener("click", event => {
+      // Mouse click toggles zoom; touch double-tap is handled by pointer events.
+      if (event.pointerType === "mouse") toggleZoom(event.offsetX, event.offsetY);
     });
 
   } else if (
