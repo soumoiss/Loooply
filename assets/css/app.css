@@ -400,3 +400,152 @@ html[data-theme="noite"] .card-row, html[data-theme="noite"] .track-card { box-s
 .media-comment-popover[hidden] { display:none; }
 .media-comment-popover p { margin:0; white-space:pre-wrap; overflow-wrap:anywhere; font-size:12px; line-height:1.5; }
 @media (max-width:520px) { .media-comment-toggle { width:40px; height:40px; top:7px; right:7px; } .media-comment-popover { top:52px; } }
+
+
+/* Janelas de comentários da galeria e do player musical.
+   Usam tokens globais para respeitar automaticamente todos os temas do Looply. */
+.media-comment-overlay,
+.music-player-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  display: grid;
+  place-items: center;
+  padding: clamp(8px, 2vw, 22px);
+  background: rgba(13, 8, 20, .72);
+  backdrop-filter: blur(12px);
+}
+.media-comment-window,
+.music-player-window {
+  width: min(680px, 100%);
+  max-height: min(92dvh, 920px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 28px 100px rgba(0,0,0,.38);
+  animation: looply-window-in .18s ease-out;
+}
+.media-comment-window-head,
+.music-player-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 15px 18px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+.media-comment-window-head h2,
+.music-player-header h2 {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.35;
+  color: var(--text);
+}
+.media-comment-window-subtitle,
+.music-player-header p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.media-comment-window-subtitle { padding: 12px 18px 0; color: var(--primary); font-weight: 800; }
+.media-comment-window-content {
+  padding: 18px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.75;
+  font-size: 14px;
+  color: var(--text);
+}
+.lightbox-comment-action { flex: 0 0 auto; }
+.music-player-overlay[aria-hidden="true"] { display: none; }
+.music-player-window { width: min(980px, 100%); max-height: 94dvh; }
+.music-player-scroll { min-height: 0; overflow: auto; padding: 15px 18px 20px; }
+.music-player-frame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #08060c;
+}
+.music-player-frame iframe { display: block; width: 100%; height: 100%; border: 0; }
+.music-comments-section { margin-top: 18px; }
+.music-comments-section h3 { margin: 0 0 11px; font-size: 16px; color: var(--text); }
+.music-comments-list { display: grid; }
+.music-comments-empty {
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--surface-soft);
+  color: var(--muted);
+  font-size: 12px;
+}
+.music-thread-comment { padding: 13px 0; border-bottom: 1px solid var(--line); }
+.music-thread-comment:last-child { border-bottom: 0; }
+.music-thread-comment-meta { margin-bottom: 6px; color: var(--muted); font-size: 10px; }
+.music-thread-comment-text { margin: 0; color: var(--text); white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.6; font-size: 13px; }
+.music-thread-attachments { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.music-thread-attachments img {
+  display: block;
+  width: auto;
+  max-width: min(100%, 260px);
+  max-height: 240px;
+  object-fit: contain;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-soft);
+}
+.music-comment-form {
+  margin-top: 14px;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--surface-soft);
+}
+.music-comment-form textarea {
+  width: 100%;
+  min-height: 82px;
+  resize: vertical;
+  background: var(--surface-strong);
+  color: var(--text);
+}
+.music-comment-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; margin-top: 9px; }
+.music-attach-button {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--surface-strong);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 850;
+  cursor: pointer;
+}
+.music-comment-files { flex: 1 1 90px; min-width: 0; color: var(--muted); font-size: 10px; overflow-wrap: anywhere; }
+.music-comment-status { margin: 8px 0 0; color: var(--muted); font-size: 11px; }
+.music-comment-status:empty { display: none; }
+.music-player-open { overflow: hidden; }
+@keyframes looply-window-in { from { opacity: 0; transform: translateY(7px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (max-width: 560px) {
+  .media-comment-overlay, .music-player-overlay { padding: 5px; }
+  .media-comment-window, .music-player-window { border-radius: 17px; max-height: 98dvh; }
+  .media-comment-window-head, .music-player-header { padding: 12px; }
+  .media-comment-window-head h2, .music-player-header h2 { font-size: 15px; }
+  .media-comment-window-content { padding: 14px; font-size: 13px; }
+  .media-comment-window-subtitle { padding: 10px 14px 0; }
+  .music-player-scroll { padding: 10px; }
+  .music-player-frame { border-radius: 10px; }
+  .music-comment-form { padding: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .media-comment-window, .music-player-window { animation: none; }
+}
