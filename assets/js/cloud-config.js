@@ -12,3 +12,4 @@ enabled() {
     && !this.supabaseUrl.includes("https://kgrxvsizfmaxlosiitec.supabase.co")
     && !this.supabaseAnonKey.includes("sb_publishable_pQz-Q8I_yaBZNDrXWt6EMw_f1_FUveY");
 }
+});
