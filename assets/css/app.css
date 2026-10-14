@@ -287,8 +287,9 @@ body.modal-open { overflow:hidden; }
 .lightbox-head-actions a, .lightbox-head-actions button { width:38px; height:38px; display:grid; place-items:center; border:1px solid rgba(255,255,255,.10); border-radius:11px; background:rgba(255,255,255,.05); color:#fff; text-decoration:none; cursor:pointer; }
 .lightbox-body { min-height:240px; max-height:78dvh; display:grid; place-items:center; overflow:auto; padding:0 14px 14px; }
 .lightbox-body img, .lightbox-body video { max-width:100%; max-height:75dvh; display:block; border-radius:15px; object-fit:contain; image-orientation:from-image; }
-.lightbox-body img.lightbox-zoomable { touch-action:none; transform-origin:0 0; user-select:none; -webkit-user-drag:none; cursor:zoom-in; }
-.lightbox-body img.lightbox-zoomable.is-zoomed { cursor:grab; will-change:transform; }
+.lightbox-body img.lightbox-zoomable { cursor:zoom-in; touch-action:pan-y; transform-origin:center center; transition:transform .12s ease; }
+.lightbox-body.is-image-zoomed { overflow:auto; touch-action:pan-x pan-y; }
+.lightbox-body img.lightbox-zoomable.is-zoomed { cursor:zoom-out; max-width:none; max-height:none; }
 .lightbox-body audio { width:min(100%,600px); }
 
 .splash-page { min-height:100dvh; overflow:hidden; display:grid; place-items:center; background:linear-gradient(180deg,#7010b0 0%,#6010a0 50%,#f5f0fa 50%,#f5f0fa 100%); font-family:'Cabin Sketch',cursive; }
@@ -387,3 +388,15 @@ html[data-theme="noite"] .card-row, html[data-theme="noite"] .track-card { box-s
 @media (max-width:760px) { .memory-radar-chapters { grid-template-columns:repeat(2,minmax(0,1fr)); } .memory-chapter:last-child:nth-child(odd) { grid-column:1/-1; } }
 @media (max-width:480px) { .memory-radar { grid-template-columns:minmax(0,1fr); padding:17px; border-radius:20px; } .memory-radar-summary { grid-row:2; justify-self:start; grid-template-columns:auto auto; align-items:center; gap:8px; } .memory-radar-summary strong { font-size:21px; } .memory-radar-chapters { grid-column:1; gap:7px; } .memory-chapter { padding:11px; } .memory-radar-footer { grid-column:1; align-items:flex-start; flex-direction:column; } }
 @media (prefers-reduced-motion:reduce) { .memory-chapter { transition:none; } .memory-chapter:hover { transform:none; } }
+
+
+/* Comentários de fotos: o ícone só é inserido pelo JavaScript quando existe texto. */
+.media-card { position:relative; }
+.media-comment-toggle { position:absolute; z-index:4; top:9px; right:9px; width:38px; height:38px; display:grid; place-items:center; padding:0; border:1px solid rgba(255,255,255,.72); border-radius:50%; background:rgba(28,20,35,.78); color:#fff; box-shadow:0 3px 12px rgba(0,0,0,.22); cursor:pointer; backdrop-filter:blur(8px); }
+.media-comment-toggle:hover, .media-comment-toggle[aria-expanded="true"] { background:var(--primary); }
+.media-comment-toggle svg { width:19px; height:19px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.media-comment-toggle:focus-visible { outline:3px solid rgba(155,93,229,.65); outline-offset:2px; }
+.media-comment-popover { position:absolute; z-index:5; top:54px; left:8px; right:8px; max-height:min(55%,240px); overflow:auto; padding:12px 13px; border:1px solid rgba(255,255,255,.18); border-radius:13px; background:rgba(24,18,31,.94); color:#fff; box-shadow:0 8px 24px rgba(0,0,0,.28); backdrop-filter:blur(12px); }
+.media-comment-popover[hidden] { display:none; }
+.media-comment-popover p { margin:0; white-space:pre-wrap; overflow-wrap:anywhere; font-size:12px; line-height:1.5; }
+@media (max-width:520px) { .media-comment-toggle { width:40px; height:40px; top:7px; right:7px; } .media-comment-popover { top:52px; } }
