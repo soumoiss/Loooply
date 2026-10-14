@@ -15,12 +15,12 @@ const state = {
   // Filtro opcional do Radar de Memórias; YYYY-MM-DD ou vazio.
   memoryDate: "",
   lightboxIndex: -1,
-  username: "",
-  fullscreenListenerBound: false
+  username: ""
 };
 
 
 const elements = {};
+const mediaMessageCache = new Map();
 
 
 function cacheElements() {
@@ -169,39 +169,29 @@ function normalizeType(value) {
 // Prioriza datas explicitamente gravadas no índice; quando faltam, tenta inferir
 // datas comuns do nome do arquivo (YYYY-MM-DD ou YYYYMMDD). Não inventa datas.
 function inferISODate(source, src) {
-  const filenameSource = String(source?.path || source?.src || source?.name || src || "");
-  const filename = filenameSource.split(/[?#]/, 1)[0].split("/").pop() || "";
-  const compactTimestamp = filename.match(/(?:^|[^0-9])(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})(?=[^0-9]|$)/);
-  const dashed = filename.match(/(?:^|[^0-9])(\d{4})-(\d{2})-(\d{2})(?=[^0-9]|$)/);
-  const compactDate = filename.match(/(?:^|[^0-9])(\d{4})(\d{2})(\d{2})(?=[^0-9]|$)/);
-  const filenameParts = compactTimestamp || dashed || compactDate;
-  if (filenameParts) {
-    const candidate = `${filenameParts[1]}-${filenameParts[2]}-${filenameParts[3]}`;
-    const parsed = fromISO(candidate);
-    if (parsed) return candidate;
+  const filename = String(src || "").split(/[?#]/, 1)[0].split("/").pop() || "";
+  // A data e hora exatas no nome prevalecem sobre a data de upload.
+  const exact = filename.match(/(?:^|[^0-9])(\d{4})(\d{2})(\d{2})_\d{6}(?=\.[^.]+$|$)/);
+  if (exact) {
+    const exactDate = `${exact[1]}-${exact[2]}-${exact[3]}`;
+    const parsedExact = new Date(`${exactDate}T12:00:00`);
+    if (!Number.isNaN(parsedExact.getTime()) && parsedExact.toISOString().slice(0, 10) === exactDate) return exactDate;
   }
 
-  // Preserva a fonte original do índice (date/createdAt/uploadedAt/modified).
-  // Também aceita timestamps ISO com hora/fuso sem alterar o dia civil informado.
-  for (const value of [source?.date, source?.createdAt, source?.uploadedAt, source?.uploadDate, source?.modified]) {
-    const explicit = String(value ?? "").trim();
-    const match = explicit.match(/^(\d{4}-\d{2}-\d{2})(?:$|T)/);
-    if (match && fromISO(match[1])) return match[1];
-    // Alguns índices guardam o timestamp de upload/modificação como Unix seconds
-    // (mtime), não como ISO. Converter para UTC e extrair o dia civil do índice
-    // evita que o fuso local desloque a data para o dia anterior/seguinte.
-    const numeric = typeof value === "number" ? value : (/^\d{10}(?:\.\d+)?$/.test(explicit) ? Number(explicit) : NaN);
-    if (Number.isFinite(numeric) && numeric > 0) {
-      const milliseconds = numeric < 1e12 ? numeric * 1000 : numeric;
-      const timestampDate = new Date(milliseconds);
-      if (!Number.isNaN(timestampDate.getTime())) {
-        const iso = `${timestampDate.getUTCFullYear()}-${String(timestampDate.getUTCMonth() + 1).padStart(2, "0")}-${String(timestampDate.getUTCDate()).padStart(2, "0")}`;
-        if (fromISO(iso)) return iso;
-      }
-    }
-  }
-  return "";
+  const explicit = [source?.date, source?.createdAt, source?.uploadedAt, source?.modified]
+    .map(value => String(value || "").trim())
+    .find(value => /^\d{4}-\d{2}-\d{2}(?:$|T)/.test(value));
+  if (explicit) return explicit.slice(0, 10);
+
+  // Compatibilidade com nomes antigos quando o índice não contém data de upload.
+  const dashed = filename.match(/(?:^|[^0-9])(\d{4}-\d{2}-\d{2})(?:[^0-9]|$)/);
+  const compact = filename.match(/(?:^|[^0-9])(\d{4})(\d{2})(\d{2})(?:[^0-9]|$)/);
+  const candidate = dashed?.[1] || (compact ? `${compact[1]}-${compact[2]}-${compact[3]}` : "");
+  if (!candidate) return "";
+  const parsed = new Date(`${candidate}T12:00:00`);
+  return Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== candidate ? "" : candidate;
 }
+
 
 function normalizeItem(item, index) {
   const source = item || {};
@@ -541,6 +531,39 @@ function renderCard(item, index) {
   const date = document.createElement("p"); date.textContent = item.date ? formatShort(item.date) : "Sem data";
   body.append(badges, title, date); card.append(visual, body);
   visual.addEventListener("click", () => openLightbox(index));
+
+  // Só cria o botão quando a foto realmente possui comentário não vazio.
+  if (item.type === "image") {
+    loadMediaMessage(item).then(message => {
+      if (!message || !card.isConnected) return;
+
+      const commentButton = document.createElement("button");
+      commentButton.type = "button";
+      commentButton.className = "media-comment-toggle";
+      commentButton.setAttribute("aria-label", `Ver comentário de ${item.title}`);
+      commentButton.setAttribute("aria-expanded", "false");
+      commentButton.title = "Ver comentário";
+      commentButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.5 8.5 0 0 1 8.7 3.9a8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/></svg>';
+
+      const commentPanel = document.createElement("div");
+      commentPanel.className = "media-comment-popover";
+      commentPanel.hidden = true;
+      commentPanel.setAttribute("role", "status");
+      const commentText = document.createElement("p");
+      commentText.textContent = message;
+      commentPanel.appendChild(commentText);
+
+      commentButton.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const willOpen = commentPanel.hidden;
+        commentPanel.hidden = !willOpen;
+        commentButton.setAttribute("aria-expanded", String(willOpen));
+      });
+      commentPanel.addEventListener("click", event => event.stopPropagation());
+      card.append(commentButton, commentPanel);
+    });
+  }
   return card;
 }
 
@@ -685,174 +708,32 @@ function applyFilters() {
 }
 
 
-async function loadMediaMessage(item) {
+function loadMediaMessage(item) {
   const source = String(item?.src || "");
-  if (!source) return "";
-  const clean = source.split(/[?#]/, 1)[0];
-  const slash = clean.lastIndexOf("/");
-  let filename = clean.slice(slash + 1);
-  try { filename = decodeURIComponent(filename); } catch {}
-  if (!filename) return "";
-  const base = clean.slice(0, slash + 1);
-  // Convenção estrita: MSG_<nome completo do arquivo de mídia>.txt
-  const messageUrl = `${base}MSG_${encodeURIComponent(filename)}.txt`;
-  try {
-    const response = await fetch(messageUrl, { cache: "no-cache" });
-    if (!response.ok) return "";
-    return (await response.text()).trim().slice(0, 5000);
-  } catch (error) {
-    console.debug("Looply: mensagem opcional indisponível para esta mídia.", error);
-    return "";
-  }
+  if (!source) return Promise.resolve("");
+  if (mediaMessageCache.has(source)) return mediaMessageCache.get(source);
+
+  const task = (async () => {
+    const clean = source.split(/[?#]/, 1)[0];
+    const slash = clean.lastIndexOf("/");
+    let filename = clean.slice(slash + 1);
+    try { filename = decodeURIComponent(filename); } catch {}
+    if (!filename) return "";
+    const base = clean.slice(0, slash + 1);
+    // Convenção existente: MSG_<nome completo do arquivo de mídia>.txt
+    const messageUrl = `${base}MSG_${encodeURIComponent(filename)}.txt`;
+    try {
+      const response = await fetch(messageUrl, { cache: "no-cache" });
+      if (!response.ok) return "";
+      return (await response.text()).trim().slice(0, 5000);
+    } catch (error) {
+      console.debug("Looply: mensagem opcional indisponível para esta mídia.", error);
+      return "";
+    }
+  })();
+  mediaMessageCache.set(source, task);
+  return task;
 }
-
-function setupLightboxImageGestures(image) {
-  const pointers = new Map();
-  const gesture = {
-    mode: "",
-    startX: 0,
-    startY: 0,
-    lastX: 0,
-    lastY: 0,
-    startDistance: 0,
-    startScale: 1,
-    anchorX: 0,
-    anchorY: 0,
-    scale: 1,
-    x: 0,
-    y: 0,
-    baseRect: null,
-    hadMultiplePointers: false
-  };
-
-  image.classList.add("lightbox-zoomable");
-  image.draggable = false;
-  image.style.transformOrigin = "0 0";
-
-  const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
-  const midpoint = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
-
-  function paint() {
-    if (gesture.scale <= 1.001) {
-      gesture.scale = 1;
-      gesture.x = 0;
-      gesture.y = 0;
-      image.style.transform = "";
-      image.classList.remove("is-zoomed");
-      image.style.cursor = "zoom-in";
-      return;
-    }
-    image.style.transform = `translate(${gesture.x}px, ${gesture.y}px) scale(${gesture.scale})`;
-    image.classList.add("is-zoomed");
-    image.style.cursor = "grab";
-  }
-
-  function startPinch() {
-    const pair = [...pointers.values()].slice(0, 2);
-    if (pair.length < 2) return;
-    if (!gesture.baseRect || gesture.scale === 1) {
-      image.style.transform = "";
-      gesture.baseRect = image.getBoundingClientRect();
-    }
-    const center = midpoint(pair[0], pair[1]);
-    gesture.mode = "pinch";
-    gesture.hadMultiplePointers = true;
-    gesture.startDistance = Math.max(1, distance(pair[0], pair[1]));
-    gesture.startScale = gesture.scale;
-    gesture.anchorX = (center.x - gesture.baseRect.left - gesture.x) / gesture.scale;
-    gesture.anchorY = (center.y - gesture.baseRect.top - gesture.y) / gesture.scale;
-  }
-
-  function onPointerDown(event) {
-    if (event.pointerType === "mouse" && event.button !== 0) return;
-    event.preventDefault();
-    if (!gesture.baseRect && gesture.scale === 1) {
-      image.style.transform = "";
-      gesture.baseRect = image.getBoundingClientRect();
-    }
-    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-    try { image.setPointerCapture(event.pointerId); } catch (_) {}
-
-    if (pointers.size >= 2) {
-      startPinch();
-      return;
-    }
-    gesture.mode = gesture.scale > 1 ? "pan" : "swipe";
-    gesture.startX = gesture.lastX = event.clientX;
-    gesture.startY = gesture.lastY = event.clientY;
-    gesture.hadMultiplePointers = false;
-  }
-
-  function onPointerMove(event) {
-    if (!pointers.has(event.pointerId)) return;
-    event.preventDefault();
-    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-
-    if (pointers.size >= 2) {
-      if (gesture.mode !== "pinch") startPinch();
-      const pair = [...pointers.values()].slice(0, 2);
-      const center = midpoint(pair[0], pair[1]);
-      const nextScale = Math.min(4, Math.max(1, gesture.startScale * distance(pair[0], pair[1]) / gesture.startDistance));
-      gesture.scale = nextScale;
-      gesture.x = center.x - gesture.baseRect.left - gesture.anchorX * nextScale;
-      gesture.y = center.y - gesture.baseRect.top - gesture.anchorY * nextScale;
-      paint();
-      return;
-    }
-
-    if (gesture.mode === "pan" && gesture.scale > 1) {
-      gesture.x += event.clientX - gesture.lastX;
-      gesture.y += event.clientY - gesture.lastY;
-      gesture.lastX = event.clientX;
-      gesture.lastY = event.clientY;
-      paint();
-    }
-  }
-
-  function finishPointer(event, cancelled = false) {
-    if (!pointers.has(event.pointerId)) return;
-    const wasSwipe = gesture.mode === "swipe" && !gesture.hadMultiplePointers && gesture.scale === 1;
-    const deltaX = event.clientX - gesture.startX;
-    const deltaY = event.clientY - gesture.startY;
-    pointers.delete(event.pointerId);
-
-    if (pointers.size >= 2) {
-      startPinch();
-      return;
-    }
-    if (pointers.size === 1) {
-      const remaining = [...pointers.values()][0];
-      gesture.mode = gesture.scale > 1 ? "pan" : "";
-      gesture.lastX = remaining.x;
-      gesture.lastY = remaining.y;
-      return;
-    }
-
-    gesture.mode = "";
-    if (gesture.scale <= 1.03) {
-      gesture.scale = 1;
-      paint();
-    }
-    if (!cancelled && wasSwipe && Math.abs(deltaX) >= 55 && Math.abs(deltaX) > Math.abs(deltaY) * 1.25) {
-      moveLightbox(deltaX < 0 ? 1 : -1);
-    }
-  }
-
-  image.addEventListener("pointerdown", onPointerDown);
-  image.addEventListener("pointermove", onPointerMove);
-  image.addEventListener("pointerup", event => finishPointer(event));
-  image.addEventListener("pointercancel", event => finishPointer(event, true));
-  image.addEventListener("lostpointercapture", event => finishPointer(event, true));
-  image.addEventListener("dblclick", event => {
-    event.preventDefault();
-    gesture.scale = 1;
-    gesture.x = 0;
-    gesture.y = 0;
-    gesture.baseRect = null;
-    paint();
-  });
-}
-
 
 function openLightbox(index) {
   const item =
@@ -903,7 +784,14 @@ function openLightbox(index) {
 
 
     body.appendChild(image);
-    setupLightboxImageGestures(image);
+    image.classList.add("lightbox-zoomable");
+    image.setAttribute("title", "Toque para ampliar; toque novamente para restaurar");
+    image.addEventListener("click", () => {
+      const zoomed = image.classList.toggle("is-zoomed");
+      image.style.transform = zoomed ? "scale(2)" : "scale(1)";
+      image.style.cursor = zoomed ? "zoom-out" : "zoom-in";
+      body.classList.toggle("is-image-zoomed", zoomed);
+    });
 
   } else if (
     item.type === "video"
@@ -944,10 +832,8 @@ function openLightbox(index) {
     audio.controls =
       true;
 
-
     audio.preload =
       "metadata";
-
 
     audio.src =
       item.src;
@@ -959,21 +845,7 @@ function openLightbox(index) {
   }
 
 
-  // A seção só existe quando o arquivo de mensagem contém texto.
-  loadMediaMessage(item).then(message => {
-    if (!message || !body.isConnected || state.items[state.lightboxIndex] !== item) return;
-    const messagePanel = document.createElement("section");
-    messagePanel.className = "media-message-panel";
-    messagePanel.setAttribute("aria-labelledby", "mediaMessageTitle");
-    const messageHeading = document.createElement("h3");
-    messageHeading.id = "mediaMessageTitle";
-    messageHeading.textContent = "Mensagem";
-    const messageContent = document.createElement("p");
-    messageContent.className = "media-message-content";
-    messageContent.textContent = message;
-    messagePanel.append(messageHeading, messageContent);
-    body.appendChild(messagePanel);
-  });
+  // Comentários são exibidos sob demanda pelo ícone da própria fotografia.
 
   if (elements.lightboxTitle) {
     elements.lightboxTitle.textContent =
@@ -1039,41 +911,26 @@ function openLightbox(index) {
 
 async function toggleLightboxFullscreen() {
   const panel = elements.lightbox?.querySelector(".lightbox-panel");
-  if (!panel || !elements.lightbox) return;
-
-  // O modo alternativo também precisa funcionar como um verdadeiro alternador.
-  if (elements.lightbox.classList.contains("is-fallback-fullscreen")) {
-    elements.lightbox.classList.remove("is-fallback-fullscreen");
-    syncFullscreenButton();
-    return;
-  }
-
+  if (!panel) return;
   try {
     if (document.fullscreenElement === panel) {
-      if (document.exitFullscreen) await document.exitFullscreen();
-      else elements.lightbox.classList.add("is-fallback-fullscreen");
+      await document.exitFullscreen();
     } else if (panel.requestFullscreen) {
       await panel.requestFullscreen();
     } else {
+      // Fallback para navegadores sem Fullscreen API: o lightbox já ocupa a tela.
       elements.lightbox.classList.add("is-fallback-fullscreen");
     }
   } catch (error) {
-    // Alguns WebViews/navegadores expõem Fullscreen API, mas recusam a chamada.
-    // Nesse caso, ativa o modo alternativo em vez de deixar o botão sem efeito.
-    console.warn("Looply: API de tela cheia indisponível; usando modo alternativo.", error);
-    elements.lightbox.classList.add("is-fallback-fullscreen");
+    console.warn("Looply: o navegador não permitiu entrar em tela cheia.", error);
   }
-  syncFullscreenButton();
 }
 
 function syncFullscreenButton() {
   const button = elements.lightboxFullscreen;
   if (!button) return;
   const panel = elements.lightbox?.querySelector(".lightbox-panel");
-  const active = Boolean(
-    (panel && document.fullscreenElement === panel) ||
-    elements.lightbox?.classList.contains("is-fallback-fullscreen")
-  );
+  const active = Boolean(panel && document.fullscreenElement === panel);
   button.setAttribute("aria-pressed", String(active));
   button.setAttribute("aria-label", active ? "Sair da tela cheia" : "Abrir em tela cheia");
   button.title = active ? "Sair da tela cheia" : "Tela cheia";
@@ -1290,10 +1147,37 @@ export async function initGallery() {
   elements.lightboxFullscreen
     ?.addEventListener("click", () => { void toggleLightboxFullscreen(); });
 
-  if (!state.fullscreenListenerBound) {
-    document.addEventListener("fullscreenchange", syncFullscreenButton);
-    state.fullscreenListenerBound = true;
-  }
+  document.addEventListener("fullscreenchange", syncFullscreenButton);
+
+  // Navegação por gesto funciona no lightbox comum e em tela cheia.
+  let swipeStartX = 0;
+  let swipeStartY = 0;
+  elements.lightboxBody?.addEventListener("touchstart", event => {
+    if (event.touches.length !== 1) return;
+    swipeStartX = event.touches[0].clientX;
+    swipeStartY = event.touches[0].clientY;
+  }, { passive: true });
+  elements.lightboxBody?.addEventListener("touchend", event => {
+    if (event.changedTouches.length !== 1) return;
+    const dx = event.changedTouches[0].clientX - swipeStartX;
+    const dy = event.changedTouches[0].clientY - swipeStartY;
+    const zoomed = elements.lightboxBody.querySelector("img.is-zoomed");
+    if (!zoomed && Math.abs(dx) >= 55 && Math.abs(dx) > Math.abs(dy) * 1.25) {
+      moveLightbox(dx < 0 ? 1 : -1);
+    }
+  }, { passive: true });
+  elements.lightboxBody?.addEventListener("wheel", event => {
+    const image = elements.lightboxBody.querySelector("img.lightbox-zoomable");
+    if (!image || !event.ctrlKey) return;
+    event.preventDefault();
+    const current = Number(image.dataset.zoom || 1);
+    const next = Math.max(1, Math.min(4, current + (event.deltaY < 0 ? 0.25 : -0.25)));
+    image.dataset.zoom = String(next);
+    image.style.transform = `scale(${next})`;
+    image.style.cursor = next > 1 ? "zoom-out" : "zoom-in";
+    image.classList.toggle("is-zoomed", next > 1);
+    elements.lightboxBody.classList.toggle("is-image-zoomed", next > 1);
+  }, { passive: false });
 
   elements.lightbox
     ?.addEventListener(
