@@ -6,8 +6,10 @@ export const CLOUD_CONFIG = Object.freeze({
   supabaseAnonKey: "sb_publishable_pQz-Q8I_yaBZNDrXWt6EMw_f1_FUveY",
   
 
+
 enabled() {
   return /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(this.supabaseUrl)
+    && typeof this.supabaseAnonKey === "string"
     && this.supabaseAnonKey.length > 30
     && !this.supabaseUrl.includes("https://kgrxvsizfmaxlosiitec.supabase.co")
     && !this.supabaseAnonKey.includes("sb_publishable_pQz-Q8I_yaBZNDrXWt6EMw_f1_FUveY");
