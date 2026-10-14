@@ -150,17 +150,32 @@ def main() -> None:
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
 
     previous_dates: dict[str, str] = {}
+    previous_items: dict[str, tuple[str, str, dict]] = {}
     if OUTPUT.exists():
         try:
             previous = json.loads(OUTPUT.read_text(encoding="utf-8"))
-            collections = [previous.get("fotos", []), previous.get("audios", []), previous.get("videos", [])]
-            collections.extend((previous.get("exclusivo") or {}).values())
-            for collection in collections:
-                for item in collection if isinstance(collection, list) else []:
-                    if isinstance(item, dict) and item.get("path") and item.get("uploadedAt"):
-                        previous_dates[str(item["path"])] = str(item["uploadedAt"])
+            collections = [
+                ("fotos", "", previous.get("fotos", [])),
+                ("audios", "", previous.get("audios", [])),
+                ("videos", "", previous.get("videos", [])),
+            ]
+            collections.extend(
+                ("exclusivo", str(owner), items)
+                for owner, items in (previous.get("exclusivo") or {}).items()
+            )
+            for category, owner, collection in collections:
+                if not isinstance(collection, list):
+                    continue
+                for item in collection:
+                    if not isinstance(item, dict) or not item.get("path"):
+                        continue
+                    path_key = str(item["path"])
+                    previous_items[path_key] = (category, owner, item)
+                    if item.get("uploadedAt"):
+                        previous_dates[path_key] = str(item["uploadedAt"])
         except (OSError, ValueError, TypeError):
-            pass
+            previous_items = {}
+            previous_dates = {}
 
     files = sorted(
         (path for path in MEDIA_DIR.rglob("*") if path.is_file() and path.suffix.lower() in EXTENSIONS),
@@ -178,7 +193,10 @@ def main() -> None:
             ignored.append(path.relative_to(ROOT).as_posix())
             continue
 
-        item = build_item(path, previous_dates)
+        generated_item = build_item(path, previous_dates)
+        previous_record = previous_items.get(generated_item["path"])
+        # Mantém campos legados/metadados personalizados; os campos gerados atuais prevalecem.
+        item = ({**previous_record[2], **generated_item} if previous_record else generated_item)
         owner = owner_from_path(path)
 
         if owner:
@@ -191,6 +209,27 @@ def main() -> None:
             audios.append(item)
         else:
             videos.append(item)
+
+    # Segurança: não apaga silenciosamente referências antigas que não estejam presentes
+    # no checkout/export recebido. Elas são preservadas e listadas para auditoria.
+    current_paths = {path.relative_to(ROOT).as_posix() for path in files if is_allowed_shared_path(path)}
+    preserved_missing: list[str] = []
+    for path_key, (category, owner, old_item) in previous_items.items():
+        if path_key in current_paths or not path_key.startswith("midia/"):
+            continue
+        preserved_missing.append(path_key)
+        if category == "exclusivo":
+            target_owner = owner if owner in exclusivo else None
+            if target_owner:
+                exclusivo[target_owner].append(old_item)
+                continue
+        media_type = str(old_item.get("type", "")).lower()
+        if category == "fotos" or media_type in {"foto", "image", "imagem"}:
+            fotos.append(old_item)
+        elif category == "audios" or media_type in {"audio", "áudio"}:
+            audios.append(old_item)
+        elif category == "videos" or media_type in {"video", "vídeo"}:
+            videos.append(old_item)
 
     fotos = sort_items(fotos)
     audios = sort_items(audios)
@@ -230,6 +269,10 @@ def main() -> None:
     if ignored:
         print("Arquivos em subpastas não reconhecidas foram ignorados:")
         for path in ignored:
+            print(f"  - {path}")
+    if preserved_missing:
+        print("AVISO: referências antigas sem arquivo físico foram preservadas para evitar perda de registros:")
+        for path in preserved_missing:
             print(f"  - {path}")
 
 
