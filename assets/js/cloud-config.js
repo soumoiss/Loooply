@@ -9,7 +9,7 @@ export const CLOUD_CONFIG = Object.freeze({
     return /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(this.supabaseUrl)
       && typeof this.supabaseAnonKey === "string"
       && this.supabaseAnonKey.length > 20
-      && !this.supabaseUrl.includes("COLE_AQUI")
-      && !this.supabaseAnonKey.includes("COLE_AQUI");
+      && !this.supabaseUrl.includes("https://kgrxvsizfmaxlosiitec.supabase.co")
+      && !this.supabaseAnonKey.includes("sb_publishable_pQz-Q8I_yaBZNDrXWt6EMw_f1_FUveY");
   }
 });
