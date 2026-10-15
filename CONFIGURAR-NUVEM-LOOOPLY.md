@@ -7,15 +7,14 @@
 - Supabase Storage privado para fotografias anexadas aos comentários.
 - Políticas RLS para que o navegador nunca receba uma chave administrativa secreta.
 
-**Importante:** esta integração só passa a sincronizar de verdade depois de configurar o projeto Supabase e suas credenciais. Enquanto `assets/js/cloud-config.js` estiver com os textos de exemplo, o app continua no modo local anterior. Não existe ainda um projeto Supabase provisionado por este código.
+**Estado verificado em 14/10/2026:** o projeto Supabase `Loooply` já existe e está ativo. A URL e a chave publicável estão configuradas em `assets/js/cloud-config.js`. Foi corrigido um defeito de validação que rejeitava esses próprios valores, desativando a integração. A tabela de comentários também já está publicada em `supabase_realtime`.
 
-## 1. Criar o projeto Supabase
+## 1. Conferir a configuração do projeto Supabase
 
-1. Entre em https://supabase.com/ e crie um projeto para o Loooply.
-2. Guarde a senha do banco em um gerenciador de senhas; ela não é a senha de login do Loooply.
-3. Em **Project Settings → API**, copie a **Project URL** e a chave **anon/public** (ou publishable).
-4. Abra `assets/js/cloud-config.js` e substitua `COLE_AQUI_A_URL_DO_SUPABASE` e `COLE_AQUI_A_CHAVE_ANON_PUBLICA` pelos dois valores.
-5. Nunca cole no front-end a chave `service_role`/secret do Supabase. Ela ignora as políticas de segurança e daria controle total do banco a qualquer pessoa que inspecionasse o site.
+1. Entre em https://supabase.com/ e abra o projeto `Loooply`.
+2. Em **Project Settings → API**, confira a **Project URL** e a chave publicável. Compare com `assets/js/cloud-config.js` sem copiar chaves secretas para o navegador.
+3. Nunca cole no front-end a chave `service_role`/secret do Supabase. Ela ignora as políticas de segurança e daria controle total do banco a qualquer pessoa que inspecionasse o site.
+4. Não crie um segundo projeto sem necessidade: use o projeto existente e revise o ambiente antes de aplicar migrações.
 
 ## 2. Criar tabelas e políticas
 
@@ -25,8 +24,12 @@ No Supabase, abra **SQL Editor → New query**, cole todo o conteúdo de `supaba
 
 Não é seguro definir uma senha real dentro dos arquivos do projeto. A senha será escolhida por você no painel de autenticação.
 
+A conta `peixinho` já foi encontrada no banco com perfil `Peixinho`, papel `admin`, identidade Auth confirmada e sem banimento ativo. Não crie uma segunda conta com o mesmo apelido. A senha inicial solicitada ainda precisa ser definida por um fluxo administrativo de Auth seguro, pois a ferramenta usada nesta recuperação não oferece a operação oficial de redefinição de senha.
+
+Se precisar provisionar a conta em outro ambiente, siga estes passos:
+
 1. No Supabase, abra **Authentication → Users → Add user → Create new user**.
-2. Crie o usuário com e-mail `peixinho@loooply.app` e escolha uma senha forte que só você conheça.
+2. Use o e-mail interno `peixinho@loooply.app` e defina uma senha forte pelo painel administrativo.
 3. Se houver a opção de confirmar o e-mail, marque o usuário como confirmado. Esse e-mail é um identificador interno para o login por apelido; não é uma caixa postal real.
 4. Copie o UUID desse usuário na lista Authentication → Users.
 5. No SQL Editor, execute o comando abaixo substituindo `UUID-DO-USUARIO` pelo UUID real:
@@ -55,15 +58,15 @@ A integração cria automaticamente o perfil de cada conta com função `user`. 
 - O painel `admin.html` consulta todos os perfis e até os 500 comentários mais recentes, incluindo anexos. A busca filtra usuário, faixa e texto.
 - O histórico antigo guardado no IndexedDB não é migrado automaticamente para a nuvem. Ele continuará no dispositivo antigo, a menos que seja copiado/importado em uma etapa separada.
 
-## 6. Publicação e testes
+## 6. Publicação, migrações e testes
 
-Publique todos os arquivos modificados no mesmo local em que o Loooply já é hospedado, incluindo `admin.html`, `assets/js/cloud.js`, `assets/js/cloud-config.js`, `assets/js/comments-store.js` e `supabase/schema.sql` (o SQL também precisa ser executado no painel Supabase; apenas publicar o arquivo não cria tabelas).
+Publique os arquivos modificados no mesmo local em que o Loooply já é hospedado. As migrações versionadas em `supabase/migrations/` foram aplicadas ao projeto remoto durante esta recuperação; `supabase/schema.sql` documenta o esquema reproduzível para ambientes novos. Não reaplique migrações fora de ordem nem crie um segundo projeto sem revisar o estado atual.
 
-Use HTTPS para que o Supabase Auth funcione corretamente. Teste com duas contas e dois dispositivos: publicar um comentário com uma foto no primeiro, sair, entrar no segundo e abrir a mesma música. Em seguida, entre como Peixinho e confira o painel administrador.
+Use HTTPS para que o Supabase Auth funcione corretamente. Antes de declarar a validação ponta a ponta, teste com duas contas Auth reais em dois navegadores: publicar um comentário com uma foto no primeiro, confirmar o registro no banco, observar a atualização em tempo real no segundo, recarregar e conferir a persistência. Em seguida, entre como Peixinho e confira o painel administrador.
 
 ## Limitações conhecidas e segurança
 
-- Não é possível confirmar a sincronização real sem uma URL e uma chave válidas de um projeto Supabase, contas criadas e SQL executado.
+- O projeto e a configuração pública já existem, e a publicação Realtime foi verificada. Ainda falta o teste funcional de duas sessões autenticadas e a configuração da senha inicial de Peixinho.
 - A chave pública/anon é projetada para ficar no front-end; a segurança depende das políticas RLS do SQL. Nunca use `service_role` no navegador.
 - O acesso de administrador é somente de leitura no painel desta entrega, exceto que o SQL permite ao administrador ajustar perfis e excluir comentários. A interface ainda não expõe esses controles de moderação.
 - A chave da YouTube Data API que já existia no arquivo de músicas está visível no código público. No Google Cloud, restrinja-a por HTTP referrer aos domínios do app e apenas à YouTube Data API; se ela já foi publicada sem restrições, revogue-a e gere outra.

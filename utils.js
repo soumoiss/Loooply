@@ -14,19 +14,10 @@ const Utils = {
      * @param {string} password - Senha
      * @returns {boolean} - Sucesso do login
      */
-    login: function(username, password) {
-      const user = LOOOPLY_CONFIG.USERS[username];
-      
-      if (!user || user.password !== password) {
-        return false;
-      }
-
-      localStorage.setItem(LOOOPLY_CONFIG.STORAGE.LOGIN_STATE, 'true');
-      localStorage.setItem(LOOOPLY_CONFIG.STORAGE.USERNAME, username);
-      localStorage.setItem(LOOOPLY_CONFIG.STORAGE.PROFILE_PIC, user.profilePic);
-      localStorage.setItem(LOOOPLY_CONFIG.STORAGE.LAST_VISIT, new Date().toISOString());
-      
-      return true;
+    login: function(_username, _password) {
+      // Autenticação legada desativada: não valide senhas no cliente.
+      // As páginas atuais usam assets/js/session.js e Supabase Auth quando disponível.
+      return false;
     },
 
     /**

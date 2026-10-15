@@ -1,48 +1,59 @@
-# Loooply — diagnóstico e pacote de recuperação
+# Loooply — relatório de recuperação e validação
 
-## Causa confirmada
+## Corrigido e testado localmente
 
-A validação em `assets/js/cloud-config.js` foi alterada no commit `26e5067e3381155b61afc3093095dd6dcb1b17ae` para rejeitar a própria URL e a própria chave que estão configuradas no objeto. Como cada valor necessariamente contém a si mesmo, `CLOUD_CONFIG.enabled()` retorna `false`. Isso desativa a autenticação Supabase, o painel administrativo e a fonte de comentários na nuvem.
+- Corrigida a validação da configuração pública do Supabase: a versão recebida rejeitava explicitamente a própria URL e a própria chave configuradas, fazendo `CLOUD_CONFIG.enabled()` retornar `false`.
+- Preservado o login local legado sem tratá-lo falsamente como uma sessão Supabase; comentários locais continuam no IndexedDB para as contas não migradas.
+- Implementada a assinatura Supabase Realtime para comentários da thread musical ativa, com cancelamento ao fechar/trocar de música, recarga após inscrição e tratamento de falha de conexão.
+- Atualizado o esquema reproduzível para usar `private.is_loooply_admin()`, conforme o banco ativo, e removida a promoção administrativa por UUID fixo do script geral de schema.
+- Adicionada migração idempotente para publicar `public.music_comments` em `supabase_realtime`.
+- Adicionado teste de regressão para configuração cloud, contrato Realtime, esquema administrativo e utilitário de recuperação de mídia.
+- Adicionado `scripts/restaurar-midias-github.py`, que lista e baixa arquivos indexados de `soumoiss/Loooply` sem sobrescrever arquivos locais por padrão.
+- Removidas senhas legadas em texto puro do arquivo de configuração antigo e desativado o método de login inseguro daquele utilitário não referenciado pelas páginas atuais; a autenticação ativa permanece no módulo de sessão/Supabase.
 
-Referência: https://github.com/soumoiss/Loooply/commit/26e5067e3381155b61afc3093095dd6dcb1b17ae
+## Alterações confirmadas no Supabase real
 
-## Evidências examinadas
+Projeto `Loooply` (`kgrxvsizfmaxlosiitec`, região `us-east-2`) reportou status `ACTIVE_HEALTHY`.
 
-- Repositório público `soumoiss/Loooply`, branch principal `main`.
-- O Supabase identificou o projeto Loooply como `ACTIVE_HEALTHY`.
-- O perfil `peixinho` existe, tem papel `admin`, está associado a um usuário Auth confirmado e não está banido.
-- O estado atual do banco é: 1 usuário Auth, 1 perfil, 0 comentários musicais e 0 objetos no bucket de anexos.
-- O código local mantém quatro identidades legadas; portanto, ativar a nuvem sem separar os modos de sessão bloquearia esses logins.
-- No banco ativo as políticas chamam `private.is_loooply_admin()`, enquanto `supabase/schema.sql` ainda criava `public.is_loooply_admin()`. Isso é divergência entre a configuração reproduzível do repositório e o estado atual.
-- O painel do Supabase reportou a proteção contra senhas comprometidas desativada. Há também avisos de políticas permissivas duplicadas para perfis.
-- O projeto contém uma chave da YouTube Data API no JavaScript público. Ela não autentica usuários, mas precisa de restrição por domínio/API ou rotação no Google Cloud.
+- Perfil `peixinho` existe com nome de exibição `Peixinho` e papel `admin`.
+- A identidade Auth associada está confirmada e não está banida no momento da consulta.
+- `public.music_comments` existe, com RLS habilitada.
+- O bucket privado `music-comment-photos` existe com limite de 12 MiB e MIME types de imagem permitidos.
+- Aplicada a migração `enable_music_comments_realtime` no ambiente remoto.
+- Verificado depois da migração que `public.music_comments` aparece na publicação `supabase_realtime`.
+- A tabela de comentários está vazia neste momento; portanto não havia histórico remoto a preservar ou migrar.
 
-## O que o pacote prepara
+## Corrigido, mas não testado em ambiente real
 
-1. Corrige a validação para verificar marcadores de configuração não preenchida, em vez de rejeitar valores reais.
-2. Mantém os logins legados no modo local, enquanto identidades não presentes no cadastro legado usam Supabase Auth.
-3. Escolhe a persistência de comentários pela sessão autenticada, evitando que usuários locais tentem acessar tabelas da nuvem sem sessão.
-4. Faz o painel administrativo exigir uma sessão autenticada pelo Supabase, além da checagem de papel já feita no banco.
-5. Ajusta o teste estático e o teste de navegador para validar explicitamente o modo local com a nuvem configurada.
-6. Alinha o SQL de instalação com a função administrativa do esquema `private` utilizado no banco ativo.
+- A lógica de assinatura Realtime foi verificada por testes estáticos e de contrato, mas não foi possível realizar publicação simultânea com duas sessões de navegador nesta execução.
+- O fluxo de upload existente usa o bucket privado e URLs assinadas; não foi possível realizar upload real com uma sessão autenticada.
 
-## Limitações e tarefas ainda não concluídas
+## Preparado, mas depende de configuração externa
 
-- **Nenhuma alteração foi escrita no GitHub ou no banco de produção.** A criação da branch foi recusada pela integração GitHub com HTTP 403 (`Resource not accessible by integration`). Para evitar commits intermediários diretamente em `main`, o pacote prepara as mudanças para aplicação controlada.
-- Os quatro usuários legados ainda não têm contas Supabase demonstradas no banco. Enquanto não forem migrados de forma segura, seus comentários continuam locais e não sincronizam entre dispositivos. O histórico do IndexedDB não deve ser apagado nem será migrado automaticamente por este pacote.
-- Não foi possível comprovar login real via navegador, upload remoto, sincronização entre dois dispositivos nem teste negativo com duas contas distintas, pois a integração atual não dá acesso de escrita ao repositório e não foi disponibilizado um ambiente local completo.
-- A proteção contra senhas comprometidas precisa ser habilitada no painel de autenticação do Supabase; as ferramentas disponíveis nesta sessão não expõem essa configuração.
-- A chave do YouTube precisa ser restringida ou rotacionada por alguém com acesso às configurações do Google Cloud.
+- **Senha de Peixinho:** o perfil administrativo e a identidade Auth já existem, mas a senha inicial solicitada não foi alterada. As ferramentas disponíveis não expõem o endpoint administrativo de Auth para fazer essa operação pelo método oficial. Não foi feita alteração direta e arriscada em `auth.users` nem foi incluída senha em código público. Defina a senha pelo painel/fluxo administrativo seguro do Supabase e teste login normal.
+- **Mídias:** o ZIP recebido omite 248 mídias físicas referenciadas pelo índice. Os registros não foram apagados. O utilitário de restauração está incluído; execute-o num ambiente com acesso à internet para recuperar os binários do repositório GitHub e então rode o teste estático completo.
+- **Usuários legados:** Patati, Misol, Lilika e YARA continuam com autenticação local. O banco remoto contém apenas a identidade Auth de Peixinho. Não foi feita migração automática porque o repositório contém hashes locais, não credenciais utilizáveis para criar contas remotas sem redefinição segura.
+- **Proteção contra senhas comprometidas:** o Supabase Security Advisor reportou o recurso desativado; requer alteração nas configurações de Auth do painel.
+- **Chave da YouTube Data API:** já existe no código client-side. Restrinja-a por HTTP referrer e API no Google Cloud, ou faça rotação se não estiver limitada.
 
-## Aplicação e verificação
+## Não concluído / ausente no projeto fornecido
 
-Execute o script de aplicação contra uma cópia local atualizada do repositório. Ele valida todos os trechos esperados antes de alterar arquivos e grava os originais em `.loooply-recovery-backup/`.
+- Não foi encontrada implementação de chat ou de tabelas de conversas/mensagens no código atual. Não foi criado um chat novo porque isso exigiria definir e integrar uma funcionalidade inexistente, além de desenhar seu modelo de privacidade.
+- Não foi possível executar o teste Playwright de navegador: o Chromium do ambiente bloqueou a navegação local com `net::ERR_BLOCKED_BY_ADMINISTRATOR`.
+- Não foi possível validar a sincronização com duas contas reais, login de Peixinho após redefinição de senha, nem uploads remotos com arquivo real.
 
-```bash
-python apply_recovery.py /caminho/para/Loooply
-cd /caminho/para/Loooply
-node scripts/test-static.mjs --source-only
-python scripts/smoke_test.py
-```
+## Testes executados
 
-O teste de navegador exige Playwright e Chromium disponíveis. O pacote inclui um teste de regressão específico para a lógica da configuração. Execute também `node /caminho/do/pacote/tests/test-cloud-config.mjs /caminho/para/Loooply`, revise as alterações e execute os testes antes de publicar o resultado.
+- `node scripts/test-static.mjs --source-only` — aprovado; avisa corretamente que 248 mídias físicas estão ausentes no ZIP reduzido.
+- `node tests/test-cloud-config.mjs` — aprovado.
+- `node --input-type=module --check` em todos os módulos JavaScript — aprovado.
+- Compilação sintática de scripts Python — aprovada.
+- `python scripts/restaurar-midias-github.py --dry-run` — aprovado; encontrou 248 arquivos para restaurar.
+- `python scripts/smoke_test.py` — bloqueado pelo ambiente de navegador (`ERR_BLOCKED_BY_ADMINISTRATOR`), não aprovado.
+- `node scripts/test-static.mjs` sem `--source-only` — pendente até restaurar os binários; a falha por mídia ausente é intencionalmente preservada e não mascarada.
+- Consulta SQL após migração — confirmou que `public.music_comments` está na publicação `supabase_realtime`.
+- Security Advisor — um aviso de proteção de senha comprometida desativada permanece.
+
+## Como executar
+
+Sirva a pasta por HTTP/HTTPS em vez de abrir o HTML diretamente como `file://`. Consulte `CONFIGURAR-NUVEM-LOOOPLY.md` para os passos de autenticação e configuração. Restaure primeiro as mídias se quiser que o teste estático completo confirme todos os arquivos físicos.

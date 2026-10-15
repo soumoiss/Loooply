@@ -4,3 +4,5 @@ Thumbs.db
 .idea/
 node_modules/
 *.log
+.loooply-recovery-backup/
+*.download-tmp

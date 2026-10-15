@@ -41,28 +41,25 @@ const LOOOPLY_CONFIG = {
     USER_PREFERENCES: 'userPreferences'
   },
 
-  // Usuários autorizados (Simulado - Em produção usar autenticação real)
+  // Registro legado de perfis. Credenciais não ficam mais neste arquivo;
+  // o login ativo é gerenciado por assets/js/session.js.
   USERS: {
     'Patati': {
-      password: 'patati@123',
       profilePic: 'user1_perf.png',
       role: 'user',
       email: 'patati@moissworld.com'
     },
     'Misol': {
-      password: 'misol@1234000',
       profilePic: 'user2_perf.png',
       role: 'user',
       email: 'misol@moissworld.com'
     },
     'Lilika': {
-      password: 'lilika@1234000',
       profilePic: 'user3_perf.png',
       role: 'user',
       email: 'lilika@moissworld.com'
     },
     'YARA': {
-      password: 'yaraa@0309',
       profilePic: 'user4_perf.png',
       role: 'user',
       email: 'yara@moissworld.com'
