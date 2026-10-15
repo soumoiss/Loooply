@@ -67,6 +67,7 @@ try:
           localStorage.setItem('isLoggedIn','true');
           localStorage.setItem('username','Patati');
           localStorage.setItem('profilePic','user1_perf.png');
+          localStorage.setItem('looply_session_v2', JSON.stringify({authenticated:true, username:'Patati', profilePic:'user1_perf.png', role:'user', cloudAuthenticated:false, createdAt:new Date().toISOString()}));
           localStorage.setItem('looply_theme','noite');
         """)
         page = context.new_page()
