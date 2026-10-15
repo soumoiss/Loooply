@@ -41,6 +41,7 @@ async function load() {
     if (!cloudConfigured()) throw new Error("A nuvem ainda não está configurada. Siga CONFIGURAR-NUVEM-LOOOPLY.md.");
     const session = getSession();
     if (!session) { window.location.replace("login.html"); return; }
+    if (session.cloudAuthenticated !== true) throw new Error("Esta conta ainda usa autenticação local e não possui acesso ao painel administrativo.");
     data = await cloudAdminOverview();
     document.getElementById("adminGreeting").textContent = `Olá, ${data.profile.display_name || "Peixinho"}. Você está no modo administrador.`;
     status.textContent = `${data.users.length} usuário(s) · ${data.comments.length} comentário(s) carregados. Conteúdo protegido por permissões do banco de dados.`;

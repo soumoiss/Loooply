@@ -109,6 +109,35 @@ export async function cloudGetThread(threadKey) {
   return withSignedAttachments(client, data);
 }
 
+export async function cloudSubscribeToThread(threadKey, onChange, onStatus = () => {}) {
+  const key = String(threadKey || "").trim();
+  if (!key) throw new Error("A faixa não possui uma chave de comentários válida.");
+  if (typeof onChange !== "function") throw new Error("A atualização dos comentários exige uma função de retorno.");
+  const client = await getCloudClient();
+  const { data: { user }, error: authError } = await client.auth.getUser();
+  if (authError || !user) throw new Error("Entre na sua conta para sincronizar os comentários em tempo real.");
+
+  const channel = client.channel(`music-comments:${user.id}:${crypto.randomUUID()}`)
+    .on("postgres_changes", {
+      event: "*", schema: "public", table: "music_comments", filter: `thread_key=eq.${key}`
+    }, async () => {
+      try { await onChange(await cloudGetThread(key)); }
+      catch (error) { onStatus("CALLBACK_ERROR", error); }
+    })
+    .subscribe((status, error) => {
+      onStatus(status, error || null);
+      if (status === "SUBSCRIBED") {
+        // Re-fetch after joining the channel so updates during initial loading are not missed.
+        void cloudGetThread(key).then(onChange).catch(fetchError => onStatus("CALLBACK_ERROR", fetchError));
+      }
+    });
+
+  return async () => {
+    try { await client.removeChannel(channel); }
+    catch (error) { onStatus("UNSUBSCRIBE_ERROR", error); }
+  };
+}
+
 export async function cloudAddComment(threadKey, text, files = []) {
   const key = String(threadKey || "").trim();
   if (!key) throw new Error("A faixa não possui uma chave de comentários válida.");

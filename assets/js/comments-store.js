@@ -1,10 +1,15 @@
-import { cloudConfigured, cloudGetThread, cloudAddComment } from "./cloud.js";
+import { cloudConfigured, cloudGetThread, cloudAddComment, cloudSubscribeToThread } from "./cloud.js";
+import { getSession } from "./session.js";
 
 // IndexedDB é fallback local; com Supabase ativo, a nuvem é a fonte principal.
 const DB_NAME = "looply-comments";
 const DB_VERSION = 1;
 const STORE_NAME = "threads";
 let databasePromise;
+
+function useCloudComments() {
+  return cloudConfigured() && getSession()?.cloudAuthenticated === true;
+}
 
 function openDatabase() {
   if (databasePromise) return databasePromise;
@@ -27,7 +32,7 @@ function openDatabase() {
 export async function getThread(key) {
   key = String(key || "").trim();
   if (!key) throw new Error("A faixa não possui uma chave de comentários válida.");
-  if (cloudConfigured()) return cloudGetThread(key);
+  if (useCloudComments()) return cloudGetThread(key);
   const db = await openDatabase();
   return new Promise((resolve, reject) => {
     const request = db.transaction(STORE_NAME, "readonly").objectStore(STORE_NAME).get(key);
@@ -36,8 +41,15 @@ export async function getThread(key) {
   });
 }
 
+export async function subscribeThread(key, onChange, onStatus = () => {}) {
+  key = String(key || "").trim();
+  if (!key) throw new Error("A faixa não possui uma chave de comentários válida.");
+  if (!useCloudComments()) return async () => {};
+  return cloudSubscribeToThread(key, onChange, onStatus);
+}
+
 export async function saveThread(key, comments) {
-  if (cloudConfigured()) throw new Error("Com a nuvem ativa, publique comentários usando addComment.");
+  if (useCloudComments()) throw new Error("Com a nuvem ativa para esta sessão, publique comentários usando addComment.");
   key = String(key || "").trim();
   if (!key) throw new Error("A faixa não possui uma chave de comentários válida.");
   const db = await openDatabase();
@@ -53,7 +65,7 @@ export async function saveThread(key, comments) {
 export async function addComment(key, text, files = [], author = "") {
   key = String(key || "").trim();
   if (!key) throw new Error("A faixa não possui uma chave de comentários válida.");
-  if (cloudConfigured()) return cloudAddComment(key, text, files);
+  if (useCloudComments()) return cloudAddComment(key, text, files);
   const normalizedText = String(text || "").trim();
   if (!normalizedText && !files.length) throw new Error("Escreva um comentário ou anexe uma fotografia.");
   if (files.length > 6) throw new Error("Anexe no máximo 6 fotografias por comentário.");

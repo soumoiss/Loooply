@@ -1,6 +1,6 @@
 import { getSession } from "./session.js";
 import { cloudConfigured } from "./cloud.js";
-import { getThread, addComment, attachmentURL, formatCommentDate } from "./comments-store.js";
+import { getThread, addComment, attachmentURL, formatCommentDate, subscribeThread } from "./comments-store.js";
 
 /*
  * LOOPLY — SISTEMA DE MÚSICAS
@@ -1180,6 +1180,8 @@ function render() {
 let musicOverlay = null;
 let musicAttachmentURLs = [];
 let activeMusic = null;
+let stopMusicCommentsSubscription = null;
+let musicCommentsRenderVersion = 0;
 
 function revokeMusicAttachmentURLs() {
   for (const url of musicAttachmentURLs) URL.revokeObjectURL(url);
@@ -1235,6 +1237,10 @@ function musicThreadKey(track) {
 
 async function abrirMusica(track) {
   if (!track || (!track.videoId && !track.playlistId)) return;
+  if (stopMusicCommentsSubscription) {
+    await stopMusicCommentsSubscription();
+    stopMusicCommentsSubscription = null;
+  }
   activeMusic = track;
   revokeMusicAttachmentURLs();
   const overlay = ensureMusicOverlay();
@@ -1257,12 +1263,37 @@ async function abrirMusica(track) {
   document.getElementById("musicCommentStatus").textContent = "";
   overlay.setAttribute("aria-hidden", "false");
   document.body.classList.add("music-player-open");
+  const threadKey = musicThreadKey(track);
+  if (getSession()?.cloudAuthenticated === true) {
+    try {
+      const unsubscribe = await subscribeThread(threadKey, () => {
+        if (activeMusic && musicThreadKey(activeMusic) === threadKey) void renderMusicComments();
+      }, (status, error) => {
+        if (["CHANNEL_ERROR", "TIMED_OUT", "CALLBACK_ERROR"].includes(status)
+            && activeMusic && musicThreadKey(activeMusic) === threadKey) {
+          const message = document.getElementById("musicCommentStatus");
+          if (message) message.textContent = "A sincronização em tempo real foi interrompida; os comentários ainda podem ser atualizados manualmente.";
+          if (error) console.warn("Sincronização dos comentários:", error.message || error);
+        }
+      });
+      if (!activeMusic || musicThreadKey(activeMusic) !== threadKey) await unsubscribe();
+      else stopMusicCommentsSubscription = unsubscribe;
+    } catch (error) {
+      const message = document.getElementById("musicCommentStatus");
+      if (message) message.textContent = error.message || "Não foi possível iniciar a sincronização em tempo real.";
+    }
+  }
   await renderMusicComments();
   document.getElementById("musicPlayerClose").focus();
 }
 
 function fecharMusica() {
   if (!musicOverlay) return;
+  if (stopMusicCommentsSubscription) {
+    void stopMusicCommentsSubscription();
+    stopMusicCommentsSubscription = null;
+  }
+  musicCommentsRenderVersion++;
   musicOverlay.setAttribute("aria-hidden", "true");
   document.getElementById("musicPlayerFrame")?.replaceChildren();
   document.body.classList.remove("music-player-open");
@@ -1273,12 +1304,17 @@ function fecharMusica() {
 async function renderMusicComments() {
   const host = document.getElementById("musicCommentsList");
   if (!host || !activeMusic) return;
+  const trackAtStart = activeMusic;
+  const threadAtStart = musicThreadKey(trackAtStart);
+  const renderVersion = ++musicCommentsRenderVersion;
   revokeMusicAttachmentURLs();
   host.replaceChildren();
   let comments;
   try {
-    comments = await getThread(musicThreadKey(activeMusic));
+    comments = await getThread(threadAtStart);
+    if (renderVersion !== musicCommentsRenderVersion || !activeMusic || musicThreadKey(activeMusic) !== threadAtStart) return;
   } catch (error) {
+    if (renderVersion !== musicCommentsRenderVersion) return;
     const note = document.createElement("p");
     note.className = "music-comments-empty";
     note.textContent = error.message || "O armazenamento de comentários está indisponível.";
@@ -1340,7 +1376,11 @@ async function salvarComentarioMusica(event) {
     document.getElementById("musicCommentPhotos").value = "";
     document.getElementById("musicCommentFiles").textContent = "";
     await renderMusicComments();
-    status.textContent = cloudConfigured() ? "Comentário publicado na nuvem." : "Comentário salvo neste dispositivo. Configure a nuvem para sincronizar entre aparelhos.";
+    status.textContent = cloudConfigured()
+      ? (getSession()?.cloudAuthenticated === true
+          ? "Comentário publicado na nuvem."
+          : "Comentário salvo neste dispositivo. Esta conta ainda não foi migrada para a nuvem.")
+      : "Comentário salvo neste dispositivo. Configure a nuvem para sincronizar entre aparelhos.";
   } catch (error) {
     status.textContent = error.message || "Não foi possível salvar o comentário.";
   } finally {

@@ -25,12 +25,17 @@ function normalizeUsername(value) {
 }
 
 export async function authenticate(username, password) {
+  const legacyUsername = canonicalUsername(username);
+  const legacyUser = getUser(legacyUsername);
+  if (legacyUser) {
+    if (!password) return null;
+    const hash = await sha256Hex(String(password));
+    return hash === legacyUser.passwordHash
+      ? { username: legacyUsername, ...legacyUser, role: "user", cloudAuthenticated: false }
+      : null;
+  }
   if (cloudConfigured()) return cloudSignIn(username, password);
-  const normalized = normalizeUsername(username);
-  const user = getUser(normalized);
-  if (!user || !password) return null;
-  const hash = await sha256Hex(String(password));
-  return hash === user.passwordHash ? { username: normalized, ...user } : null;
+  return null;
 }
 
 export function createSession(username, profilePic = "", role = "user", cloudAuthenticated = false) {
@@ -63,20 +68,29 @@ export function getSession() {
   const legacyProfilePic = readString(APP_CONFIG.storage.profilePic, "");
   const user = username ? getUser(username) : null;
   const v2 = readJSON(APP_CONFIG.storage.sessionV2, null);
-  const validCloudSession = v2?.cloudAuthenticated === true && Boolean(username);
-  const valid = loggedIn && (cloudConfigured() ? validCloudSession : Boolean(user)) && (!v2 || v2.authenticated === true);
+  const validCloudSession = cloudConfigured()
+    && v2?.authenticated === true
+    && v2?.cloudAuthenticated === true
+    && v2.username === username
+    && Boolean(username);
+  const validLegacySession = Boolean(user)
+    && v2?.authenticated === true
+    && v2?.cloudAuthenticated === false
+    && v2.username === username;
+  const validLocalSession = cloudConfigured() ? validLegacySession : Boolean(user);
+  const valid = loggedIn && (validCloudSession || validLocalSession) && (!v2 || v2.authenticated === true);
   if (!valid) return null;
 
   const session = {
     authenticated: true,
     username,
     profilePic: user?.profilePic || legacyProfilePic || v2?.profilePic || "",
-    role: v2?.role || "user",
+    role: validCloudSession ? (v2?.role || "user") : "user",
     cloudAuthenticated: validCloudSession,
     createdAt: v2?.createdAt || null
   };
   if (user && legacyProfilePic !== user.profilePic) writeString(APP_CONFIG.storage.profilePic, user.profilePic);
-  if (!v2 || v2.username !== username || v2.profilePic !== session.profilePic || v2.role !== session.role) {
+  if (!v2 || v2.username !== username || v2.profilePic !== session.profilePic || v2.role !== session.role || v2.cloudAuthenticated !== session.cloudAuthenticated) {
     writeJSON(APP_CONFIG.storage.sessionV2, session);
   }
   return session;
