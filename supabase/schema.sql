@@ -51,8 +51,10 @@ grant select,insert,update,delete on public.music_comments to authenticated;
 drop policy if exists "profile owner reads own" on public.profiles;
 drop policy if exists "admin reads all profiles" on public.profiles;
 drop policy if exists "profiles read own or admin" on public.profiles;
-create policy "profiles read own or admin" on public.profiles for select to authenticated
-using(id=(select auth.uid()) or (select private.is_loooply_admin()));
+drop policy if exists "authenticated users discover profiles" on public.profiles;
+-- User discovery is intentional for recipient selection; admin authorization is still enforced by private.is_loooply_admin().
+create policy "authenticated users discover profiles" on public.profiles for select to authenticated
+using(true);
 drop policy if exists "user creates own non-admin profile" on public.profiles;
 create policy "user creates own non-admin profile" on public.profiles for insert to authenticated with check(id=(select auth.uid()) and role='user');
 drop policy if exists "user updates own non-admin profile" on public.profiles;
@@ -62,7 +64,9 @@ create policy "profiles update own or admin" on public.profiles for update to au
 using((id=(select auth.uid()) and role='user') or (select private.is_loooply_admin()))
 with check((id=(select auth.uid()) and role='user') or (select private.is_loooply_admin()));
 drop policy if exists "signed in users read music comments" on public.music_comments;
-create policy "signed in users read music comments" on public.music_comments for select to authenticated using(true);
+drop policy if exists "music comments private to owner and admins" on public.music_comments;
+create policy "music comments private to owner and admins" on public.music_comments for select to authenticated
+using(user_id=(select auth.uid()) or (select private.is_loooply_admin()));
 drop policy if exists "users publish as themselves" on public.music_comments;
 create policy "users publish as themselves" on public.music_comments for insert to authenticated with check(user_id=(select auth.uid()));
 drop policy if exists "users update own music comments" on public.music_comments;
@@ -73,7 +77,9 @@ insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types)
 values('music-comment-photos','music-comment-photos',false,12582912,array['image/jpeg','image/png','image/webp','image/gif','image/avif'])
 on conflict(id) do update set public=false,file_size_limit=excluded.file_size_limit,allowed_mime_types=excluded.allowed_mime_types;
 drop policy if exists "signed in users read music comment photos" on storage.objects;
-create policy "signed in users read music comment photos" on storage.objects for select to authenticated using(bucket_id='music-comment-photos');
+drop policy if exists "music comment photos private to owner and admins" on storage.objects;
+create policy "music comment photos private to owner and admins" on storage.objects for select to authenticated
+using(bucket_id='music-comment-photos' and ((storage.foldername(name))[1]=(select auth.uid())::text or (select private.is_loooply_admin())));
 drop policy if exists "users upload own music comment photos" on storage.objects;
 create policy "users upload own music comment photos" on storage.objects for insert to authenticated with check(bucket_id='music-comment-photos' and (storage.foldername(name))[1]=(select auth.uid())::text);
 drop policy if exists "users delete own music comment photos" on storage.objects;

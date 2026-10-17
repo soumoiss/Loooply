@@ -1,0 +1,67 @@
+name: Integridade e regressões
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches:
+      - "fix/**"
+      - "test/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: integridade-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-and-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            .github
+            assets
+            data
+            scripts
+            supabase
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Verificar sintaxe JavaScript
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r file; do
+            echo "Verificando $file"
+            node --input-type=module --check < "$file"
+          done < <(find assets/js -type f -name '*.js' -print | sort)
+          node --input-type=module --check < config.js
+          node --input-type=module --check < utils.js
+          node --check scripts/test-static.mjs
+
+      - name: Testes estáticos e de configuração
+        run: node scripts/test-static.mjs --source-only
+
+      - name: Configurar Python e Playwright
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar navegador de teste
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Teste de navegador — galeria e player musical
+        run: python scripts/smoke_test.py
