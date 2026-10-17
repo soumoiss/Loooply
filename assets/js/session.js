@@ -25,17 +25,18 @@ function normalizeUsername(value) {
 }
 
 export async function authenticate(username, password) {
+  // When cloud auth is configured, every login must be verified by Supabase.
+  // Never let a legacy local password bypass cloud authentication or RLS.
+  if (cloudConfigured()) return cloudSignIn(username, password);
+
   const legacyUsername = canonicalUsername(username);
   const legacyUser = getUser(legacyUsername);
-  if (legacyUser) {
-    if (!password) return null;
-    const hash = await sha256Hex(String(password));
-    return hash === legacyUser.passwordHash
-      ? { username: legacyUsername, ...legacyUser, role: "user", cloudAuthenticated: false }
-      : null;
-  }
-  if (cloudConfigured()) return cloudSignIn(username, password);
-  return null;
+  if (!legacyUser || !password) return null;
+
+  const hash = await sha256Hex(String(password));
+  return hash === legacyUser.passwordHash
+    ? { username: legacyUsername, ...legacyUser, role: "user", cloudAuthenticated: false }
+    : null;
 }
 
 export function createSession(username, profilePic = "", role = "user", cloudAuthenticated = false) {
