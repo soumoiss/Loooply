@@ -549,3 +549,39 @@ html[data-theme="noite"] .card-row, html[data-theme="noite"] .track-card { box-s
 @media (prefers-reduced-motion: reduce) {
   .media-comment-window, .music-player-window { animation: none; }
 }
+
+
+/* Navegação compartilhada — foco, rota atual e botão voltar. */
+.header-action.is-current,
+.navigation-button.is-current {
+  color: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 38%, transparent);
+  background: var(--lilac);
+}
+.header-action[aria-current="page"],
+.navigation-button[aria-current="page"] {
+  font-weight: 850;
+}
+.looply-back {
+  flex: 0 0 auto;
+  min-width: 42px;
+  min-height: 42px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0 10px;
+  cursor: pointer;
+}
+.looply-back svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+.header-action:focus-visible,
+.navigation-button:focus-visible,
+.looply-back:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--primary) 55%, transparent);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .header-action, .navigation-button, .looply-back { transition: none !important; }
+}
