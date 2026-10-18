@@ -1,4 +1,5 @@
 import { APP_CONFIG } from "./config.js";
+import { getSession } from "./session.js";
 
 const ICONS = Object.freeze({
   back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>'
@@ -54,6 +55,28 @@ export function initSharedNavigation() {
   });
 
   const header = document.querySelector(".page-header");
+  const session = getSession();
+  if (header && session && !header.querySelector("[data-looply-header-profile]")) {
+    const profile = document.createElement("a");
+    profile.className = "looply-header-profile";
+    profile.href = APP_CONFIG.routes.profile;
+    profile.dataset.route = "profile";
+    profile.dataset.looplyHeaderProfile = "true";
+    profile.setAttribute("aria-label", "Abrir meu perfil");
+    const avatar = document.createElement("img");
+    avatar.className = "looply-header-avatar";
+    avatar.alt = "";
+    avatar.setAttribute("aria-hidden", "true");
+    if (session.profilePic) avatar.src = session.profilePic;
+    const fallback = document.createElement("span");
+    fallback.className = "looply-header-avatar-fallback";
+    fallback.setAttribute("aria-hidden", "true");
+    fallback.textContent = String(session.username || "EU").slice(0, 2).toLocaleUpperCase("pt-BR");
+    profile.append(avatar, fallback);
+    avatar.addEventListener("error", () => { avatar.hidden = true; fallback.hidden = false; }, { once: true });
+    if (session.profilePic) fallback.hidden = true;
+    header.append(profile);
+  }
   const secondary = currentKey && !["index", "login", "home"].includes(currentKey);
   if (header && secondary && !header.querySelector("[data-looply-back]")) {
     const back = document.createElement("button");
