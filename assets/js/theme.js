@@ -1,3 +1,5 @@
+import "./navigation.js";
+
 /* Tema global do Loooply: persistente e aplicado por variáveis CSS. */
 const THEMES = Object.freeze({
   lilas: { primary: "#7010b0", primaryDark: "#5f1098", primaryDeep: "#503090", deep: "#302050", bg: "#f5f0fa", bg2: "#f0e0f0", lilac: "#f0e0f0", text: "#29252f", muted: "#817b89", line: "rgba(102,82,126,.12)", surface: "rgba(255,255,255,.94)", surfaceStrong: "#ffffff", surfaceSoft: "#faf7fc", paper: "#f4ebdd", paperText: "#342f2a" },
