@@ -68,6 +68,7 @@ export function initSharedNavigation() {
     avatar.alt = "";
     avatar.setAttribute("aria-hidden", "true");
     if (session.profilePic) avatar.src = session.profilePic;
+    else avatar.hidden = true;
     const fallback = document.createElement("span");
     fallback.className = "looply-header-avatar-fallback";
     fallback.setAttribute("aria-hidden", "true");
