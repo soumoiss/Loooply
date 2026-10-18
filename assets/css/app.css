@@ -585,3 +585,29 @@ html[data-theme="noite"] .card-row, html[data-theme="noite"] .track-card { box-s
 @media (prefers-reduced-motion: reduce) {
   .header-action, .navigation-button, .looply-back { transition: none !important; }
 }
+
+.looply-header-profile {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--lilac);
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 900;
+}
+.looply-header-avatar, .looply-header-avatar-fallback {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+.looply-header-avatar-fallback { display: grid; place-items: center; }
+.looply-header-avatar-fallback[hidden], .looply-header-avatar[hidden] { display: none; }
+.looply-header-profile:focus-visible { outline: 3px solid color-mix(in srgb, var(--primary) 55%, transparent); outline-offset: 3px; }
