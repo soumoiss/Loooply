@@ -109,10 +109,17 @@ export function requireAuth(redirect = APP_CONFIG.routes.login) {
   return session;
 }
 
-export function logout() {
-  void cloudSignOut();
-  clearSessionStorage();
-  window.location.replace(APP_CONFIG.routes.login);
+export async function logout() {
+  // O usuário pediu explicitamente para sair: encerra a sessão Supabase local
+  // antes do redirecionamento, evitando que o splash restaure a conta anterior.
+  try {
+    await cloudSignOut();
+  } catch (error) {
+    console.warn("Looply: não foi possível encerrar a sessão remota.", error);
+  } finally {
+    clearSessionStorage();
+    window.location.replace(APP_CONFIG.routes.login);
+  }
 }
 
 export function redirectIfAuthenticated() {
