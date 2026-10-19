@@ -70,7 +70,7 @@ export async function ensureCloudProfile(authUser, typedUsername = "") {
 export async function cloudSignOut() {
   if (!cloudConfigured()) return;
   const client = await getCloudClient();
-  const { error } = await client.auth.signOut();
+  const { error } = await client.auth.signOut({ scope: "local" });
   if (error) throw new Error(`Não foi possível encerrar a sessão: ${error.message}`);
 }
 
