@@ -7,75 +7,41 @@
   <meta name="description" content="Looply — Cartas aos amigos ;)">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="assets/css/app.css">
+  <link rel="stylesheet" href="assets/css/splash-login.css">
+  <script type="module" src="assets/js/theme.js"></script>
   <title>Looply</title>
-<script type="module" src="assets/js/theme.js"></script>
 </head>
 <body class="splash-page">
   <main class="splash" aria-labelledby="splashTitle">
-    <div class="splash-logo" aria-hidden="true">
-      <div class="circle">
+    <h1 class="splash-title" id="splashTitle">Looply</h1>
+    <div class="splash-logo" aria-label="Logo Looply em rotação">
+      <div class="circle" aria-hidden="true">
         <svg viewBox="0 0 100 100" fill="none">
           <path d="M50 15A35 35 0 0 1 85 50" stroke="currentColor" stroke-width="5"/>
         </svg>
       </div>
     </div>
-    <h1 class="splash-title" id="splashTitle">Looply</h1>
-    <p class="splash-message" id="splashMessage">Cartas aos amigos ;)</p>
+    <p class="splash-message">Cartas aos amigos ;)</p>
     <p class="splash-company"><strong>MoissWorld</strong></p>
   </main>
   <script type="module">
-    import { redirectIfAuthenticated } from "./assets/js/session.js";
+    import { resolveStartupSession } from "./assets/js/startup.js";
 
-    let startupAudio = null;
-    let soundPlayed = false;
-
-    function createNote(audio, destination, frequency, start, duration, gainAmount) {
-      const oscillator = audio.createOscillator();
-      const gain = audio.createGain();
-      oscillator.type = "sine";
-      oscillator.frequency.setValueAtTime(frequency, start);
-      gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.exponentialRampToValueAtTime(gainAmount, start + 0.03);
-      gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
-      oscillator.connect(gain);
-      gain.connect(destination);
-      oscillator.start(start);
-      oscillator.stop(start + duration + 0.03);
-    }
-
-    function playStartupSound() {
-      if (soundPlayed || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      soundPlayed = true;
-      try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) return;
-        const audio = new AudioContext();
-        startupAudio = audio;
-        if (audio.state === "suspended") audio.resume().catch(() => {});
-        const compressor = audio.createDynamicsCompressor();
-        compressor.threshold.value = -18;
-        compressor.knee.value = 12;
-        compressor.ratio.value = 5;
-        compressor.attack.value = 0.003;
-        compressor.release.value = 0.25;
-        compressor.connect(audio.destination);
-        const now = audio.currentTime;
-        [[1046.50,.48,.15,0],[1318.51,.52,.13,.13],[1567.98,.62,.16,.27],[2093,.82,.12,.43],[2637.02,.65,.045,.46]]
-          .forEach(([frequency,duration,gain,offset]) => createNote(audio, compressor, frequency, now + offset, duration, gain));
-        setTimeout(() => {
-          try { startupAudio?.close(); } catch {}
-          startupAudio = null;
-        }, 1800);
-      } catch (error) {
-        console.warn("Looply: áudio de abertura indisponível.", error);
-      }
-    }
-
-    window.addEventListener("load", () => {
-      if (redirectIfAuthenticated()) return;
-      playStartupSound();
-      setTimeout(() => window.location.replace("login.html"), 7000);
+    const SPLASH_DURATION = 7000;
+    const startedAt = performance.now();
+    const sessionPromise = resolveStartupSession().catch((error) => {
+      console.error("Looply: erro ao verificar sessão inicial.", error);
+      return null;
     });
+
+    window.addEventListener("load", async () => {
+      const remaining = Math.max(0, SPLASH_DURATION - (performance.now() - startedAt));
+      await new Promise((resolve) => window.setTimeout(resolve, remaining));
+      const session = await sessionPromise;
+      window.location.replace(session
+        ? (session.role === "admin" ? "admin.html" : "home.html")
+        : "login.html");
+    }, { once: true });
   </script>
 </body>
 </html>
