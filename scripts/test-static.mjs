@@ -36,7 +36,7 @@ for (const name of fs.readdirSync(jsDirectory).filter(name => name.endsWith(".js
 }
 for (const relative of ["index.html", "login.html", "home.html", "galeria.html", "musicas.html", "perfil.html", "admin.html"]) {
   const html = fs.readFileSync(path.join(root, relative), "utf8");
-  const modules = html.matchAll(/<script\\b[^>]*type=["']module["'][^>]*>([\\s\\S]*?)<\\/script>/gi);
+  const modules = html.matchAll(/<script\b[^>]*type=["']module["'][^>]*>([\s\S]*?)<\/script>/gi);
   let index = 0;
   for (const match of modules) {
     if (match[1].trim()) checkModuleSyntax(match[1], `${relative} (script module ${++index})`);
