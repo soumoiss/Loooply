@@ -10,7 +10,7 @@ const required = [
   "assets/js/date-parser.js", "assets/js/cards.js", "assets/js/home.js", "assets/js/gallery.js",
   "assets/js/music.js", "assets/js/profile.js", "assets/js/comments-store.js", "assets/js/cloud.js", "assets/js/cloud-config.js", "assets/js/admin.js", "admin.html", "supabase/schema.sql", "CONFIGURAR-NUVEM-LOOOPLY.md", "data/midia-index.json", "data/musicas-index.json",
   "scripts/gerar-midia-index.py", "scripts/restaurar-midias-github.py", "tests/test-cloud-config.mjs",
-  "supabase/migrations/20261015021004_enable_music_comments_realtime.sql", "supabase/migrations/20261015021133_consolidate_profiles_rls_policies.sql", ".github/workflows/atualizar-galeria.yml"
+  "scripts/migrations/20261015021004_enable_music_comments_realtime.sql", "scripts/migrations/20261015021133_consolidate_profiles_rls_policies.sql", ".github/workflows/atualizar-galeria.yml"
 ];
 
 for (const relative of required) {
