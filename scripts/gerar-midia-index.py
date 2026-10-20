@@ -135,9 +135,20 @@ def main():
             audios.append(item)
 
     missing = []
-    # Preserva registros antigos que o ZIP/checkout não contém fisicamente.
+    # Preserva referências antigas ausentes no checkout, exceto caminhos com mojibake
+    # que apontem para um arquivo já existente após reparar a codificação do nome.
+    def repaired_existing_path(rel):
+        try:
+            repaired = rel.encode("cp437").decode("utf-8")
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            return False
+        return repaired != rel and repaired in current_paths
+
     for rel, (category, owner, item) in previous.items():
         if rel in current_paths or not rel.startswith("midia/"):
+            continue
+        if repaired_existing_path(rel):
+            print(f"AVISO: referência duplicada com codificação inválida removida: {rel}")
             continue
         missing.append(rel)
         if category == "exclusivo" and owner in exclusivo:
