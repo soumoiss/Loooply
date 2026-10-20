@@ -25,7 +25,8 @@
     <p class="splash-company"><strong>MoissWorld</strong></p>
   </main>
   <script type="module">
-    import { resolveStartupSession } from "./assets/js/startup.js";\n    import { getSession } from "./assets/js/session.js";
+    import { resolveStartupSession } from "./assets/js/startup.js";
+    import { getSession } from "./assets/js/session.js";
 
     const SPLASH_DURATION = 7000;
     const startedAt = performance.now();
@@ -43,7 +44,9 @@
     window.addEventListener("load", async () => {
       const remaining = Math.max(0, SPLASH_DURATION - (performance.now() - startedAt));
       await new Promise((resolve) => window.setTimeout(resolve, remaining));
-      // Mantém o prazo visual em 7 s; se a rede ainda estiver pendente,\n      // usa a sessão local já persistida sem bloquear a navegação.\n      const session = sessionResolved ? resolvedSession : getSession();
+      // Mantém o prazo visual em 7 s; se a rede ainda estiver pendente,
+      // usa a sessão local já persistida sem bloquear a navegação.
+      const session = sessionResolved ? resolvedSession : getSession();
       window.location.replace(session
         ? (session.role === "admin" ? "admin.html" : "home.html")
         : "login.html");
