@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -19,6 +20,28 @@ for (const relative of required) {
 
 const jsonFiles = ["manifest.webmanifest", "data/midia-index.json", "data/musicas-index.json"];
 for (const relative of jsonFiles) JSON.parse(fs.readFileSync(path.join(root, relative), "utf8"));
+
+function checkModuleSyntax(source, label) {
+  const result = spawnSync(process.execPath, ["--input-type=module", "--check"], {
+    input: source,
+    encoding: "utf8"
+  });
+  if (result.status !== 0) {
+    throw new Error(`Sintaxe JavaScript inválida em ${label}:\n${result.stderr || result.stdout}`);
+  }
+}
+const jsDirectory = path.join(root, "assets/js");
+for (const name of fs.readdirSync(jsDirectory).filter(name => name.endsWith(".js"))) {
+  checkModuleSyntax(fs.readFileSync(path.join(jsDirectory, name), "utf8"), `assets/js/${name}`);
+}
+for (const relative of ["index.html", "login.html", "home.html", "galeria.html", "musicas.html", "perfil.html", "admin.html"]) {
+  const html = fs.readFileSync(path.join(root, relative), "utf8");
+  const modules = html.matchAll(/<script\\b[^>]*type=["']module["'][^>]*>([\\s\\S]*?)<\\/script>/gi);
+  let index = 0;
+  for (const match of modules) {
+    if (match[1].trim()) checkModuleSyntax(match[1], `${relative} (script module ${++index})`);
+  }
+}
 
 const galleryModule = fs.readFileSync(path.join(root, "assets/js/gallery.js"), "utf8");
 const musicModule = fs.readFileSync(path.join(root, "assets/js/music.js"), "utf8");
