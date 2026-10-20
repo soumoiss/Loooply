@@ -1,0 +1,41 @@
+name: Validar Looply
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validar-looply-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Validar estrutura, dados, mídia e módulos
+        run: node scripts/test-static.mjs
+
+      - name: Testar configuração pública do Supabase
+        run: node tests/test-cloud-config.mjs
+
+      - name: Validar sintaxe dos scripts Python
+        run: python -m py_compile scripts/gerar-midia-index.py scripts/restaurar-midias-github.py
